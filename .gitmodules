@@ -1,0 +1,15 @@
+[submodule "firmware/submodules/ruckus"]
+	path = firmware/submodules/ruckus
+	url = git@github.com:slaclab/ruckus
+[submodule "firmware/submodules/atlas-rd53-fw-lib"]
+	path = firmware/submodules/atlas-rd53-fw-lib
+	url = git@github.com:slaclab/atlas-rd53-fw-lib
+[submodule "firmware/submodules/surf"]
+	path = firmware/submodules/surf
+	url = git@github.com:slaclab/surf
+[submodule "firmware/submodules/atlas-atca-link-agg-fw-lib"]
+	path = firmware/submodules/atlas-atca-link-agg-fw-lib
+	url = git@github.com:slaclab/atlas-atca-link-agg-fw-lib
+[submodule "firmware/submodules/xvc-udp-debug-bridge"]
+	path = firmware/submodules/xvc-udp-debug-bridge
+	url = git@github.com:slaclab/xvc-udp-debug-bridge
