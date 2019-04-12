@@ -135,7 +135,8 @@ architecture top_level of AtlasAtcaLinkAggRd53RtmAuroraSelectio is
          enXvc        => false,
          enSrp        => false,
          fabConfig    => ETH_10G_4LANE,         -- Using 10GbE XAUI
-         enDataJumbo  => true,          -- Enabling Jumbo frames
+         -- enDataJumbo  => true,          -- Enabling Jumbo frames
+         enDataJumbo  => false,          -- Enabling Jumbo frames
          -- Streaming Data Server Configurations
          numSrvData   => 1,  -- Moving all the data to one RSSI client on one RCE element
          enSrvDataTx  => true,

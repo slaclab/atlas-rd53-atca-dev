@@ -10,3 +10,5 @@ loadRuckusTcl $::env(TOP_DIR)/submodules/atlas-rd53-fw-lib
 # Load local source Code and constraints
 loadSource -dir "$::DIR_PATH/hdl"
 loadConstraints -dir "$::DIR_PATH/hdl"
+
+set_property strategy Performance_ExplorePostRoutePhysOpt [get_runs impl_1]

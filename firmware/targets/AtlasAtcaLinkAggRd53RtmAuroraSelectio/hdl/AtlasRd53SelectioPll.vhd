@@ -29,113 +29,42 @@ entity AtlasRd53SelectioPll is
       TPD_G        : time    := 1 ns;
       SIMULATION_G : boolean := false);
    port (
-      ref156Clk     : in  sl;
-      ref156Rst     : in  sl;
-      ref160ClkP    : in  sl;
-      ref160ClkN    : in  sl;
+      ref160Clk : in  sl;
+      ref160Rst : in  sl;
       -- Timing Clock/Reset Interface
-      iDelayCtrlRdy : out sl;
-      clk640MHz     : out sl;
-      clk160MHz     : out sl;
-      rst160MHz     : out sl);
+      clk640MHz : out slv(5 downto 0);
+      clk160MHz : out slv(5 downto 0);
+      rst160MHz : out slv(5 downto 0));
 end AtlasRd53SelectioPll;
 
 architecture mapping of AtlasRd53SelectioPll is
 
-   signal ref160Clock : sl;
-   signal ref160Clk   : sl;
+   signal locked  : sl := '0';
+   signal clkFb   : sl := '0';
+   signal clkout0 : sl := '0';
 
-   signal clk300MHz : sl := '0';
-   signal rst300MHz : sl := '1';
-   signal ref160Rst : sl := '1';
-   signal locked    : sl := '0';
-   signal pllClock  : sl := '0';
-   signal reset     : sl := '1';
-   signal clkFb     : sl := '0';
-   signal clkout0   : sl := '0';
-   signal clkout1   : sl := '0';
-
-   attribute IODELAY_GROUP                 : string;
-   attribute IODELAY_GROUP of U_IDELAYCTRL : label is "xapp_idelay";
-
-   attribute KEEP_HIERARCHY                 : string;
-   attribute KEEP_HIERARCHY of U_IDELAYCTRL : label is "TRUE";
+   signal clock640MHz : sl := '0';
+   signal clock160MHz : sl := '0';
+   signal reset       : sl := '1';
+   signal reset160MHz : sl := '1';
 
 begin
 
-   U_MMCM : entity work.ClockManagerUltraScale
-      generic map(
-         TPD_G              => TPD_G,
-         SIMULATION_G       => SIMULATION_G,
-         TYPE_G             => "MMCM",
-         INPUT_BUFG_G       => false,
-         FB_BUFG_G          => true,
-         RST_IN_POLARITY_G  => '1',
-         NUM_CLOCKS_G       => 1,
-         -- MMCM attributes
-         BANDWIDTH_G        => "OPTIMIZED",
-         CLKIN_PERIOD_G     => 6.4,
-         DIVCLK_DIVIDE_G    => 1,
-         CLKFBOUT_MULT_F_G  => 6.0,
-         CLKOUT0_DIVIDE_F_G => 3.125)   -- 300 MHz = 937.5 MHz/3.125
-      port map(
-         clkIn     => ref156Clk,
-         rstIn     => ref156Rst,
-         clkOut(0) => clk300MHz,
-         rstOut(0) => rst300MHz);
-
-   U_IDELAYCTRL : IDELAYCTRL
-      generic map (
-         SIM_DEVICE => "ULTRASCALE")
-      port map (
-         RDY    => iDelayCtrlRdy,
-         REFCLK => clk300MHz,
-         RST    => rst300MHz);
-
-   U_IBUFDS_GTE4 : IBUFDS_GTE4
-      generic map (
-         REFCLK_EN_TX_PATH  => '0',
-         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
-         REFCLK_ICNTL_RX    => "00")
-      port map (
-         I     => ref160ClkP,
-         IB    => ref160ClkN,
-         CEB   => '0',
-         ODIV2 => ref160Clock,
-         O     => open);
-
-   U_BUFG_GT : BUFG_GT
-      port map (
-         I       => ref160Clock,
-         CE      => '1',
-         CEMASK  => '1',
-         CLR     => '0',
-         CLRMASK => '1',
-         DIV     => "000",
-         O       => ref160Clk);
-
-   U_ref160Rst : entity work.RstPipeline
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         clk    => ref160Clk,
-         rstIn  => ref156Rst,
-         rstOut => ref160Rst);
+   clk640MHz <= (others => clock640MHz);
+   clk160MHz <= (others => clock160MHz);
+   rst160MHz <= (others => reset160MHz);
 
    GEN_REAL : if (SIMULATION_G = false) generate
       U_PLL : PLLE3_ADV
          generic map (
-            COMPENSATION       => "AUTO",
-            STARTUP_WAIT       => "FALSE",
-            CLKIN_PERIOD       => 6.256,  -- 160 MHz
-            DIVCLK_DIVIDE      => 1,
-            CLKFBOUT_MULT      => 8,      -- 1.28 GHz = 160 MHz x 8
-            CLKOUT0_DIVIDE     => 2,      -- 640 MHz = 1.28 GHz/2
-            CLKOUT1_DIVIDE     => 8,      -- 160 MHz = 1.28 GHz/8
-            CLKOUT0_PHASE      => 0.0,
-            CLKOUT1_PHASE      => 0.0,
-            CLKOUT0_DUTY_CYCLE => 0.5,
-            CLKOUT1_DUTY_CYCLE => 0.5)
+            CLKOUTPHY_MODE => "VCO",
+            COMPENSATION   => "INTERNAL",
+            STARTUP_WAIT   => "FALSE",
+            CLKIN_PERIOD   => 6.256,    -- 160 MHz
+            DIVCLK_DIVIDE  => 2,
+            CLKFBOUT_MULT  => 16,       -- 1.28 GHz = 160 MHz x 16 / 2 
+            CLKOUT0_DIVIDE => 2,        -- 640 MHz = 1.28 GHz/2
+            CLKOUT1_DIVIDE => 8)        -- 160 MHz = 1.28 GHz/8
          port map (
             DCLK        => '0',
             DRDY        => open,
@@ -147,7 +76,7 @@ begin
             PWRDWN      => '0',
             RST         => ref160Rst,
             CLKIN       => ref160Clk,
-            CLKOUTPHYEN => '0',
+            CLKOUTPHYEN => '1',
             CLKFBOUT    => clkFb,
             CLKFBIN     => clkFb,
             LOCKED      => locked,
@@ -169,20 +98,23 @@ begin
    U_Bufg640 : BUFG
       port map (
          I => clkout0,
-         O => clk640MHz);
+         O => clock640MHz);
 
    ------------------------------------------------------------------------------------------------------
    -- 160 MHz is the ISERDESE3/OSERDESE3's CLKDIV port
    -- Refer to "Figure 3-49: Sub-Optimal to Optimal Clocking Topologies for OSERDESE3" in UG949 (v2018.2)
+   -- https://www.xilinx.com/support/answers/67885.html   
    ------------------------------------------------------------------------------------------------------
    U_Bufg160 : BUFGCE_DIV
       generic map (
-         BUFGCE_DIVIDE => 4)            -- 160 MHz = 640 MHz/4
+         IS_CE_INVERTED  => '0',
+         IS_CLR_INVERTED => '1',
+         BUFGCE_DIVIDE   => 4)          -- 160 MHz = 640 MHz/4
       port map (
          I   => clkout0,                -- 640 MHz
-         CE  => '1',
-         CLR => '0',
-         O   => clkout1);               -- 160 MHz
+         CE  => locked,
+         CLR => locked,
+         O   => clock160MHz);           -- 160 MHz
 
    U_Rst160 : entity work.RstSync
       generic map (
@@ -190,7 +122,7 @@ begin
          IN_POLARITY_G  => '0',
          OUT_POLARITY_G => '1')
       port map (
-         clk      => clkout1,
+         clk      => clock160MHz,
          asyncRst => locked,
          syncRst  => reset);
 
@@ -198,10 +130,8 @@ begin
       generic map (
          TPD_G => TPD_G)
       port map (
-         clk    => clkout1,
+         clk    => clock160MHz,
          rstIn  => reset,
-         rstOut => rst160MHz);
-
-   clk160MHz <= clkout1;
+         rstOut => reset160MHz);
 
 end mapping;

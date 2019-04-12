@@ -110,6 +110,7 @@ end Application;
 architecture mapping of Application is
 
    constant VALID_THOLD_C : positive := (8192/8);  -- hold one jumbo frame in store/forward AXI stream FIFOs
+   -- constant VALID_THOLD_C : positive := (1024/8);  -- hold one jumbo frame in store/forward AXI stream FIFOs
 
    constant I2C_CONFIG_C : I2cAxiLiteDevArray(5 downto 0) := (
       others         => MakeI2cAxiLiteDevType(
@@ -164,16 +165,26 @@ architecture mapping of Application is
    signal i2cScl    : slv(3 downto 0);
    signal i2cSda    : slv(3 downto 0);
 
+   signal ref160Clock     : sl;
+   signal ref160Clk     : sl;
+   signal ref160Rst     : sl;
+   
    signal iDelayCtrlRdy : sl;
-   signal clk640MHz     : sl;
-   signal clk160MHz     : sl;
-   signal rst160MHz     : sl;
+   signal clk300MHz     : sl;
+   signal rst300MHz     : sl;
+   
+   signal clk640MHz     : slv(23 downto 0);
+   signal clk160MHz     : slv(23 downto 0);
+   signal rst160MHz     : slv(23 downto 0);
 
    signal smaClk       : sl;
    signal pllToFpgaClk : sl;
 
-   attribute KEEP_HIERARCHY                  : string;
-   attribute KEEP_HIERARCHY of U_RTM_Mapping : label is "TRUE";
+   attribute IODELAY_GROUP                 : string;
+   attribute IODELAY_GROUP of U_IDELAYCTRL : label is "rd53_aurora";
+
+   attribute KEEP_HIERARCHY                 : string;
+   attribute KEEP_HIERARCHY of U_IDELAYCTRL : label is "TRUE";
 
 begin
 
@@ -229,21 +240,80 @@ begin
    -----------
    -- Clocking
    -----------
-   U_Clocking : entity work.AtlasRd53SelectioPll
+   U_IBUFDS_GTE4 : IBUFDS_GTE4
       generic map (
-         TPD_G        => TPD_G,
-         SIMULATION_G => SIMULATION_G)
+         REFCLK_EN_TX_PATH  => '0',
+         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
+         REFCLK_ICNTL_RX    => "00")
       port map (
-         ref156Clk     => ref156Clk,
-         ref156Rst     => ref156Rst,
-         ref160ClkP    => qsfpRef160ClkP,
-         ref160ClkN    => qsfpRef160ClkN,
-         -- Timing Clock/Reset Interface
-         iDelayCtrlRdy => iDelayCtrlRdy,
-         clk640MHz     => clk640MHz,
-         clk160MHz     => clk160MHz,
-         rst160MHz     => rst160MHz);
+         I     => qsfpRef160ClkP,
+         IB    => qsfpRef160ClkN,
+         CEB   => '0',
+         ODIV2 => ref160Clock,
+         O     => open);
 
+   U_BUFG_GT : BUFG_GT
+      port map (
+         I       => ref160Clock,
+         CE      => '1',
+         CEMASK  => '1',
+         CLR     => '0',
+         CLRMASK => '1',
+         DIV     => "000",
+         O       => ref160Clk);
+
+   U_ref160Rst : entity work.RstPipeline
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk    => ref160Clk,
+         rstIn  => ref156Rst,
+         rstOut => ref160Rst);   
+   
+   GEN_PLL :
+   for i in 3 downto 0 generate   
+      U_ClkRst : entity work.AtlasRd53SelectioPll
+         generic map (
+            TPD_G        => TPD_G,
+            SIMULATION_G => SIMULATION_G)
+         port map (
+            ref160Clk  => ref160Clk,
+            ref160Rst  => ref160Rst,
+            -- Timing Clock/Reset Interface
+            clk640MHz  => clk640MHz(6*i+5 downto 6*i),
+            clk160MHz  => clk160MHz(6*i+5 downto 6*i),
+            rst160MHz  => rst160MHz(6*i+5 downto 6*i));
+   end generate GEN_PLL;         
+
+   U_MMCM : entity work.ClockManagerUltraScale
+      generic map(
+         TPD_G              => TPD_G,
+         SIMULATION_G       => SIMULATION_G,
+         TYPE_G             => "MMCM",
+         INPUT_BUFG_G       => false,
+         FB_BUFG_G          => true,
+         RST_IN_POLARITY_G  => '1',
+         NUM_CLOCKS_G       => 1,
+         -- MMCM attributes
+         BANDWIDTH_G        => "OPTIMIZED",
+         CLKIN_PERIOD_G     => 6.4,
+         DIVCLK_DIVIDE_G    => 1,
+         CLKFBOUT_MULT_F_G  => 6.0,
+         CLKOUT0_DIVIDE_F_G => 3.125)   -- 300 MHz = 937.5 MHz/3.125
+      port map(
+         clkIn     => ref156Clk,
+         rstIn     => ref156Rst,
+         clkOut(0) => clk300MHz,
+         rstOut(0) => rst300MHz);   
+   
+   U_IDELAYCTRL : IDELAYCTRL
+      generic map (
+         SIM_DEVICE => "ULTRASCALE")
+      port map (
+         RDY    => iDelayCtrlRdy,
+         REFCLK => clk300MHz,
+         RST    => rst300MHz);
+         
    --------------
    -- RTM Mapping
    --------------
@@ -398,9 +468,9 @@ begin
             mConfigMaster   => mConfigMasters(i),
             mConfigSlave    => mConfigSlaves(i),
             -- Timing/Trigger Interface
-            clk640MHz       => clk640MHz,
-            clk160MHz       => clk160MHz,
-            rst160MHz       => rst160MHz,
+            clk640MHz       => clk640MHz(i),
+            clk160MHz       => clk160MHz(i),
+            rst160MHz       => rst160MHz(i),
             -- RD53 ASIC Serial Ports
             dPortDataP      => dPortDataP(i),
             dPortDataN      => dPortDataN(i),
