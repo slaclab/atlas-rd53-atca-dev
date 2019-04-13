@@ -30,8 +30,7 @@ use unisim.vcomponents.all;
 entity Application is
    generic (
       TPD_G        : time    := 1 ns;
-      SIMULATION_G : boolean := false;
-      ETH_CONFIG_G : EthConfigArray);
+      SIMULATION_G : boolean := false);
    port (
       -----------------------------
       --  Interfaces to Application
@@ -109,8 +108,8 @@ end Application;
 
 architecture mapping of Application is
 
-   constant VALID_THOLD_C : positive := (8192/8);  -- hold one jumbo frame in store/forward AXI stream FIFOs
-   -- constant VALID_THOLD_C : positive := (1024/8);  -- hold one jumbo frame in store/forward AXI stream FIFOs
+   -- constant VALID_THOLD_C : positive := (8192/8);  -- hold one jumbo frame in store/forward AXI stream FIFOs
+   constant VALID_THOLD_C : positive := (1024/8);  -- hold one jumbo frame in store/forward AXI stream FIFOs
 
    constant I2C_CONFIG_C : I2cAxiLiteDevArray(5 downto 0) := (
       others         => MakeI2cAxiLiteDevType(
@@ -160,31 +159,22 @@ architecture mapping of Application is
    signal dPortDataN : Slv4Array(23 downto 0);
    signal dPortCmdP  : slv(23 downto 0);
    signal dPortCmdN  : slv(23 downto 0);
+   signal serDesData : Slv8Array(95 downto 0);
+   signal dlyCfg     : Slv5Array(95 downto 0);
 
    signal i2cSelect : Slv6Array(3 downto 0);
    signal i2cScl    : slv(3 downto 0);
    signal i2cSda    : slv(3 downto 0);
 
-   signal ref160Clock     : sl;
-   signal ref160Clk     : sl;
-   signal ref160Rst     : sl;
-   
-   signal iDelayCtrlRdy : sl;
-   signal clk300MHz     : sl;
-   signal rst300MHz     : sl;
-   
-   signal clk640MHz     : slv(23 downto 0);
-   signal clk160MHz     : slv(23 downto 0);
-   signal rst160MHz     : slv(23 downto 0);
+   signal ref160Clock : sl;
+   signal ref160Clk   : sl;
+   signal ref160Rst   : sl;
+
+   signal clk160MHz : sl;
+   signal rst160MHz : sl;
 
    signal smaClk       : sl;
    signal pllToFpgaClk : sl;
-
-   attribute IODELAY_GROUP                 : string;
-   attribute IODELAY_GROUP of U_IDELAYCTRL : label is "rd53_aurora";
-
-   attribute KEEP_HIERARCHY                 : string;
-   attribute KEEP_HIERARCHY of U_IDELAYCTRL : label is "TRUE";
 
 begin
 
@@ -268,52 +258,8 @@ begin
       port map (
          clk    => ref160Clk,
          rstIn  => ref156Rst,
-         rstOut => ref160Rst);   
-   
-   GEN_PLL :
-   for i in 3 downto 0 generate   
-      U_ClkRst : entity work.AtlasRd53SelectioPll
-         generic map (
-            TPD_G        => TPD_G,
-            SIMULATION_G => SIMULATION_G)
-         port map (
-            ref160Clk  => ref160Clk,
-            ref160Rst  => ref160Rst,
-            -- Timing Clock/Reset Interface
-            clk640MHz  => clk640MHz(6*i+5 downto 6*i),
-            clk160MHz  => clk160MHz(6*i+5 downto 6*i),
-            rst160MHz  => rst160MHz(6*i+5 downto 6*i));
-   end generate GEN_PLL;         
+         rstOut => ref160Rst);
 
-   U_MMCM : entity work.ClockManagerUltraScale
-      generic map(
-         TPD_G              => TPD_G,
-         SIMULATION_G       => SIMULATION_G,
-         TYPE_G             => "MMCM",
-         INPUT_BUFG_G       => false,
-         FB_BUFG_G          => true,
-         RST_IN_POLARITY_G  => '1',
-         NUM_CLOCKS_G       => 1,
-         -- MMCM attributes
-         BANDWIDTH_G        => "OPTIMIZED",
-         CLKIN_PERIOD_G     => 6.4,
-         DIVCLK_DIVIDE_G    => 1,
-         CLKFBOUT_MULT_F_G  => 6.0,
-         CLKOUT0_DIVIDE_F_G => 3.125)   -- 300 MHz = 937.5 MHz/3.125
-      port map(
-         clkIn     => ref156Clk,
-         rstIn     => ref156Rst,
-         clkOut(0) => clk300MHz,
-         rstOut(0) => rst300MHz);   
-   
-   U_IDELAYCTRL : IDELAYCTRL
-      generic map (
-         SIM_DEVICE => "ULTRASCALE")
-      port map (
-         RDY    => iDelayCtrlRdy,
-         REFCLK => clk300MHz,
-         RST    => rst300MHz);
-         
    --------------
    -- RTM Mapping
    --------------
@@ -335,6 +281,26 @@ begin
          dpmToRtmN  => dpmToRtmN,
          rtmToDpmP  => rtmToDpmP,
          rtmToDpmN  => rtmToDpmN);
+
+   ------------------------------         
+   -- High Speed SelectIO Modules
+   ------------------------------         
+   U_Selectio : entity work.AtlasRd53HsSelectio
+      generic map(
+         TPD_G        => TPD_G,
+         SIMULATION_G => SIMULATION_G)
+      port map (
+         ref160Clk  => ref160Clk,
+         ref160Rst  => ref160Rst,
+         -- Deserialization Interface
+         serDesData => serDesData,
+         dlyCfg     => dlyCfg,
+         -- mDP DATA Interface
+         dPortDataP => dPortDataP,
+         dPortDataN => dPortDataN,
+         -- Timing Clock/Reset Interface
+         clk160MHz  => clk160MHz,
+         rst160MHz  => rst160MHz);
 
    --------------------
    -- AXI-Lite Crossbar
@@ -446,8 +412,6 @@ begin
             SYNTH_MODE_G  => "xpm",
             MEMORY_TYPE_G => "ultra")
          port map (
-            -- I/O Delay Interfaces
-            iDelayCtrlRdy   => iDelayCtrlRdy,
             -- AXI-Lite Interface
             axilClk         => axilClk,
             axilRst         => axilRst,
@@ -468,12 +432,12 @@ begin
             mConfigMaster   => mConfigMasters(i),
             mConfigSlave    => mConfigSlaves(i),
             -- Timing/Trigger Interface
-            clk640MHz       => clk640MHz(i),
-            clk160MHz       => clk160MHz(i),
-            rst160MHz       => rst160MHz(i),
+            clk160MHz       => clk160MHz,
+            rst160MHz       => rst160MHz,
+            -- Deserialization Interface
+            serDesData      => serDesData(4*i+3 downto 4*i),
+            dlyCfg          => dlyCfg(4*i+3 downto 4*i),
             -- RD53 ASIC Serial Ports
-            dPortDataP      => dPortDataP(i),
-            dPortDataN      => dPortDataN(i),
             dPortCmdP       => dPortCmdP(i),
             dPortCmdN       => dPortCmdN(i));
    end generate GEN_mDP;

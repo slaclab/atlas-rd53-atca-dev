@@ -177,8 +177,7 @@ begin
    U_App : entity work.Application
       generic map (
          TPD_G        => TPD_G,
-         SIMULATION_G => SIMULATION_G,
-         ETH_CONFIG_G => ETH_CONFIG_C)
+         SIMULATION_G => SIMULATION_G)
       port map (
          -----------------------------
          --  Interfaces to Application

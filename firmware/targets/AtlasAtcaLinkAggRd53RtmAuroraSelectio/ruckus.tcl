@@ -8,7 +8,13 @@ loadRuckusTcl $::env(TOP_DIR)/submodules/xvc-udp-debug-bridge
 loadRuckusTcl $::env(TOP_DIR)/submodules/atlas-rd53-fw-lib
 
 # Load local source Code and constraints
-loadSource -dir "$::DIR_PATH/hdl"
+loadSource      -dir "$::DIR_PATH/hdl"
 loadConstraints -dir "$::DIR_PATH/hdl"
+loadIpCore      -dir "$::DIR_PATH/ip"
+
+
+# Load the simulation testbed
+loadSource -sim_only -dir "$::DIR_PATH/tb"
+set_property top {ApplicationTb} [get_filesets sim_1]
 
 set_property strategy Performance_ExplorePostRoutePhysOpt [get_runs impl_1]

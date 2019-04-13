@@ -46,70 +46,15 @@ set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports { dpmTo
 
 ##############################################################################
 
-#######################
-# Placement Constraints
-#######################
-
-create_pblock PBLOCK_RD53_A
-add_cells_to_pblock [get_pblocks PBLOCK_RD53_A] [get_cells {U_App/GEN_mDP[0].U_Core/U_RxPhyLayer/GEN_LANE[*].U_Rx/U_SerDes}]
-add_cells_to_pblock [get_pblocks PBLOCK_RD53_A] [get_cells {U_App/GEN_mDP[1].U_Core/U_RxPhyLayer/GEN_LANE[*].U_Rx/U_SerDes}]
-add_cells_to_pblock [get_pblocks PBLOCK_RD53_A] [get_cells {U_App/GEN_mDP[2].U_Core/U_RxPhyLayer/GEN_LANE[*].U_Rx/U_SerDes}]
-add_cells_to_pblock [get_pblocks PBLOCK_RD53_A] [get_cells {U_App/GEN_mDP[3].U_Core/U_RxPhyLayer/GEN_LANE[*].U_Rx/U_SerDes}]
-add_cells_to_pblock [get_pblocks PBLOCK_RD53_A] [get_cells {U_App/GEN_mDP[4].U_Core/U_RxPhyLayer/GEN_LANE[*].U_Rx/U_SerDes}]
-add_cells_to_pblock [get_pblocks PBLOCK_RD53_A] [get_cells {U_App/GEN_mDP[5].U_Core/U_RxPhyLayer/GEN_LANE[*].U_Rx/U_SerDes}]
-resize_pblock       [get_pblocks PBLOCK_RD53_A] -add {CLOCKREGION_X2Y2:CLOCKREGION_X2Y2}
-
-create_pblock PBLOCK_RD53_B
-add_cells_to_pblock [get_pblocks PBLOCK_RD53_B] [get_cells {U_App/GEN_mDP[6].U_Core/U_RxPhyLayer/GEN_LANE[*].U_Rx/U_SerDes}]
-add_cells_to_pblock [get_pblocks PBLOCK_RD53_B] [get_cells {U_App/GEN_mDP[7].U_Core/U_RxPhyLayer/GEN_LANE[*].U_Rx/U_SerDes}]
-add_cells_to_pblock [get_pblocks PBLOCK_RD53_B] [get_cells {U_App/GEN_mDP[8].U_Core/U_RxPhyLayer/GEN_LANE[*].U_Rx/U_SerDes}]
-add_cells_to_pblock [get_pblocks PBLOCK_RD53_B] [get_cells {U_App/GEN_mDP[9].U_Core/U_RxPhyLayer/GEN_LANE[*].U_Rx/U_SerDes}]
-add_cells_to_pblock [get_pblocks PBLOCK_RD53_B] [get_cells {U_App/GEN_mDP[10].U_Core/U_RxPhyLayer/GEN_LANE[*].U_Rx/U_SerDes}]
-add_cells_to_pblock [get_pblocks PBLOCK_RD53_B] [get_cells {U_App/GEN_mDP[11].U_Core/U_RxPhyLayer/GEN_LANE[*].U_Rx/U_SerDes}]
-resize_pblock       [get_pblocks PBLOCK_RD53_B] -add {CLOCKREGION_X2Y7:CLOCKREGION_X2Y7}
-
-create_pblock PBLOCK_RD53_C
-add_cells_to_pblock [get_pblocks PBLOCK_RD53_C] [get_cells {U_App/GEN_mDP[12].U_Core/U_RxPhyLayer/GEN_LANE[*].U_Rx/U_SerDes}]
-add_cells_to_pblock [get_pblocks PBLOCK_RD53_C] [get_cells {U_App/GEN_mDP[13].U_Core/U_RxPhyLayer/GEN_LANE[*].U_Rx/U_SerDes}]
-add_cells_to_pblock [get_pblocks PBLOCK_RD53_C] [get_cells {U_App/GEN_mDP[14].U_Core/U_RxPhyLayer/GEN_LANE[*].U_Rx/U_SerDes}]
-add_cells_to_pblock [get_pblocks PBLOCK_RD53_C] [get_cells {U_App/GEN_mDP[15].U_Core/U_RxPhyLayer/GEN_LANE[*].U_Rx/U_SerDes}]
-add_cells_to_pblock [get_pblocks PBLOCK_RD53_C] [get_cells {U_App/GEN_mDP[16].U_Core/U_RxPhyLayer/GEN_LANE[*].U_Rx/U_SerDes}]
-add_cells_to_pblock [get_pblocks PBLOCK_RD53_C] [get_cells {U_App/GEN_mDP[17].U_Core/U_RxPhyLayer/GEN_LANE[*].U_Rx/U_SerDes}]
-resize_pblock       [get_pblocks PBLOCK_RD53_C] -add {CLOCKREGION_X2Y5:CLOCKREGION_X2Y5}
-
-create_pblock PBLOCK_RD53_D
-add_cells_to_pblock [get_pblocks PBLOCK_RD53_D] [get_cells {U_App/GEN_mDP[18].U_Core/U_RxPhyLayer/GEN_LANE[*].U_Rx/U_SerDes}]
-add_cells_to_pblock [get_pblocks PBLOCK_RD53_D] [get_cells {U_App/GEN_mDP[19].U_Core/U_RxPhyLayer/GEN_LANE[*].U_Rx/U_SerDes}]
-add_cells_to_pblock [get_pblocks PBLOCK_RD53_D] [get_cells {U_App/GEN_mDP[20].U_Core/U_RxPhyLayer/GEN_LANE[*].U_Rx/U_SerDes}]
-add_cells_to_pblock [get_pblocks PBLOCK_RD53_D] [get_cells {U_App/GEN_mDP[21].U_Core/U_RxPhyLayer/GEN_LANE[*].U_Rx/U_SerDes}]
-add_cells_to_pblock [get_pblocks PBLOCK_RD53_D] [get_cells {U_App/GEN_mDP[22].U_Core/U_RxPhyLayer/GEN_LANE[*].U_Rx/U_SerDes}]
-add_cells_to_pblock [get_pblocks PBLOCK_RD53_D] [get_cells {U_App/GEN_mDP[23].U_Core/U_RxPhyLayer/GEN_LANE[*].U_Rx/U_SerDes}]
-resize_pblock       [get_pblocks PBLOCK_RD53_D] -add {CLOCKREGION_X2Y4:CLOCKREGION_X2Y4}
-
-set_property LOC PLL_X0Y5  [get_cells {U_App/GEN_PLL[0].U_ClkRst/GEN_REAL.U_PLL}]
-set_property LOC PLL_X0Y15 [get_cells {U_App/GEN_PLL[1].U_ClkRst/GEN_REAL.U_PLL}]
-set_property LOC PLL_X0Y11 [get_cells {U_App/GEN_PLL[2].U_ClkRst/GEN_REAL.U_PLL}]
-set_property LOC PLL_X0Y9  [get_cells {U_App/GEN_PLL[3].U_ClkRst/GEN_REAL.U_PLL}]
-
 ####################
 # Timing Constraints
 ####################
 
-create_generated_clock -name clk300MHz [get_pins {U_App/U_MMCM/MmcmGen.U_Mmcm/CLKOUT0}]
+create_generated_clock -name clk160MHzPhy0 [get_pins {U_App/U_Selectio/U_Bank66/inst/top_inst/clk_rst_top_inst/clk_scheme_inst/GEN_PLL_IN_IP_USP.plle4_adv_pll0_inst/CLKOUT0}]
+create_generated_clock -name clk160MHzPhy1 [get_pins {U_App/U_Selectio/U_Bank71/inst/top_inst/clk_rst_top_inst/clk_scheme_inst/GEN_PLL_IN_IP_USP.plle4_adv_pll0_inst/CLKOUT0}]
+create_generated_clock -name clk160MHzPhy2 [get_pins {U_App/U_Selectio/U_Bank69/inst/top_inst/clk_rst_top_inst/clk_scheme_inst/GEN_PLL_IN_IP_USP.plle4_adv_pll0_inst/CLKOUT0}]
+create_generated_clock -name clk160MHzPhy3 [get_pins {U_App/U_Selectio/U_Bank68/inst/top_inst/clk_rst_top_inst/clk_scheme_inst/GEN_PLL_IN_IP_USP.plle4_adv_pll0_inst/CLKOUT0}]
 
-create_generated_clock -name clk640MHz_A [get_pins {U_App/GEN_PLL[0].U_ClkRst/GEN_REAL.U_PLL/CLKOUT0}]
-create_generated_clock -name clk640MHz_B [get_pins {U_App/GEN_PLL[1].U_ClkRst/GEN_REAL.U_PLL/CLKOUT0}]
-create_generated_clock -name clk640MHz_C [get_pins {U_App/GEN_PLL[2].U_ClkRst/GEN_REAL.U_PLL/CLKOUT0}]
-create_generated_clock -name clk640MHz_D [get_pins {U_App/GEN_PLL[3].U_ClkRst/GEN_REAL.U_PLL/CLKOUT0}]
-
-create_generated_clock -name clk160MHz_A [get_pins {U_App/GEN_PLL[0].U_ClkRst/U_Bufg160/O}]
-create_generated_clock -name clk160MHz_B [get_pins {U_App/GEN_PLL[1].U_ClkRst/U_Bufg160/O}]
-create_generated_clock -name clk160MHz_C [get_pins {U_App/GEN_PLL[2].U_ClkRst/U_Bufg160/O}]
-create_generated_clock -name clk160MHz_D [get_pins {U_App/GEN_PLL[3].U_ClkRst/U_Bufg160/O}]
-
-set_clock_groups -asynchronous -group [get_clocks {clk160MHz_A}] -group [get_clocks {clk160MHz_B}] -group [get_clocks {clk160MHz_C}] -group [get_clocks {clk160MHz_D}]
-
-set_property CLOCK_DELAY_GROUP RD53_CLK_A_GRP [get_nets {U_App/GEN_PLL[0].U_ClkRst/clk160MHz[*]}] [get_nets {U_App/GEN_PLL[0].U_ClkRst/clk640MHz[*]}]
-set_property CLOCK_DELAY_GROUP RD53_CLK_B_GRP [get_nets {U_App/GEN_PLL[1].U_ClkRst/clk160MHz[*]}] [get_nets {U_App/GEN_PLL[1].U_ClkRst/clk640MHz[*]}]
-set_property CLOCK_DELAY_GROUP RD53_CLK_C_GRP [get_nets {U_App/GEN_PLL[2].U_ClkRst/clk160MHz[*]}] [get_nets {U_App/GEN_PLL[2].U_ClkRst/clk640MHz[*]}]
-set_property CLOCK_DELAY_GROUP RD53_CLK_D_GRP [get_nets {U_App/GEN_PLL[3].U_ClkRst/clk160MHz[*]}] [get_nets {U_App/GEN_PLL[3].U_ClkRst/clk640MHz[*]}]
+set_clock_groups -asynchronous -group [get_clocks {clk160MHzPhy0}] -group [get_clocks {clk160MHzPhy1}] 
+set_clock_groups -asynchronous -group [get_clocks {clk160MHzPhy0}] -group [get_clocks {clk160MHzPhy2}] 
+set_clock_groups -asynchronous -group [get_clocks {clk160MHzPhy0}] -group [get_clocks {clk160MHzPhy3}] 
