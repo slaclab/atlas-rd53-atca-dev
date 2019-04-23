@@ -108,8 +108,7 @@ end Application;
 
 architecture mapping of Application is
 
-   -- constant VALID_THOLD_C : positive := (8192/8);  -- hold one jumbo frame in store/forward AXI stream FIFOs
-   constant VALID_THOLD_C : positive := (1024/8);  -- hold one jumbo frame in store/forward AXI stream FIFOs
+   constant VALID_THOLD_C : positive := (1024/8);
 
    constant I2C_CONFIG_C : I2cAxiLiteDevArray(5 downto 0) := (
       others         => MakeI2cAxiLiteDevType(
@@ -181,11 +180,17 @@ begin
    -------------------------
    -- Terminate Unused Ports
    -------------------------
-   U_smaClk : IBUFDS
+   U_smaClk : IBUFDS_GTE4
+      generic map (
+         REFCLK_EN_TX_PATH  => '0',
+         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
+         REFCLK_ICNTL_RX    => "00")
       port map (
-         I  => smaClkP,
-         IB => smaClkN,
-         O  => smaClk);
+         I     => smaClkP,
+         IB    => smaClkN,
+         CEB   => '0',
+         ODIV2 => smaClk,
+         O     => open);
 
    U_pllToFpgaClk : IBUFDS
       port map (
@@ -408,9 +413,7 @@ begin
             SIMULATION_G  => SIMULATION_G,
             AXIS_CONFIG_G => APP_AXIS_CONFIG_C,
             VALID_THOLD_G => VALID_THOLD_C,
-            XIL_DEVICE_G  => XIL_DEVICE_C,
-            SYNTH_MODE_G  => "xpm",
-            MEMORY_TYPE_G => "ultra")
+            XIL_DEVICE_G  => XIL_DEVICE_C)
          port map (
             -- AXI-Lite Interface
             axilClk         => axilClk,

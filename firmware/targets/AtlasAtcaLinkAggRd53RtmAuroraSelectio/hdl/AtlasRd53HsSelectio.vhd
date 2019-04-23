@@ -1315,8 +1315,8 @@ begin
    for i in 95 downto 0 generate
       dlyConfig(i)(8 downto 4) <= dlyCfg(i);
       rdEn(i)                  <= not(empty(i));
-      vtc(i)                   <= '1';
-      load(i)                   <= '0';
+      vtc(i)                   <= '0';
+      load(i)                   <= '1';
       serDesData(i)            <= data(i);
       -- serDesData(i)            <= bitReverse(data(i));
    end generate GEN_VEC;

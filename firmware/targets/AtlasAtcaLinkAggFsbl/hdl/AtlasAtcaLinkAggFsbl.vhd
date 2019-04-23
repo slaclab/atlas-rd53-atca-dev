@@ -133,8 +133,8 @@ architecture top_level of AtlasAtcaLinkAggFsbl is
       ETH_FAB2_IDX_C  => ETH_PORT_SRP_ONLY_C,
       ETH_FAB3_IDX_C  => ETH_PORT_SRP_ONLY_C,
       ETH_FAB4_IDX_C  => ETH_PORT_SRP_ONLY_C,
-      ETH_BASE1_IDX_C => ETH_PORT_SRP_ONLY_C,
-      ETH_FP_IDX_C    => ETH_PORT_SRP_ONLY_C);
+      ETH_BASE1_IDX_C => ETH_PORT_DISABLED_C,
+      ETH_FP_IDX_C    => ETH_PORT_SRP_ONLY_C); 
 
    signal ref156Clk : sl;
    signal ref156Rst : sl;
