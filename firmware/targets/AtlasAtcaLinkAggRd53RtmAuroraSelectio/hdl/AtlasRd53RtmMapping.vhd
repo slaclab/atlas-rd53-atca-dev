@@ -38,11 +38,12 @@ entity AtlasRd53RtmMapping is
       i2cSelect  : in    Slv6Array(3 downto 0);
       i2cScl     : inout slv(3 downto 0);
       i2cSda     : inout slv(3 downto 0);
-      -- RTM Ports (188 diff. pairs to RTM interface)
-      dpmToRtmP  : inout Slv23Array(3 downto 0);
-      dpmToRtmN  : inout Slv23Array(3 downto 0);
-      rtmToDpmP  : inout Slv24Array(3 downto 0);
-      rtmToDpmN  : inout Slv24Array(3 downto 0));
+      -- RTM Ports
+      rtmIo          : inout Slv8Array(3 downto 0);
+      dpmToRtmP      : inout Slv16Array(3 downto 0);
+      dpmToRtmN      : inout Slv16Array(3 downto 0);
+      rtmToDpmP      : inout Slv16Array(3 downto 0);
+      rtmToDpmN      : inout Slv16Array(3 downto 0));
 end AtlasRd53RtmMapping;
 
 architecture mapping of AtlasRd53RtmMapping is
@@ -52,21 +53,21 @@ begin
    GEN_DPM :
    for dpm in 3 downto 0 generate
 
-      dpmToRtmP(dpm)(16) <= i2cSelect(dpm)(0);
-      dpmToRtmN(dpm)(16) <= i2cSelect(dpm)(1);
+      rtmIo(dpm)(0) <= i2cSelect(dpm)(0);
+      rtmIo(dpm)(1) <= i2cSelect(dpm)(1);
 
-      dpmToRtmP(dpm)(17) <= i2cSelect(dpm)(2);
-      dpmToRtmN(dpm)(17) <= i2cSelect(dpm)(3);
+      rtmIo(dpm)(2) <= i2cSelect(dpm)(2);
+      rtmIo(dpm)(3) <= i2cSelect(dpm)(3);
 
-      dpmToRtmP(dpm)(18) <= i2cSelect(dpm)(4);
-      dpmToRtmN(dpm)(18) <= i2cSelect(dpm)(5);
+      rtmIo(dpm)(4) <= i2cSelect(dpm)(4);
+      rtmIo(dpm)(5) <= i2cSelect(dpm)(5);
 
-      rtmToDpmP(dpm)(19) <= i2cScl(dpm);
-      rtmToDpmN(dpm)(19) <= i2cSda(dpm);
+      rtmIo(dpm)(6) <= i2cScl(dpm);
+      rtmIo(dpm)(7) <= i2cSda(dpm);
 
       GEN_VEC :
       for i in 2 downto 0 generate
-
+      
          rtmToDpmP(dpm)(i+12) <= dPortCmdP(6*dpm+0+i);
          rtmToDpmN(dpm)(i+12) <= dPortCmdN(6*dpm+0+i);
 
@@ -95,7 +96,7 @@ begin
          dPortDataN(6*dpm+3+i)(2) <= dpmToRtmN(dpm)(i*4+2);
 
          dPortDataP(6*dpm+3+i)(3) <= dpmToRtmP(dpm)(i*4+3);
-         dPortDataN(6*dpm+3+i)(3) <= dpmToRtmN(dpm)(i*4+3);
+         dPortDataN(6*dpm+3+i)(3) <= dpmToRtmN(dpm)(i*4+3);     
 
       end generate GEN_VEC;
 

@@ -73,11 +73,12 @@ entity AtlasAtcaLinkAggRd53RtmAuroraSelectio is
       sfpTxN         : out   slv(3 downto 0);
       sfpRxP         : in    slv(3 downto 0);
       sfpRxN         : in    slv(3 downto 0);
-      -- RTM Ports (188 diff. pairs to RTM interface)
-      dpmToRtmP      : inout Slv23Array(3 downto 0);
-      dpmToRtmN      : inout Slv23Array(3 downto 0);
-      rtmToDpmP      : inout Slv24Array(3 downto 0);
-      rtmToDpmN      : inout Slv24Array(3 downto 0);
+      -- RTM Ports
+      rtmIo          : inout Slv8Array(3 downto 0);
+      dpmToRtmP      : inout Slv16Array(3 downto 0);
+      dpmToRtmN      : inout Slv16Array(3 downto 0);
+      rtmToDpmP      : inout Slv16Array(3 downto 0);
+      rtmToDpmN      : inout Slv16Array(3 downto 0);
       -------------------   
       --  Top Level Ports
       -------------------   
@@ -100,7 +101,6 @@ entity AtlasAtcaLinkAggRd53RtmAuroraSelectio is
       qsfpScl        : inout slv(1 downto 0);
       qsfpSda        : inout slv(1 downto 0);
       -- ATCA Backplane: BASE ETH[1] and Front Panel LVDS SGMII Ports
-      fpEthLed       : out   slv(3 downto 0);
       ethRefClkP     : in    slv(1 downto 0);
       ethRefClkN     : in    slv(1 downto 0);
       ethTxP         : out   slv(1 downto 0);
@@ -244,7 +244,8 @@ begin
          sfpTxN          => sfpTxN,
          sfpRxP          => sfpRxP,
          sfpRxN          => sfpRxN,
-         -- RTM Ports (188 diff. pairs to RTM interface)
+         -- RTM Ports
+         rtmIo           => rtmIo,
          dpmToRtmP       => dpmToRtmP,
          dpmToRtmN       => dpmToRtmN,
          rtmToDpmP       => rtmToDpmP,

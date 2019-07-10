@@ -99,11 +99,12 @@ entity Application is
       sfpTxN          : out   slv(3 downto 0);
       sfpRxP          : in    slv(3 downto 0);
       sfpRxN          : in    slv(3 downto 0);
-      -- RTM Ports (188 diff. pairs to RTM interface)
-      dpmToRtmP       : inout Slv23Array(3 downto 0);
-      dpmToRtmN       : inout Slv23Array(3 downto 0);
-      rtmToDpmP       : inout Slv24Array(3 downto 0);
-      rtmToDpmN       : inout Slv24Array(3 downto 0));
+      -- RTM Ports
+      rtmIo          : inout Slv8Array(3 downto 0);
+      dpmToRtmP      : inout Slv16Array(3 downto 0);
+      dpmToRtmN      : inout Slv16Array(3 downto 0);
+      rtmToDpmP      : inout Slv16Array(3 downto 0);
+      rtmToDpmN      : inout Slv16Array(3 downto 0));
 end Application;
 
 architecture mapping of Application is
@@ -281,7 +282,8 @@ begin
          i2cSelect  => i2cSelect,
          i2cScl     => i2cScl,
          i2cSda     => i2cSda,
-         -- RTM Ports (188 diff. pairs to RTM interface)
+         -- RTM Ports
+         rtmIo      => rtmIo,
          dpmToRtmP  => dpmToRtmP,
          dpmToRtmN  => dpmToRtmN,
          rtmToDpmP  => rtmToDpmP,

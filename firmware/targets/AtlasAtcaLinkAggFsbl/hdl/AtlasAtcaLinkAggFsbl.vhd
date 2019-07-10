@@ -73,11 +73,12 @@ entity AtlasAtcaLinkAggFsbl is
       sfpTxN         : out   slv(3 downto 0);
       sfpRxP         : in    slv(3 downto 0);
       sfpRxN         : in    slv(3 downto 0);
-      -- RTM Ports (188 diff. pairs to RTM interface)
-      dpmToRtmP      : inout Slv23Array(3 downto 0);
-      dpmToRtmN      : inout Slv23Array(3 downto 0);
-      rtmToDpmP      : inout Slv24Array(3 downto 0);
-      rtmToDpmN      : inout Slv24Array(3 downto 0);
+      -- RTM Ports
+      rtmIo          : inout Slv8Array(3 downto 0);
+      dpmToRtmP      : inout Slv16Array(3 downto 0);
+      dpmToRtmN      : inout Slv16Array(3 downto 0);
+      rtmToDpmP      : inout Slv16Array(3 downto 0);
+      rtmToDpmN      : inout Slv16Array(3 downto 0);
       -------------------   
       --  Top Level Ports
       -------------------   
@@ -100,7 +101,6 @@ entity AtlasAtcaLinkAggFsbl is
       qsfpScl        : inout slv(1 downto 0);
       qsfpSda        : inout slv(1 downto 0);
       -- ATCA Backplane: BASE ETH[1] and Front Panel LVDS SGMII Ports
-      fpEthLed       : out   slv(3 downto 0);
       ethRefClkP     : in    slv(1 downto 0);
       ethRefClkN     : in    slv(1 downto 0);
       ethTxP         : out   slv(1 downto 0);
@@ -134,10 +134,13 @@ architecture top_level of AtlasAtcaLinkAggFsbl is
       ETH_FAB3_IDX_C  => ETH_PORT_SRP_ONLY_C,
       ETH_FAB4_IDX_C  => ETH_PORT_SRP_ONLY_C,
       ETH_BASE1_IDX_C => ETH_PORT_DISABLED_C,
-      ETH_FP_IDX_C    => ETH_PORT_SRP_ONLY_C); 
+      ETH_FP_IDX_C    => ETH_PORT_SRP_ONLY_C);
 
    signal ref156Clk : sl;
    signal ref156Rst : sl;
+
+   signal smaClk     : sl;
+   signal smaClkBufg : sl;
 
    signal srvMasters : AxiStreamOctalMasterArray(NUM_ETH_C-1 downto 0);
    signal srvSlaves  : AxiStreamOctalSlaveArray(NUM_ETH_C-1 downto 0);
@@ -146,12 +149,37 @@ architecture top_level of AtlasAtcaLinkAggFsbl is
 
 begin
 
+   fpBusyOut  <= not(fpTrigInL);
+   fpSpareOut <= not(fpSpareInL);
+
+   U_smaClk : IBUFDS_GTE4
+      generic map (
+         REFCLK_EN_TX_PATH  => '0',
+         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
+         REFCLK_ICNTL_RX    => "00")
+      port map (
+         I     => smaClkP,
+         IB    => smaClkN,
+         CEB   => '0',
+         ODIV2 => smaClk,
+         O     => open);
+
+   U_smaClkBufg : BUFG_GT
+      port map (
+         I       => smaClk,
+         CE      => '1',
+         CEMASK  => '1',
+         CLR     => '0',
+         CLRMASK => '1',
+         DIV     => "000",              -- Divide by 1
+         O       => smaClkBufg);
+
    U_fpgaToPllClk : entity work.ClkOutBufDiff
       generic map (
          TPD_G        => TPD_G,
          XIL_DEVICE_G => XIL_DEVICE_C)
       port map (
-         clkIn   => '0',
+         clkIn   => smaClkBufg,
          clkOutP => fpgaToPllClkP,
          clkOutN => fpgaToPllClkN);
 
@@ -210,6 +238,10 @@ begin
          -- Misc. Interface 
          ref156Clk       => ref156Clk,
          ref156Rst       => ref156Rst,
+         ipmiBsi         => open,
+         ledRedL         => ledRedL,
+         ledBlueL        => ledBlueL,
+         ledGreenL       => ledGreenL,
          -------------------   
          --  Top Level Ports
          -------------------   
@@ -232,7 +264,6 @@ begin
          qsfpScl         => qsfpScl,
          qsfpSda         => qsfpSda,
          -- ATCA Backplane: BASE ETH[1] and Front Panel LVDS SGMII Ports
-         fpEthLed        => fpEthLed,
          ethRefClkP      => ethRefClkP,
          ethRefClkN      => ethRefClkN,
          ethTxP          => ethTxP,
