@@ -100,17 +100,13 @@ entity AtlasAtcaLinkAggFsbl is
       sfpSda         : inout slv(3 downto 0);
       qsfpScl        : inout slv(1 downto 0);
       qsfpSda        : inout slv(1 downto 0);
-      -- ATCA Backplane: BASE ETH[1] and Front Panel LVDS SGMII Ports
-      ethRefClkP     : in    slv(1 downto 0);
-      ethRefClkN     : in    slv(1 downto 0);
-      ethTxP         : out   slv(1 downto 0);
-      ethTxN         : out   slv(1 downto 0);
-      ethRxP         : in    slv(1 downto 0);
-      ethRxN         : in    slv(1 downto 0);
-      ethMdio        : inout slv(1 downto 0);
-      ethMdc         : out   slv(1 downto 0);
-      ethRstL        : out   slv(1 downto 0);
-      ethIrqL        : in    slv(1 downto 0);
+      -- Front Panel: ETH[1:0] SGMII Ports
+      sgmiiClkP      : in    sl;
+      sgmiiClkN      : in    sl;
+      sgmiiRxP       : in    slv(1 downto 0);
+      sgmiiRxN       : in    slv(1 downto 0);
+      sgmiiTxP       : out   slv(1 downto 0);
+      sgmiiTxN       : out   slv(1 downto 0);
       -- ATCA Backplane: FABRIC ETH[1:4]
       fabEthRefClkP  : in    sl;
       fabEthRefClkN  : in    sl;
@@ -129,12 +125,12 @@ end AtlasAtcaLinkAggFsbl;
 architecture top_level of AtlasAtcaLinkAggFsbl is
 
    constant ETH_CONFIG_C : EthConfigArray := (
-      ETH_FAB1_IDX_C  => ETH_PORT_SRP_ONLY_C,
-      ETH_FAB2_IDX_C  => ETH_PORT_SRP_ONLY_C,
-      ETH_FAB3_IDX_C  => ETH_PORT_SRP_ONLY_C,
-      ETH_FAB4_IDX_C  => ETH_PORT_SRP_ONLY_C,
-      ETH_BASE1_IDX_C => ETH_PORT_DISABLED_C,
-      ETH_FP_IDX_C    => ETH_PORT_SRP_ONLY_C);
+      ETH_FAB1_IDX_C => ETH_PORT_SRP_ONLY_C,
+      ETH_FAB2_IDX_C => ETH_PORT_SRP_ONLY_C,
+      ETH_FAB3_IDX_C => ETH_PORT_SRP_ONLY_C,
+      ETH_FAB4_IDX_C => ETH_PORT_SRP_ONLY_C,
+      ETH_FP0_IDX_C  => ETH_PORT_SRP_ONLY_C,
+      ETH_FP1_IDX_C  => ETH_PORT_SRP_ONLY_C);
 
    signal ref156Clk : sl;
    signal ref156Rst : sl;
@@ -263,17 +259,13 @@ begin
          sfpSda          => sfpSda,
          qsfpScl         => qsfpScl,
          qsfpSda         => qsfpSda,
-         -- ATCA Backplane: BASE ETH[1] and Front Panel LVDS SGMII Ports
-         ethRefClkP      => ethRefClkP,
-         ethRefClkN      => ethRefClkN,
-         ethTxP          => ethTxP,
-         ethTxN          => ethTxN,
-         ethRxP          => ethRxP,
-         ethRxN          => ethRxN,
-         ethMdio         => ethMdio,
-         ethMdc          => ethMdc,
-         ethRstL         => ethRstL,
-         ethIrqL         => ethIrqL,
+         -- Front Panel: ETH[1:0] SGMII Ports
+         sgmiiClkP       => sgmiiClkP,
+         sgmiiClkN       => sgmiiClkN,
+         sgmiiTxP        => sgmiiTxP,
+         sgmiiTxN        => sgmiiTxN,
+         sgmiiRxP        => sgmiiRxP,
+         sgmiiRxN        => sgmiiRxN,
          -- ATCA Backplane: FABRIC ETH[1:4]
          fabEthRefClkP   => fabEthRefClkP,
          fabEthRefClkN   => fabEthRefClkN,
