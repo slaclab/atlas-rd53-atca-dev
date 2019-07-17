@@ -1,29 +1,23 @@
-#  This file is part of the IPMC project. It is subject to the license terms in
-#  the LICENSE.txt file found in the top-level directory of this distribution
-#  and at https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. No
-#  part of the IPMC project, including this file, may be copied, modified,
-#  propagated, or distributed except according to the terms contained in the
-#  LICENSE.txt file.
-
 [Common Header]
 Version = 1
 
 [Board Info]
 Version = 1
 Language Code = en
-Mfg Date/Time = 07/09/2019
+Mfg Date/Time = 07/19/2019
 Manufacturer = SLAC
 Product Name = ATLAS ATCA  Link Agg
 # The serial number is 8 bytes which is checked/updated
 # to the value of the onboard ID PROM with every IPMC reset.
 Serial Number = '\x00\x00\x00\x00\x00\x00\x00\x00,ENC:BINARY'
 Part Number = PC_256_101_02_C00
+FRU Programmer File ID = pc_256_101_02_c00.inf
 
 [Product Info]
 Version = 1
 Language Code = en
 Manufacturer = SLAC
-Product Name = ATLAS ATCA  Link Agg
+Product Name = ATLAS ATCA Link Agg
 Part/Model Number = PC_256_101_02_C00
 Product Version = 0
 # The serial number is 8 bytes which is checked/updated
@@ -41,42 +35,19 @@ FRU File ID = pc_256_101_02_c00.inf
 3 = ';; Attention (Amber) ATCA LED3'
 
 [Board Point-to-Point Connectivity]
-Base,1, 0 = Base, 0
-
-# The *BASE-BX* entries in the fabric P2P records below 
-# are left for backward compatibility with older boards.
-# (The -BX specs were defined by PICMG prior to the equivalent
-#  -KX specs by IEEE.)
-#
-# The order of these is defined in PICMG 3.1 R2.0 where, again
-# for backward compatibility with old Shelf Managers, the 
-# Ethernet-10Gbs entries follow the Ethernet entries.
-# If the Shelf Manager understands PICMG 3.1 R2.0 it will
-# re-order these to put the faster protocols first.
-
-[Board Point-to-Point Connectivity]
 Vendor Format Version = 1
 
-# 1000BASE-KX on Port 0
-Fabric,1, 0 = Ethernet,3
-Fabric,2, 0 = Ethernet,3
-Fabric,3, 0 = Ethernet,3
-Fabric,4, 0 = Ethernet,3
-
-# 1000BASE-BX on Port 0
+# The COB is also capable of 1000BASE-KX on Lane 0
 Fabric,1, 0 = Ethernet,0
 Fabric,2, 0 = Ethernet,0
 Fabric,3, 0 = Ethernet,0
 Fabric,4, 0 = Ethernet,0
 
-[Board Point-to-Point Connectivity]
-Vendor Format Version = 1
-
-# 40GBASE-KR4 on Ports 0,1,2,3
-Fabric,1, 0 1 2 3 = Ethernet-10Gbd,1
-Fabric,2, 0 1 2 3 = Ethernet-10Gbd,1
-Fabric,3, 0 1 2 3 = Ethernet-10Gbd,1
-Fabric,4, 0 1 2 3 = Ethernet-10Gbd,1
+# The preferred Fabric connections are 10GBASE-KX4 (XAUI)
+Fabric,1, 0 1 2 3 = Ethernet,1
+Fabric,2, 0 1 2 3 = Ethernet,1
+Fabric,3, 0 1 2 3 = Ethernet,1
+Fabric,4, 0 1 2 3 = Ethernet,1
 
 # 10GBASE-KR on Port 0
 Fabric,1, 0 = Ethernet-10Gbd,0
@@ -84,9 +55,8 @@ Fabric,2, 0 = Ethernet-10Gbd,0
 Fabric,3, 0 = Ethernet-10Gbd,0
 Fabric,4, 0 = Ethernet-10Gbd,0
 
-[Board Connectivity]
-# 10GBASE-BX4 (XAUI) on Ports 0,1,2,3
-Fabric,1, 0 1 2 3 = Ethernet,1
-Fabric,2, 0 1 2 3 = Ethernet,1
-Fabric,3, 0 1 2 3 = Ethernet,1
-Fabric,4, 0 1 2 3 = Ethernet,1
+# 40GBASE-KR4 on Ports 0,1,2,3
+Fabric,1, 0 1 2 3 = Ethernet-10Gbd,1
+Fabric,2, 0 1 2 3 = Ethernet-10Gbd,1
+Fabric,3, 0 1 2 3 = Ethernet-10Gbd,1
+Fabric,4, 0 1 2 3 = Ethernet-10Gbd,1

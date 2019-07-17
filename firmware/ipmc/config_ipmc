@@ -91,7 +91,7 @@ parser.add_argument(
 args     = parser.parse_args()
 
 # Set the constants
-slot     = 3
+slot     = 2
 bootAddr = "0x04000000"
 fruName  = os.path.splitext(os.path.basename(args.fru))[0].lower()
 
