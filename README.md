@@ -75,23 +75,6 @@ $ make gui
 
 # How to reprogram the FPGA PROM via Rogue software
 
-1) Setup the rogue environment
-```
-$ cd cameralink-gateway/software
-$ source setup_env_template.sh
-```
-
-2) Run the FEB firmware update script:
-```
-$ python scripts/updateFeb.py --lane <PGP_LANE> --mcs <PATH_TO_MCS>
-```
-where <PGP_LANE> is the PGP lane index (range from 0 to 3)
-and <PATH_TO_MCS> is the path to the firmware .MCS file
-
-
-<!--- ######################################################## -->
-
-# How to reprogram the PCIe firmware via Rogue software
 ```
 # Go to software directory
 $ cd atlas-rd53-atca-dev/software
