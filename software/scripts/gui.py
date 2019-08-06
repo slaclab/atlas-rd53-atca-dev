@@ -68,7 +68,7 @@ top = feb.Top(
 
 # Create GUI
 appTop = pyrogue.gui.application(sys.argv)
-guiTop = pyrogue.gui.GuiTop(group='FmcDev')
+guiTop = pyrogue.gui.GuiTop()
 guiTop.addTree(top)
 guiTop.resize(800, 1000)
 
