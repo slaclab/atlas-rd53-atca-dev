@@ -13,3 +13,6 @@
 [submodule "firmware/submodules/xvc-udp-debug-bridge"]
 	path = firmware/submodules/xvc-udp-debug-bridge
 	url = git@github.com:slaclab/xvc-udp-debug-bridge
+[submodule "firmware/submodules/rce-gen3-fw-lib"]
+	path = firmware/submodules/rce-gen3-fw-lib
+	url = git@github.com:slaclab/rce-gen3-fw-lib
