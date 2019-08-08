@@ -2,7 +2,7 @@
 -- File       : AtlasAtcaLinkAggBp1GbE_1Lane.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: First Stage Boot Loader (FSBL)
+-- Description: Simple Firmware Example (backplane 1000BASE-KX only)
 -------------------------------------------------------------------------------
 -- This file is part of 'ATLAS ATCA LINK AGG DEV'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
