@@ -160,7 +160,7 @@ architecture mapping of Application is
    signal dPortCmdP  : slv(23 downto 0);
    signal dPortCmdN  : slv(23 downto 0);
    signal serDesData : Slv8Array(95 downto 0);
-   signal dlyCfg     : Slv5Array(95 downto 0);
+   signal dlySlip    : slv(95 downto 0);
 
    signal i2cSelect : Slv6Array(3 downto 0);
    signal i2cScl    : slv(3 downto 0);
@@ -301,7 +301,7 @@ begin
          ref160Rst  => ref160Rst,
          -- Deserialization Interface
          serDesData => serDesData,
-         dlyCfg     => dlyCfg,
+         dlySlip    => dlySlip,
          -- mDP DATA Interface
          dPortDataP => dPortDataP,
          dPortDataN => dPortDataN,
@@ -364,7 +364,7 @@ begin
                AXI_CLK_FREQ_G => AXIL_CLK_FREQ_C)
             port map (
                -- I2C Ports
-               sel            => i2cSelect(i),
+               -- sel            => i2cSelect(i),
                scl            => i2cScl(i),
                sda            => i2cSda(i),
                -- AXI-Lite Register Interface
@@ -441,7 +441,7 @@ begin
             rst160MHz       => rst160MHz,
             -- Deserialization Interface
             serDesData      => serDesData(4*i+3 downto 4*i),
-            dlyCfg          => dlyCfg(4*i+3 downto 4*i),
+            dlySlip         => dlySlip(4*i+3 downto 4*i),
             -- RD53 ASIC Serial Ports
             dPortCmdP       => dPortCmdP(i),
             dPortCmdN       => dPortCmdN(i));

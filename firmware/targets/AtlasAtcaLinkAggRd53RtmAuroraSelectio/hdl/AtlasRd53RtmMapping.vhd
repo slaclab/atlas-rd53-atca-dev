@@ -68,36 +68,36 @@ begin
       GEN_VEC :
       for i in 2 downto 0 generate
       
-         rtmToDpmP(dpm)(i+12) <= dPortCmdP(6*dpm+0+i);
-         rtmToDpmN(dpm)(i+12) <= dPortCmdN(6*dpm+0+i);
+         dpmToRtmP(dpm)(i+12) <= dPortCmdP(6*dpm+0+i);
+         dpmToRtmN(dpm)(i+12) <= dPortCmdN(6*dpm+0+i);
 
-         dPortDataP(6*dpm+0+i)(0) <= rtmToDpmP(dpm)(i*4+0);
-         dPortDataN(6*dpm+0+i)(0) <= rtmToDpmN(dpm)(i*4+0);
+         dPortDataP(6*dpm+0+i)(0) <= dpmToRtmP(dpm)(i*4+0);
+         dPortDataN(6*dpm+0+i)(0) <= dpmToRtmN(dpm)(i*4+0);
 
-         dPortDataP(6*dpm+0+i)(1) <= rtmToDpmP(dpm)(i*4+1);
-         dPortDataN(6*dpm+0+i)(1) <= rtmToDpmN(dpm)(i*4+1);
+         dPortDataP(6*dpm+0+i)(1) <= dpmToRtmP(dpm)(i*4+1);
+         dPortDataN(6*dpm+0+i)(1) <= dpmToRtmN(dpm)(i*4+1);
 
-         dPortDataP(6*dpm+0+i)(2) <= rtmToDpmP(dpm)(i*4+2);
-         dPortDataN(6*dpm+0+i)(2) <= rtmToDpmN(dpm)(i*4+2);
+         dPortDataP(6*dpm+0+i)(2) <= dpmToRtmP(dpm)(i*4+2);
+         dPortDataN(6*dpm+0+i)(2) <= dpmToRtmN(dpm)(i*4+2);
 
-         dPortDataP(6*dpm+0+i)(3) <= rtmToDpmP(dpm)(i*4+3);
-         dPortDataN(6*dpm+0+i)(3) <= rtmToDpmN(dpm)(i*4+3);
+         dPortDataP(6*dpm+0+i)(3) <= dpmToRtmP(dpm)(i*4+3);
+         dPortDataN(6*dpm+0+i)(3) <= dpmToRtmN(dpm)(i*4+3);
 
-         dpmToRtmP(dpm)(i+12) <= dPortCmdP(6*dpm+3+i);
-         dpmToRtmN(dpm)(i+12) <= dPortCmdN(6*dpm+3+i);
+         rtmToDpmP(dpm)(i+12) <= dPortCmdP(6*dpm+3+i);
+         rtmToDpmN(dpm)(i+12) <= dPortCmdN(6*dpm+3+i);
 
-         dPortDataP(6*dpm+3+i)(0) <= dpmToRtmP(dpm)(i*4+0);
-         dPortDataN(6*dpm+3+i)(0) <= dpmToRtmN(dpm)(i*4+0);
+         dPortDataP(6*dpm+3+i)(0) <= rtmToDpmP(dpm)(i*4+0);
+         dPortDataN(6*dpm+3+i)(0) <= rtmToDpmN(dpm)(i*4+0);
 
-         dPortDataP(6*dpm+3+i)(1) <= dpmToRtmP(dpm)(i*4+1);
-         dPortDataN(6*dpm+3+i)(1) <= dpmToRtmN(dpm)(i*4+1);
+         dPortDataP(6*dpm+3+i)(1) <= rtmToDpmP(dpm)(i*4+1);
+         dPortDataN(6*dpm+3+i)(1) <= rtmToDpmN(dpm)(i*4+1);
 
-         dPortDataP(6*dpm+3+i)(2) <= dpmToRtmP(dpm)(i*4+2);
-         dPortDataN(6*dpm+3+i)(2) <= dpmToRtmN(dpm)(i*4+2);
+         dPortDataP(6*dpm+3+i)(2) <= rtmToDpmP(dpm)(i*4+2);
+         dPortDataN(6*dpm+3+i)(2) <= rtmToDpmN(dpm)(i*4+2);
 
-         dPortDataP(6*dpm+3+i)(3) <= dpmToRtmP(dpm)(i*4+3);
-         dPortDataN(6*dpm+3+i)(3) <= dpmToRtmN(dpm)(i*4+3);     
-
+         dPortDataP(6*dpm+3+i)(3) <= rtmToDpmP(dpm)(i*4+3);
+         dPortDataN(6*dpm+3+i)(3) <= rtmToDpmN(dpm)(i*4+3);  
+       
       end generate GEN_VEC;
 
    end generate GEN_DPM;

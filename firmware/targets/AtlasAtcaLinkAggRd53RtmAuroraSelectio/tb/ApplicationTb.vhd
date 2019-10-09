@@ -92,10 +92,11 @@ architecture testbed of ApplicationTb is
    signal axilWriteMaster : AxiLiteWriteMasterType;
    signal axilWriteSlave  : AxiLiteWriteSlaveType;
 
-   signal dpmToRtmP : Slv23Array(3 downto 0) := (others => (others => 'Z'));
-   signal dpmToRtmN : Slv23Array(3 downto 0) := (others => (others => 'Z'));
-   signal rtmToDpmP : Slv24Array(3 downto 0) := (others => (others => 'Z'));
-   signal rtmToDpmN : Slv24Array(3 downto 0) := (others => (others => 'Z'));
+   signal rtmIo     : Slv8Array(3 downto 0)  := (others => (others => 'Z'));
+   signal dpmToRtmP : Slv16Array(3 downto 0) := (others => (others => 'Z'));
+   signal dpmToRtmN : Slv16Array(3 downto 0) := (others => (others => 'Z'));
+   signal rtmToDpmP : Slv16Array(3 downto 0) := (others => (others => 'Z'));
+   signal rtmToDpmN : Slv16Array(3 downto 0) := (others => (others => 'Z'));
 
 begin
 
@@ -140,10 +141,9 @@ begin
             GTX3_N_PAD      => dPortDataN(i)(3));
    end generate GEN_VEC;
 
-
    U_Clk160 : entity work.ClkRst
       generic map (
-         CLK_PERIOD_G      => 6.4 ns,
+         CLK_PERIOD_G      => 6.237 ns,
          RST_START_DELAY_G => 0 ns,
          RST_HOLD_TIME_G   => 1000 ns)
       port map (
@@ -170,7 +170,8 @@ begin
          dPortDataN => dPortDataN,
          dPortCmdP  => dPortCmdP,
          dPortCmdN  => dPortCmdN,
-         -- RTM Ports (188 diff. pairs to RTM interface)
+         -- RTM Ports
+         rtmIo      => rtmIo,
          dpmToRtmP  => dpmToRtmP,
          dpmToRtmN  => dpmToRtmN,
          rtmToDpmP  => rtmToDpmP,
@@ -250,7 +251,8 @@ begin
          sfpTxN          => open,
          sfpRxP          => (others => '0'),
          sfpRxN          => (others => '1'),
-         -- RTM Ports (188 diff. pairs to RTM interface)
+         -- RTM Ports
+         rtmIo           => rtmIo,
          dpmToRtmP       => dpmToRtmP,
          dpmToRtmN       => dpmToRtmN,
          rtmToDpmP       => rtmToDpmP,

@@ -18,16 +18,16 @@
         <spirit:configurableElementValue spirit:referenceId="BUSIFPARAM_VALUE.CLOCK_CLK.INSERT_VIP">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="BUSIFPARAM_VALUE.CLOCK_CLK.PHASE">0.000</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="BUSIFPARAM_VALUE.RESET_RST.INSERT_VIP">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_ALL_EN_PIN_INFO">0 {nibble 0 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_3p loc AH26} 1 {nibble 0 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_3n loc AJ26} 2 {nibble 0 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_2p loc AM26} 3 {nibble 0 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_2n loc AM27} 4 {nibble 0 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_1p loc AK26} 5 {nibble 0 dir RX sig_ty
-pe DIFF data_strb Data data_strb_org Data sig_name data2_1n loc AK27} 6 {nibble 1 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_0p loc AL27} 7 {nibble 1 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_0n loc AL28} 8 {nibble 1 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_3p loc AH27} 9 {nibble 1 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_3n loc AH28} 10 {nibble 1 dir RX sig_type DIFF data_strb Data d
-ata_strb_org Data sig_name data1_2p loc AJ28} 11 {nibble 1 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_2n loc AK28} 13 {nibble 2 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_1p loc AN26} 14 {nibble 2 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_1n loc AP26} 15 {nibble 2 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_0p loc AP28} 16 {nibble 2 dir RX sig_type DIFF data_strb Data data_strb_org Data si
-g_name data1_0n loc AP29} 17 {nibble 2 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_3p loc AN27} 18 {nibble 2 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_3n loc AN28} 19 {nibble 3 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_2p loc AN29} 20 {nibble 3 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_2n loc AP30} 21 {nibble 3 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_1p loc 
-AL29} 22 {nibble 3 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_1n loc AM29} 23 {nibble 3 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_0p loc AL30} 24 {nibble 3 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_0n loc AM30} 26 {nibble 4 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_0p loc AJ29} 27 {nibble 4 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_0n loc AK30} 28 {nibble 4 d
-ir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_1p loc AK31} 29 {nibble 4 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_1n loc AK32} 30 {nibble 4 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_2p loc AJ30} 31 {nibble 4 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_2n loc AJ31} 32 {nibble 5 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_3p loc AH33} 33 {nibble 5 dir RX sig_type DIFF 
-data_strb Data data_strb_org Data sig_name data3_3n loc AJ33} 34 {nibble 5 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_0p loc AH31} 35 {nibble 5 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_0n loc AH32} 36 {nibble 5 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_1p loc AH34} 37 {nibble 5 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_1n loc AJ34} 39 {nibble 6 dir RX sig_type DIFF data_strb Data data_
-strb_org Data sig_name data4_2p loc AL32} 40 {nibble 6 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_2n loc AL33} 41 {nibble 6 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_3p loc AN33} 42 {nibble 6 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_3n loc AP33} 43 {nibble 6 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_0p loc AN31} 44 {nibble 6 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_na
-me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_1p loc AN34} 46 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_1n loc AP34} 47 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_2p loc AM32} 48 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_2n loc AN32} 49 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_3p loc AL34
-} 50 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_3n loc AM34}</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_ALL_EN_PIN_INFO">0 {nibble 0 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_3p loc AH26} 1 {nibble 0 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_3n loc AJ26} 2 {nibble 0 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_2p loc AM26} 3 {nibble 0 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_2n loc AM27} 4 {nibble 0 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_1p loc AK26} 5 {nibble 0 dir RX sig_ty
+pe DIFF data_strb Data data_strb_org Data sig_name data5_1n loc AK27} 6 {nibble 1 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_0p loc AL27} 7 {nibble 1 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_0n loc AL28} 8 {nibble 1 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_3p loc AH27} 9 {nibble 1 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_3n loc AH28} 10 {nibble 1 dir RX sig_type DIFF data_strb Data d
+ata_strb_org Data sig_name data4_2p loc AJ28} 11 {nibble 1 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_2n loc AK28} 13 {nibble 2 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_1p loc AN26} 14 {nibble 2 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_1n loc AP26} 15 {nibble 2 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_0p loc AP28} 16 {nibble 2 dir RX sig_type DIFF data_strb Data data_strb_org Data si
+g_name data4_0n loc AP29} 17 {nibble 2 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_3p loc AN27} 18 {nibble 2 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_3n loc AN28} 19 {nibble 3 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_2p loc AN29} 20 {nibble 3 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_2n loc AP30} 21 {nibble 3 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_1p loc 
+AL29} 22 {nibble 3 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_1n loc AM29} 23 {nibble 3 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_0p loc AL30} 24 {nibble 3 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_0n loc AM30} 26 {nibble 4 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_0p loc AJ29} 27 {nibble 4 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_0n loc AK30} 28 {nibble 4 d
+ir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_1p loc AK31} 29 {nibble 4 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_1n loc AK32} 30 {nibble 4 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_2p loc AJ30} 31 {nibble 4 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_2n loc AJ31} 32 {nibble 5 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_3p loc AH33} 33 {nibble 5 dir RX sig_type DIFF 
+data_strb Data data_strb_org Data sig_name data0_3n loc AJ33} 34 {nibble 5 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_0p loc AH31} 35 {nibble 5 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_0n loc AH32} 36 {nibble 5 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_1p loc AH34} 37 {nibble 5 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_1n loc AJ34} 39 {nibble 6 dir RX sig_type DIFF data_strb Data data_
+strb_org Data sig_name data1_2p loc AL32} 40 {nibble 6 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_2n loc AL33} 41 {nibble 6 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_3p loc AN33} 42 {nibble 6 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_3n loc AP33} 43 {nibble 6 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_0p loc AN31} 44 {nibble 6 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_na
+me data2_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_1p loc AN34} 46 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_1n loc AP34} 47 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_2p loc AM32} 48 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_2n loc AN32} 49 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_3p loc AL34
+} 50 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_3n loc AM34}</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_ALL_RX_EN">0b0111111111111011111111111101111111111110111111111111</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_BANK">68</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_BIDIR_BITSLICE_EN">0000000000000000000000000000000000000000000000000000</spirit:configurableElementValue>
@@ -129,16 +129,16 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_NIBBLE5_TRI">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_NIBBLE6_TRI">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_NIBBLE7_TRI">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_PIN_INFO">0 {nibble 0 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_3p loc AH26} 1 {nibble 0 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_3n loc AJ26} 2 {nibble 0 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_2p loc AM26} 3 {nibble 0 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_2n loc AM27} 4 {nibble 0 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_1p loc AK26} 5 {nibble 0 dir RX sig_ty
-pe DIFF data_strb Data data_strb_org Data sig_name data2_1n loc AK27} 6 {nibble 1 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_0p loc AL27} 7 {nibble 1 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_0n loc AL28} 8 {nibble 1 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_3p loc AH27} 9 {nibble 1 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_3n loc AH28} 10 {nibble 1 dir RX sig_type DIFF data_strb Data d
-ata_strb_org Data sig_name data1_2p loc AJ28} 11 {nibble 1 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_2n loc AK28} 13 {nibble 2 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_1p loc AN26} 14 {nibble 2 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_1n loc AP26} 15 {nibble 2 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_0p loc AP28} 16 {nibble 2 dir RX sig_type DIFF data_strb Data data_strb_org Data si
-g_name data1_0n loc AP29} 17 {nibble 2 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_3p loc AN27} 18 {nibble 2 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_3n loc AN28} 19 {nibble 3 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_2p loc AN29} 20 {nibble 3 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_2n loc AP30} 21 {nibble 3 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_1p loc 
-AL29} 22 {nibble 3 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_1n loc AM29} 23 {nibble 3 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_0p loc AL30} 24 {nibble 3 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_0n loc AM30} 26 {nibble 4 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_0p loc AJ29} 27 {nibble 4 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_0n loc AK30} 28 {nibble 4 d
-ir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_1p loc AK31} 29 {nibble 4 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_1n loc AK32} 30 {nibble 4 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_2p loc AJ30} 31 {nibble 4 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_2n loc AJ31} 32 {nibble 5 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_3p loc AH33} 33 {nibble 5 dir RX sig_type DIFF 
-data_strb Data data_strb_org Data sig_name data3_3n loc AJ33} 34 {nibble 5 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_0p loc AH31} 35 {nibble 5 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_0n loc AH32} 36 {nibble 5 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_1p loc AH34} 37 {nibble 5 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_1n loc AJ34} 39 {nibble 6 dir RX sig_type DIFF data_strb Data data_
-strb_org Data sig_name data4_2p loc AL32} 40 {nibble 6 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_2n loc AL33} 41 {nibble 6 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_3p loc AN33} 42 {nibble 6 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_3n loc AP33} 43 {nibble 6 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_0p loc AN31} 44 {nibble 6 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_na
-me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_1p loc AN34} 46 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_1n loc AP34} 47 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_2p loc AM32} 48 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_2n loc AN32} 49 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_3p loc AL34
-} 50 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_3n loc AM34}</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_PIN_INFO">0 {nibble 0 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_3p loc AH26} 1 {nibble 0 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_3n loc AJ26} 2 {nibble 0 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_2p loc AM26} 3 {nibble 0 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_2n loc AM27} 4 {nibble 0 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_1p loc AK26} 5 {nibble 0 dir RX sig_ty
+pe DIFF data_strb Data data_strb_org Data sig_name data5_1n loc AK27} 6 {nibble 1 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_0p loc AL27} 7 {nibble 1 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data5_0n loc AL28} 8 {nibble 1 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_3p loc AH27} 9 {nibble 1 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_3n loc AH28} 10 {nibble 1 dir RX sig_type DIFF data_strb Data d
+ata_strb_org Data sig_name data4_2p loc AJ28} 11 {nibble 1 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_2n loc AK28} 13 {nibble 2 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_1p loc AN26} 14 {nibble 2 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_1n loc AP26} 15 {nibble 2 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data4_0p loc AP28} 16 {nibble 2 dir RX sig_type DIFF data_strb Data data_strb_org Data si
+g_name data4_0n loc AP29} 17 {nibble 2 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_3p loc AN27} 18 {nibble 2 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_3n loc AN28} 19 {nibble 3 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_2p loc AN29} 20 {nibble 3 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_2n loc AP30} 21 {nibble 3 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_1p loc 
+AL29} 22 {nibble 3 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_1n loc AM29} 23 {nibble 3 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_0p loc AL30} 24 {nibble 3 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data3_0n loc AM30} 26 {nibble 4 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_0p loc AJ29} 27 {nibble 4 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_0n loc AK30} 28 {nibble 4 d
+ir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_1p loc AK31} 29 {nibble 4 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_1n loc AK32} 30 {nibble 4 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_2p loc AJ30} 31 {nibble 4 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_2n loc AJ31} 32 {nibble 5 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data0_3p loc AH33} 33 {nibble 5 dir RX sig_type DIFF 
+data_strb Data data_strb_org Data sig_name data0_3n loc AJ33} 34 {nibble 5 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_0p loc AH31} 35 {nibble 5 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_0n loc AH32} 36 {nibble 5 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_1p loc AH34} 37 {nibble 5 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_1n loc AJ34} 39 {nibble 6 dir RX sig_type DIFF data_strb Data data_
+strb_org Data sig_name data1_2p loc AL32} 40 {nibble 6 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_2n loc AL33} 41 {nibble 6 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_3p loc AN33} 42 {nibble 6 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data1_3n loc AP33} 43 {nibble 6 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_0p loc AN31} 44 {nibble 6 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_na
+me data2_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_1p loc AN34} 46 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_1n loc AP34} 47 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_2p loc AM32} 48 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_2n loc AN32} 49 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_3p loc AL34
+} 50 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb_org Data sig_name data2_3n loc AM34}</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_PLL0_CLK0_PHASE">0.0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_PLL0_CLK1_PHASE">0.0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_PLL0_CLKFBOUT_MULT">16</spirit:configurableElementValue>
@@ -165,59 +165,59 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_BITSLICE_EN">0b0111111111111011111111111101111111111110111111111111</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_CASCADE">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_FORMAT">COUNT</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE0">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE1">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE10">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE11">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE12">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE13">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE14">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE15">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE16">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE17">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE18">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE19">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE2">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE20">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE21">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE22">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE23">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE24">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE25">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE26">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE27">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE28">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE29">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE3">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE30">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE31">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE32">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE33">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE34">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE35">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE36">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE37">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE38">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE39">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE4">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE40">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE41">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE42">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE43">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE44">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE45">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE46">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE47">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE48">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE49">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE5">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE50">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE51">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE6">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE7">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE8">2</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE9">2</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE0">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE1">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE10">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE11">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE12">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE13">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE14">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE15">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE16">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE17">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE18">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE19">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE2">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE20">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE21">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE22">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE23">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE24">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE25">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE26">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE27">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE28">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE29">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE3">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE30">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE31">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE32">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE33">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE34">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE35">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE36">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE37">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE38">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE39">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE4">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE40">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE41">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE42">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE43">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE44">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE45">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE46">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE47">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE48">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE49">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE5">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE50">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE51">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE6">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE7">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE8">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_TYPE9">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_VALUE">000000000000</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_VALUE0">000000000000</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_RX_DELAY_VALUE1">000000000000</spirit:configurableElementValue>
@@ -464,7 +464,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN0_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN0_LOC">AH26</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN0_NAME">IO_L1P_T0L_N0_DBC_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN0_SIGNAL_NAME">data2_3p</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN0_SIGNAL_NAME">data5_3p</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN0_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN10_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN10_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -472,7 +472,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN10_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN10_LOC">AJ28</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN10_NAME">IO_L6P_T0U_N10_AD6P_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN10_SIGNAL_NAME">data1_2p</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN10_SIGNAL_NAME">data4_2p</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN10_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN11_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN11_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -480,7 +480,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN11_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN11_LOC">AK28</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN11_NAME">IO_L6N_T0U_N11_AD6N_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN11_SIGNAL_NAME">data1_2n</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN11_SIGNAL_NAME">data4_2n</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN11_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN12_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN12_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -496,7 +496,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN1_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN1_LOC">AJ26</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN1_NAME">IO_L1N_T0L_N1_DBC_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN1_SIGNAL_NAME">data2_3n</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN1_SIGNAL_NAME">data5_3n</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN1_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN2_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN2_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -504,7 +504,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN2_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN2_LOC">AM26</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN2_NAME">IO_L2P_T0L_N2_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN2_SIGNAL_NAME">data2_2p</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN2_SIGNAL_NAME">data5_2p</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN2_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN3_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN3_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -512,7 +512,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN3_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN3_LOC">AM27</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN3_NAME">IO_L2N_T0L_N3_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN3_SIGNAL_NAME">data2_2n</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN3_SIGNAL_NAME">data5_2n</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN3_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN4_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN4_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -520,7 +520,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN4_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN4_LOC">AK26</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN4_NAME">IO_L3P_T0L_N4_AD15P_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN4_SIGNAL_NAME">data2_1p</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN4_SIGNAL_NAME">data5_1p</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN4_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN5_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN5_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -528,7 +528,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN5_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN5_LOC">AK27</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN5_NAME">IO_L3N_T0L_N5_AD15N_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN5_SIGNAL_NAME">data2_1n</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN5_SIGNAL_NAME">data5_1n</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN5_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN6_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN6_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -536,7 +536,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN6_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN6_LOC">AL27</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN6_NAME">IO_L4P_T0U_N6_DBC_AD7P_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN6_SIGNAL_NAME">data2_0p</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN6_SIGNAL_NAME">data5_0p</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN6_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN7_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN7_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -544,7 +544,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN7_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN7_LOC">AL28</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN7_NAME">IO_L4N_T0U_N7_DBC_AD7N_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN7_SIGNAL_NAME">data2_0n</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN7_SIGNAL_NAME">data5_0n</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN7_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN8_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN8_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -552,7 +552,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN8_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN8_LOC">AH27</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN8_NAME">IO_L5P_T0U_N8_AD14P_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN8_SIGNAL_NAME">data1_3p</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN8_SIGNAL_NAME">data4_3p</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN8_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN9_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN9_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -560,7 +560,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN9_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN9_LOC">AH28</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN9_NAME">IO_L5N_T0U_N9_AD14N_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN9_SIGNAL_NAME">data1_3n</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN9_SIGNAL_NAME">data4_3n</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_PIN9_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE0_SELECT_ALL_PINS">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_DESELECT_ALL_PINS">0</spirit:configurableElementValue>
@@ -570,7 +570,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN0_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN0_LOC">AN26</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN0_NAME">IO_L7P_T1L_N0_QBC_AD13P_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN0_SIGNAL_NAME">data1_1p</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN0_SIGNAL_NAME">data4_1p</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN0_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN10_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN10_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -578,7 +578,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN10_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN10_LOC">AL30</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN10_NAME">IO_L12P_T1U_N10_GC_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN10_SIGNAL_NAME">data0_0p</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN10_SIGNAL_NAME">data3_0p</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN10_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN11_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN11_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -586,7 +586,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN11_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN11_LOC">AM30</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN11_NAME">IO_L12N_T1U_N11_GC_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN11_SIGNAL_NAME">data0_0n</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN11_SIGNAL_NAME">data3_0n</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN11_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN12_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN12_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -602,7 +602,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN1_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN1_LOC">AP26</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN1_NAME">IO_L7N_T1L_N1_QBC_AD13N_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN1_SIGNAL_NAME">data1_1n</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN1_SIGNAL_NAME">data4_1n</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN1_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN2_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN2_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -610,7 +610,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN2_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN2_LOC">AP28</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN2_NAME">IO_L8P_T1L_N2_AD5P_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN2_SIGNAL_NAME">data1_0p</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN2_SIGNAL_NAME">data4_0p</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN2_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN3_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN3_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -618,7 +618,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN3_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN3_LOC">AP29</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN3_NAME">IO_L8N_T1L_N3_AD5N_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN3_SIGNAL_NAME">data1_0n</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN3_SIGNAL_NAME">data4_0n</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN3_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN4_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN4_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -626,7 +626,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN4_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN4_LOC">AN27</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN4_NAME">IO_L9P_T1L_N4_AD12P_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN4_SIGNAL_NAME">data0_3p</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN4_SIGNAL_NAME">data3_3p</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN4_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN5_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN5_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -634,7 +634,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN5_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN5_LOC">AN28</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN5_NAME">IO_L9N_T1L_N5_AD12N_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN5_SIGNAL_NAME">data0_3n</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN5_SIGNAL_NAME">data3_3n</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN5_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN6_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN6_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -642,7 +642,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN6_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN6_LOC">AN29</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN6_NAME">IO_L10P_T1U_N6_QBC_AD4P_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN6_SIGNAL_NAME">data0_2p</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN6_SIGNAL_NAME">data3_2p</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN6_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN7_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN7_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -650,7 +650,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN7_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN7_LOC">AP30</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN7_NAME">IO_L10N_T1U_N7_QBC_AD4N_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN7_SIGNAL_NAME">data0_2n</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN7_SIGNAL_NAME">data3_2n</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN7_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN8_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN8_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -658,7 +658,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN8_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN8_LOC">AL29</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN8_NAME">IO_L11P_T1U_N8_GC_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN8_SIGNAL_NAME">data0_1p</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN8_SIGNAL_NAME">data3_1p</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN8_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN9_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN9_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -666,7 +666,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN9_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN9_LOC">AM29</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN9_NAME">IO_L11N_T1U_N9_GC_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN9_SIGNAL_NAME">data0_1n</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN9_SIGNAL_NAME">data3_1n</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_PIN9_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE1_SELECT_ALL_PINS">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_DESELECT_ALL_PINS">0</spirit:configurableElementValue>
@@ -676,7 +676,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN0_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN0_LOC">AJ29</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN0_NAME">IO_L13P_T2L_N0_GC_QBC_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN0_SIGNAL_NAME">data3_0p</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN0_SIGNAL_NAME">data0_0p</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN0_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN10_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN10_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -684,7 +684,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN10_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN10_LOC">AH34</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN10_NAME">IO_L18P_T2U_N10_AD2P_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN10_SIGNAL_NAME">data4_1p</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN10_SIGNAL_NAME">data1_1p</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN10_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN11_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN11_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -692,7 +692,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN11_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN11_LOC">AJ34</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN11_NAME">IO_L18N_T2U_N11_AD2N_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN11_SIGNAL_NAME">data4_1n</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN11_SIGNAL_NAME">data1_1n</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN11_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN12_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN12_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -708,7 +708,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN1_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN1_LOC">AK30</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN1_NAME">IO_L13N_T2L_N1_GC_QBC_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN1_SIGNAL_NAME">data3_0n</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN1_SIGNAL_NAME">data0_0n</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN1_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN2_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN2_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -716,7 +716,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN2_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN2_LOC">AK31</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN2_NAME">IO_L14P_T2L_N2_GC_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN2_SIGNAL_NAME">data3_1p</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN2_SIGNAL_NAME">data0_1p</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN2_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN3_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN3_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -724,7 +724,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN3_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN3_LOC">AK32</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN3_NAME">IO_L14N_T2L_N3_GC_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN3_SIGNAL_NAME">data3_1n</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN3_SIGNAL_NAME">data0_1n</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN3_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN4_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN4_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -732,7 +732,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN4_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN4_LOC">AJ30</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN4_NAME">IO_L15P_T2L_N4_AD11P_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN4_SIGNAL_NAME">data3_2p</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN4_SIGNAL_NAME">data0_2p</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN4_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN5_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN5_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -740,7 +740,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN5_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN5_LOC">AJ31</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN5_NAME">IO_L15N_T2L_N5_AD11N_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN5_SIGNAL_NAME">data3_2n</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN5_SIGNAL_NAME">data0_2n</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN5_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN6_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN6_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -748,7 +748,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN6_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN6_LOC">AH33</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN6_NAME">IO_L16P_T2U_N6_QBC_AD3P_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN6_SIGNAL_NAME">data3_3p</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN6_SIGNAL_NAME">data0_3p</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN6_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN7_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN7_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -756,7 +756,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN7_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN7_LOC">AJ33</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN7_NAME">IO_L16N_T2U_N7_QBC_AD3N_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN7_SIGNAL_NAME">data3_3n</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN7_SIGNAL_NAME">data0_3n</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN7_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN8_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN8_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -764,7 +764,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN8_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN8_LOC">AH31</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN8_NAME">IO_L17P_T2U_N8_AD10P_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN8_SIGNAL_NAME">data4_0p</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN8_SIGNAL_NAME">data1_0p</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN8_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN9_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN9_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -772,7 +772,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN9_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN9_LOC">AH32</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN9_NAME">IO_L17N_T2U_N9_AD10N_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN9_SIGNAL_NAME">data4_0n</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN9_SIGNAL_NAME">data1_0n</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_PIN9_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE2_SELECT_ALL_PINS">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_DESELECT_ALL_PINS">0</spirit:configurableElementValue>
@@ -782,7 +782,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN0_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN0_LOC">AL32</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN0_NAME">IO_L19P_T3L_N0_DBC_AD9P_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN0_SIGNAL_NAME">data4_2p</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN0_SIGNAL_NAME">data1_2p</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN0_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN10_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN10_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -790,7 +790,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN10_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN10_LOC">AL34</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN10_NAME">IO_L24P_T3U_N10_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN10_SIGNAL_NAME">data5_3p</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN10_SIGNAL_NAME">data2_3p</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN10_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN11_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN11_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -798,7 +798,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN11_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN11_LOC">AM34</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN11_NAME">IO_L24N_T3U_N11_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN11_SIGNAL_NAME">data5_3n</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN11_SIGNAL_NAME">data2_3n</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN11_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN12_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN12_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -814,7 +814,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN1_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN1_LOC">AL33</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN1_NAME">IO_L19N_T3L_N1_DBC_AD9N_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN1_SIGNAL_NAME">data4_2n</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN1_SIGNAL_NAME">data1_2n</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN1_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN2_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN2_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -822,7 +822,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN2_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN2_LOC">AN33</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN2_NAME">IO_L20P_T3L_N2_AD1P_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN2_SIGNAL_NAME">data4_3p</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN2_SIGNAL_NAME">data1_3p</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN2_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN3_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN3_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -830,7 +830,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN3_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN3_LOC">AP33</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN3_NAME">IO_L20N_T3L_N3_AD1N_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN3_SIGNAL_NAME">data4_3n</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN3_SIGNAL_NAME">data1_3n</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN3_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN4_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN4_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -838,7 +838,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN4_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN4_LOC">AN31</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN4_NAME">IO_L21P_T3L_N4_AD8P_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN4_SIGNAL_NAME">data5_0p</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN4_SIGNAL_NAME">data2_0p</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN4_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN5_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN5_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -846,7 +846,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN5_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN5_LOC">AP31</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN5_NAME">IO_L21N_T3L_N5_AD8N_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN5_SIGNAL_NAME">data5_0n</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN5_SIGNAL_NAME">data2_0n</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN5_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN6_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN6_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -854,7 +854,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN6_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN6_LOC">AN34</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN6_NAME">IO_L22P_T3U_N6_DBC_AD0P_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN6_SIGNAL_NAME">data5_1p</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN6_SIGNAL_NAME">data2_1p</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN6_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN7_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN7_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -862,7 +862,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN7_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN7_LOC">AP34</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN7_NAME">IO_L22N_T3U_N7_DBC_AD0N_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN7_SIGNAL_NAME">data5_1n</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN7_SIGNAL_NAME">data2_1n</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN7_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN8_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN8_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -870,7 +870,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN8_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN8_LOC">AM32</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN8_NAME">IO_L23P_T3U_N8_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN8_SIGNAL_NAME">data5_2p</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN8_SIGNAL_NAME">data2_2p</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN8_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN9_BUS_DIR">RX</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN9_DATA_STROBE">Data</spirit:configurableElementValue>
@@ -878,7 +878,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN9_INIT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN9_LOC">AN32</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN9_NAME">IO_L23N_T3U_N9_68</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN9_SIGNAL_NAME">data5_2n</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN9_SIGNAL_NAME">data2_2n</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_PIN9_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.BYTE3_SELECT_ALL_PINS">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.CLK_FWD_PHASE">0</spirit:configurableElementValue>
@@ -982,7 +982,7 @@ me data5_0n loc AP31} 45 {nibble 7 dir RX sig_type DIFF data_strb Data data_strb
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.RIU_FROM_PLL">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.RX_DELAY_CASCADE">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.RX_DELAY_MODE">COUNT</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.RX_DELAY_TYPE">2</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.RX_DELAY_TYPE">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.RX_DELAY_VALUE">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.RX_EQUALIZATION_D">EQ_LEVEL0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.RX_EQUALIZATION_S">NONE</spirit:configurableElementValue>
