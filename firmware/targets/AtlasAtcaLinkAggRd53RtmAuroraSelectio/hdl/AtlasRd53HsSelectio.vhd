@@ -1094,7 +1094,9 @@ architecture mapping of AtlasRd53HsSelectio is
 
    signal rx_clk  : slv(3 downto 0);
    signal riu_clk : slv(3 downto 0);
-
+   
+   signal readClk : sl;
+   signal readRst : sl;
 
    signal dly_rdy_bsc0              : slv(3 downto 0);
    signal dly_rdy_bsc1              : slv(3 downto 0);
@@ -1106,45 +1108,50 @@ architecture mapping of AtlasRd53HsSelectio is
    signal dly_rdy_bsc7              : slv(3 downto 0);
    signal rst_seq_done              : slv(3 downto 0);
    signal shared_pll0_clkoutphy_out : slv(3 downto 0);
+   signal readEnable                : slv(15 downto 0);
 
-   signal dlyConfig : Slv9Array(95 downto 0) := (others => (others => '0'));
-   signal empty     : slv(95 downto 0);
-   signal rdEn      : slv(95 downto 0);
-   signal vtc       : slv(95 downto 0);
-   signal load      : slv(95 downto 0);
-   signal inc       : slv(95 downto 0);
-   signal ce        : slv(95 downto 0);
-   signal data      : Slv8Array(95 downto 0);
+   signal empty : slv(95 downto 0);
+   signal rdEn  : slv(95 downto 0);
+   signal vtc   : slv(95 downto 0);
+   signal load  : slv(95 downto 0);
+   signal inc   : slv(95 downto 0);
+   signal ce    : slv(95 downto 0);
+   signal data  : Slv8Array(95 downto 0);
+   signal test  : Slv8Array(95 downto 0);
 
 begin
 
-   clk160MHz <= clock160MHz(0);
-   rst160MHz <= reset160MHz(0);
+   clk160MHz <= readClk;
+   rst160MHz <= readRst;
+   
+   readClk <= ref160Clk;
+
+   U_Rst0 : entity work.RstSync
+      generic map (
+         TPD_G          => TPD_G,
+         IN_POLARITY_G  => '0',
+         OUT_POLARITY_G => '1')
+      port map (
+         clk      => readClk,
+         asyncRst => locked(0),
+         syncRst  => readRst);
 
    rx_clk  <= (others => ref160Clk);
    riu_clk <= (others => ref160Clk);
-
-   GEN_RST :
-   for i in 3 downto 0 generate
-      U_Rst0 : entity work.RstSync
-         generic map (
-            TPD_G          => TPD_G,
-            IN_POLARITY_G  => '0',
-            OUT_POLARITY_G => '1')
-         port map (
-            clk      => clock160MHz(i),
-            asyncRst => locked(i),
-            syncRst  => reset160MHz(i));
-   end generate GEN_RST;
-
+   
    GEN_VEC :
    for i in 95 downto 0 generate
-      rdEn(i)       <= not(empty(i));
-      ce(i)         <= dlySlip(i);
-      inc(i)        <= '1';
-      load(i)       <= '0';
-      vtc(i)        <= '0';
+
+      rdEn(i) <= not(empty(i));
+      
+      ce(i)   <= dlySlip(i);
+      inc(i)  <= dlySlip(i);
+      load(i) <= '0';
+      vtc(i)  <= '0';
+
+      -- serDesData(i) <= test(i);
       serDesData(i) <= data(i);
+
    end generate GEN_VEC;
 
    U_Bank66 : AtlasRd53HsSelectioBank66
@@ -1173,7 +1180,7 @@ begin
          rx_inc_26                  => inc(24*0+0),
          rx_load_26                 => load(24*0+0),
          rx_en_vtc_26               => vtc(24*0+0),
-         fifo_rd_clk_26             => clock160MHz(0),
+         fifo_rd_clk_26             => readClk,
          fifo_rd_en_26              => rdEn(24*0+0),
          fifo_empty_26              => empty(24*0+0),
          -- DATA[0][1]
@@ -1184,7 +1191,7 @@ begin
          rx_inc_28                  => inc(24*0+1),
          rx_load_28                 => load(24*0+1),
          rx_en_vtc_28               => vtc(24*0+1),
-         fifo_rd_clk_28             => clock160MHz(0),
+         fifo_rd_clk_28             => readClk,
          fifo_rd_en_28              => rdEn(24*0+1),
          fifo_empty_28              => empty(24*0+1),
          -- DATA[0][2]
@@ -1195,7 +1202,7 @@ begin
          rx_inc_30                  => inc(24*0+2),
          rx_load_30                 => load(24*0+2),
          rx_en_vtc_30               => vtc(24*0+2),
-         fifo_rd_clk_30             => clock160MHz(0),
+         fifo_rd_clk_30             => readClk,
          fifo_rd_en_30              => rdEn(24*0+2),
          fifo_empty_30              => empty(24*0+2),
          -- DATA[0][3]
@@ -1206,7 +1213,7 @@ begin
          rx_inc_32                  => inc(24*0+3),
          rx_load_32                 => load(24*0+3),
          rx_en_vtc_32               => vtc(24*0+3),
-         fifo_rd_clk_32             => clock160MHz(0),
+         fifo_rd_clk_32             => readClk,
          fifo_rd_en_32              => rdEn(24*0+3),
          fifo_empty_32              => empty(24*0+3),
          -- DATA[1][0]
@@ -1217,7 +1224,7 @@ begin
          rx_inc_34                  => inc(24*0+4),
          rx_load_34                 => load(24*0+4),
          rx_en_vtc_34               => vtc(24*0+4),
-         fifo_rd_clk_34             => clock160MHz(0),
+         fifo_rd_clk_34             => readClk,
          fifo_rd_en_34              => rdEn(24*0+4),
          fifo_empty_34              => empty(24*0+4),
          -- DATA[1][1]
@@ -1228,7 +1235,7 @@ begin
          rx_inc_36                  => inc(24*0+5),
          rx_load_36                 => load(24*0+5),
          rx_en_vtc_36               => vtc(24*0+5),
-         fifo_rd_clk_36             => clock160MHz(0),
+         fifo_rd_clk_36             => readClk,
          fifo_rd_en_36              => rdEn(24*0+5),
          fifo_empty_36              => empty(24*0+5),
          -- DATA[1][2]
@@ -1239,7 +1246,7 @@ begin
          rx_inc_39                  => inc(24*0+6),
          rx_load_39                 => load(24*0+6),
          rx_en_vtc_39               => vtc(24*0+6),
-         fifo_rd_clk_39             => clock160MHz(0),
+         fifo_rd_clk_39             => readClk,
          fifo_rd_en_39              => rdEn(24*0+6),
          fifo_empty_39              => empty(24*0+6),
          -- DATA[1][3]
@@ -1250,7 +1257,7 @@ begin
          rx_inc_41                  => inc(24*0+7),
          rx_load_41                 => load(24*0+7),
          rx_en_vtc_41               => vtc(24*0+7),
-         fifo_rd_clk_41             => clock160MHz(0),
+         fifo_rd_clk_41             => readClk,
          fifo_rd_en_41              => rdEn(24*0+7),
          fifo_empty_41              => empty(24*0+7),
          -- DATA[2][0]
@@ -1261,7 +1268,7 @@ begin
          rx_inc_43                  => inc(24*0+8),
          rx_load_43                 => load(24*0+8),
          rx_en_vtc_43               => vtc(24*0+8),
-         fifo_rd_clk_43             => clock160MHz(0),
+         fifo_rd_clk_43             => readClk,
          fifo_rd_en_43              => rdEn(24*0+8),
          fifo_empty_43              => empty(24*0+8),
          -- DATA[2][1]
@@ -1272,7 +1279,7 @@ begin
          rx_inc_45                  => inc(24*0+9),
          rx_load_45                 => load(24*0+9),
          rx_en_vtc_45               => vtc(24*0+9),
-         fifo_rd_clk_45             => clock160MHz(0),
+         fifo_rd_clk_45             => readClk,
          fifo_rd_en_45              => rdEn(24*0+9),
          fifo_empty_45              => empty(24*0+9),
          -- DATA[2][2]
@@ -1283,7 +1290,7 @@ begin
          rx_inc_47                  => inc(24*0+10),
          rx_load_47                 => load(24*0+10),
          rx_en_vtc_47               => vtc(24*0+10),
-         fifo_rd_clk_47             => clock160MHz(0),
+         fifo_rd_clk_47             => readClk,
          fifo_rd_en_47              => rdEn(24*0+10),
          fifo_empty_47              => empty(24*0+10),
          -- DATA[2][3]
@@ -1294,7 +1301,7 @@ begin
          rx_inc_49                  => inc(24*0+11),
          rx_load_49                 => load(24*0+11),
          rx_en_vtc_49               => vtc(24*0+11),
-         fifo_rd_clk_49             => clock160MHz(0),
+         fifo_rd_clk_49             => readClk,
          fifo_rd_en_49              => rdEn(24*0+11),
          fifo_empty_49              => empty(24*0+11),
          -- DATA[3][0]
@@ -1305,7 +1312,7 @@ begin
          rx_inc_23                  => inc(24*0+12),
          rx_load_23                 => load(24*0+12),
          rx_en_vtc_23               => vtc(24*0+12),
-         fifo_rd_clk_23             => clock160MHz(0),
+         fifo_rd_clk_23             => readClk,
          fifo_rd_en_23              => rdEn(24*0+12),
          fifo_empty_23              => empty(24*0+12),
          -- DATA[3][1]
@@ -1316,7 +1323,7 @@ begin
          rx_inc_21                  => inc(24*0+13),
          rx_load_21                 => load(24*0+13),
          rx_en_vtc_21               => vtc(24*0+13),
-         fifo_rd_clk_21             => clock160MHz(0),
+         fifo_rd_clk_21             => readClk,
          fifo_rd_en_21              => rdEn(24*0+13),
          fifo_empty_21              => empty(24*0+13),
          -- DATA[3][2]
@@ -1327,7 +1334,7 @@ begin
          rx_inc_19                  => inc(24*0+14),
          rx_load_19                 => load(24*0+14),
          rx_en_vtc_19               => vtc(24*0+14),
-         fifo_rd_clk_19             => clock160MHz(0),
+         fifo_rd_clk_19             => readClk,
          fifo_rd_en_19              => rdEn(24*0+14),
          fifo_empty_19              => empty(24*0+14),
          -- DATA[3][3]
@@ -1338,7 +1345,7 @@ begin
          rx_inc_17                  => inc(24*0+15),
          rx_load_17                 => load(24*0+15),
          rx_en_vtc_17               => vtc(24*0+15),
-         fifo_rd_clk_17             => clock160MHz(0),
+         fifo_rd_clk_17             => readClk,
          fifo_rd_en_17              => rdEn(24*0+15),
          fifo_empty_17              => empty(24*0+15),
          -- DATA[4][0]
@@ -1349,7 +1356,7 @@ begin
          rx_inc_15                  => inc(24*0+16),
          rx_load_15                 => load(24*0+16),
          rx_en_vtc_15               => vtc(24*0+16),
-         fifo_rd_clk_15             => clock160MHz(0),
+         fifo_rd_clk_15             => readClk,
          fifo_rd_en_15              => rdEn(24*0+16),
          fifo_empty_15              => empty(24*0+16),
          -- DATA[4][1]
@@ -1360,7 +1367,7 @@ begin
          rx_inc_13                  => inc(24*0+17),
          rx_load_13                 => load(24*0+17),
          rx_en_vtc_13               => vtc(24*0+17),
-         fifo_rd_clk_13             => clock160MHz(0),
+         fifo_rd_clk_13             => readClk,
          fifo_rd_en_13              => rdEn(24*0+17),
          fifo_empty_13              => empty(24*0+17),
          -- DATA[4][2]
@@ -1371,7 +1378,7 @@ begin
          rx_inc_10                  => inc(24*0+18),
          rx_load_10                 => load(24*0+18),
          rx_en_vtc_10               => vtc(24*0+18),
-         fifo_rd_clk_10             => clock160MHz(0),
+         fifo_rd_clk_10             => readClk,
          fifo_rd_en_10              => rdEn(24*0+18),
          fifo_empty_10              => empty(24*0+18),
          -- DATA[4][3]
@@ -1382,7 +1389,7 @@ begin
          rx_inc_8                   => inc(24*0+19),
          rx_load_8                  => load(24*0+19),
          rx_en_vtc_8                => vtc(24*0+19),
-         fifo_rd_clk_8              => clock160MHz(0),
+         fifo_rd_clk_8              => readClk,
          fifo_rd_en_8               => rdEn(24*0+19),
          fifo_empty_8               => empty(24*0+19),
          -- DATA[5][0]
@@ -1393,7 +1400,7 @@ begin
          rx_inc_6                   => inc(24*0+20),
          rx_load_6                  => load(24*0+20),
          rx_en_vtc_6                => vtc(24*0+20),
-         fifo_rd_clk_6              => clock160MHz(0),
+         fifo_rd_clk_6              => readClk,
          fifo_rd_en_6               => rdEn(24*0+20),
          fifo_empty_6               => empty(24*0+20),
          -- DATA[5][1]
@@ -1404,7 +1411,7 @@ begin
          rx_inc_4                   => inc(24*0+21),
          rx_load_4                  => load(24*0+21),
          rx_en_vtc_4                => vtc(24*0+21),
-         fifo_rd_clk_4              => clock160MHz(0),
+         fifo_rd_clk_4              => readClk,
          fifo_rd_en_4               => rdEn(24*0+21),
          fifo_empty_4               => empty(24*0+21),
          -- DATA[5][2]
@@ -1415,7 +1422,7 @@ begin
          rx_inc_2                   => inc(24*0+22),
          rx_load_2                  => load(24*0+22),
          rx_en_vtc_2                => vtc(24*0+22),
-         fifo_rd_clk_2              => clock160MHz(0),
+         fifo_rd_clk_2              => readClk,
          fifo_rd_en_2               => rdEn(24*0+22),
          fifo_empty_2               => empty(24*0+22),
          -- DATA[5][3]
@@ -1426,7 +1433,7 @@ begin
          rx_inc_0                   => inc(24*0+23),
          rx_load_0                  => load(24*0+23),
          rx_en_vtc_0                => vtc(24*0+23),
-         fifo_rd_clk_0              => clock160MHz(0),
+         fifo_rd_clk_0              => readClk,
          fifo_rd_en_0               => rdEn(24*0+23),
          fifo_empty_0               => empty(24*0+23));
 
@@ -1456,7 +1463,7 @@ begin
          rx_inc_26                  => inc(24*1+0),
          rx_load_26                 => load(24*1+0),
          rx_en_vtc_26               => vtc(24*1+0),
-         fifo_rd_clk_26             => clock160MHz(0),
+         fifo_rd_clk_26             => readClk,
          fifo_rd_en_26              => rdEn(24*1+0),
          fifo_empty_26              => empty(24*1+0),
          -- DATA[0][1]
@@ -1467,7 +1474,7 @@ begin
          rx_inc_28                  => inc(24*1+1),
          rx_load_28                 => load(24*1+1),
          rx_en_vtc_28               => vtc(24*1+1),
-         fifo_rd_clk_28             => clock160MHz(0),
+         fifo_rd_clk_28             => readClk,
          fifo_rd_en_28              => rdEn(24*1+1),
          fifo_empty_28              => empty(24*1+1),
          -- DATA[0][2]
@@ -1478,7 +1485,7 @@ begin
          rx_inc_30                  => inc(24*1+2),
          rx_load_30                 => load(24*1+2),
          rx_en_vtc_30               => vtc(24*1+2),
-         fifo_rd_clk_30             => clock160MHz(0),
+         fifo_rd_clk_30             => readClk,
          fifo_rd_en_30              => rdEn(24*1+2),
          fifo_empty_30              => empty(24*1+2),
          -- DATA[0][3]
@@ -1489,7 +1496,7 @@ begin
          rx_inc_32                  => inc(24*1+3),
          rx_load_32                 => load(24*1+3),
          rx_en_vtc_32               => vtc(24*1+3),
-         fifo_rd_clk_32             => clock160MHz(0),
+         fifo_rd_clk_32             => readClk,
          fifo_rd_en_32              => rdEn(24*1+3),
          fifo_empty_32              => empty(24*1+3),
          -- DATA[1][0]
@@ -1500,7 +1507,7 @@ begin
          rx_inc_34                  => inc(24*1+4),
          rx_load_34                 => load(24*1+4),
          rx_en_vtc_34               => vtc(24*1+4),
-         fifo_rd_clk_34             => clock160MHz(0),
+         fifo_rd_clk_34             => readClk,
          fifo_rd_en_34              => rdEn(24*1+4),
          fifo_empty_34              => empty(24*1+4),
          -- DATA[1][1]
@@ -1511,7 +1518,7 @@ begin
          rx_inc_36                  => inc(24*1+5),
          rx_load_36                 => load(24*1+5),
          rx_en_vtc_36               => vtc(24*1+5),
-         fifo_rd_clk_36             => clock160MHz(0),
+         fifo_rd_clk_36             => readClk,
          fifo_rd_en_36              => rdEn(24*1+5),
          fifo_empty_36              => empty(24*1+5),
          -- DATA[1][2]
@@ -1522,7 +1529,7 @@ begin
          rx_inc_39                  => inc(24*1+6),
          rx_load_39                 => load(24*1+6),
          rx_en_vtc_39               => vtc(24*1+6),
-         fifo_rd_clk_39             => clock160MHz(0),
+         fifo_rd_clk_39             => readClk,
          fifo_rd_en_39              => rdEn(24*1+6),
          fifo_empty_39              => empty(24*1+6),
          -- DATA[1][3]
@@ -1533,7 +1540,7 @@ begin
          rx_inc_41                  => inc(24*1+7),
          rx_load_41                 => load(24*1+7),
          rx_en_vtc_41               => vtc(24*1+7),
-         fifo_rd_clk_41             => clock160MHz(0),
+         fifo_rd_clk_41             => readClk,
          fifo_rd_en_41              => rdEn(24*1+7),
          fifo_empty_41              => empty(24*1+7),
          -- DATA[2][0]
@@ -1544,7 +1551,7 @@ begin
          rx_inc_43                  => inc(24*1+8),
          rx_load_43                 => load(24*1+8),
          rx_en_vtc_43               => vtc(24*1+8),
-         fifo_rd_clk_43             => clock160MHz(0),
+         fifo_rd_clk_43             => readClk,
          fifo_rd_en_43              => rdEn(24*1+8),
          fifo_empty_43              => empty(24*1+8),
          -- DATA[2][1]
@@ -1555,7 +1562,7 @@ begin
          rx_inc_45                  => inc(24*1+9),
          rx_load_45                 => load(24*1+9),
          rx_en_vtc_45               => vtc(24*1+9),
-         fifo_rd_clk_45             => clock160MHz(0),
+         fifo_rd_clk_45             => readClk,
          fifo_rd_en_45              => rdEn(24*1+9),
          fifo_empty_45              => empty(24*1+9),
          -- DATA[2][2]
@@ -1566,7 +1573,7 @@ begin
          rx_inc_47                  => inc(24*1+10),
          rx_load_47                 => load(24*1+10),
          rx_en_vtc_47               => vtc(24*1+10),
-         fifo_rd_clk_47             => clock160MHz(0),
+         fifo_rd_clk_47             => readClk,
          fifo_rd_en_47              => rdEn(24*1+10),
          fifo_empty_47              => empty(24*1+10),
          -- DATA[2][3]
@@ -1577,7 +1584,7 @@ begin
          rx_inc_49                  => inc(24*1+11),
          rx_load_49                 => load(24*1+11),
          rx_en_vtc_49               => vtc(24*1+11),
-         fifo_rd_clk_49             => clock160MHz(0),
+         fifo_rd_clk_49             => readClk,
          fifo_rd_en_49              => rdEn(24*1+11),
          fifo_empty_49              => empty(24*1+11),
          -- DATA[3][0]
@@ -1588,7 +1595,7 @@ begin
          rx_inc_23                  => inc(24*1+12),
          rx_load_23                 => load(24*1+12),
          rx_en_vtc_23               => vtc(24*1+12),
-         fifo_rd_clk_23             => clock160MHz(0),
+         fifo_rd_clk_23             => readClk,
          fifo_rd_en_23              => rdEn(24*1+12),
          fifo_empty_23              => empty(24*1+12),
          -- DATA[3][1]
@@ -1599,7 +1606,7 @@ begin
          rx_inc_21                  => inc(24*1+13),
          rx_load_21                 => load(24*1+13),
          rx_en_vtc_21               => vtc(24*1+13),
-         fifo_rd_clk_21             => clock160MHz(0),
+         fifo_rd_clk_21             => readClk,
          fifo_rd_en_21              => rdEn(24*1+13),
          fifo_empty_21              => empty(24*1+13),
          -- DATA[3][2]
@@ -1610,7 +1617,7 @@ begin
          rx_inc_19                  => inc(24*1+14),
          rx_load_19                 => load(24*1+14),
          rx_en_vtc_19               => vtc(24*1+14),
-         fifo_rd_clk_19             => clock160MHz(0),
+         fifo_rd_clk_19             => readClk,
          fifo_rd_en_19              => rdEn(24*1+14),
          fifo_empty_19              => empty(24*1+14),
          -- DATA[3][3]
@@ -1621,7 +1628,7 @@ begin
          rx_inc_17                  => inc(24*1+15),
          rx_load_17                 => load(24*1+15),
          rx_en_vtc_17               => vtc(24*1+15),
-         fifo_rd_clk_17             => clock160MHz(0),
+         fifo_rd_clk_17             => readClk,
          fifo_rd_en_17              => rdEn(24*1+15),
          fifo_empty_17              => empty(24*1+15),
          -- DATA[4][0]
@@ -1632,7 +1639,7 @@ begin
          rx_inc_15                  => inc(24*1+16),
          rx_load_15                 => load(24*1+16),
          rx_en_vtc_15               => vtc(24*1+16),
-         fifo_rd_clk_15             => clock160MHz(0),
+         fifo_rd_clk_15             => readClk,
          fifo_rd_en_15              => rdEn(24*1+16),
          fifo_empty_15              => empty(24*1+16),
          -- DATA[4][1]
@@ -1643,7 +1650,7 @@ begin
          rx_inc_13                  => inc(24*1+17),
          rx_load_13                 => load(24*1+17),
          rx_en_vtc_13               => vtc(24*1+17),
-         fifo_rd_clk_13             => clock160MHz(0),
+         fifo_rd_clk_13             => readClk,
          fifo_rd_en_13              => rdEn(24*1+17),
          fifo_empty_13              => empty(24*1+17),
          -- DATA[4][2]
@@ -1654,7 +1661,7 @@ begin
          rx_inc_10                  => inc(24*1+18),
          rx_load_10                 => load(24*1+18),
          rx_en_vtc_10               => vtc(24*1+18),
-         fifo_rd_clk_10             => clock160MHz(0),
+         fifo_rd_clk_10             => readClk,
          fifo_rd_en_10              => rdEn(24*1+18),
          fifo_empty_10              => empty(24*1+18),
          -- DATA[4][3]
@@ -1665,7 +1672,7 @@ begin
          rx_inc_8                   => inc(24*1+19),
          rx_load_8                  => load(24*1+19),
          rx_en_vtc_8                => vtc(24*1+19),
-         fifo_rd_clk_8              => clock160MHz(0),
+         fifo_rd_clk_8              => readClk,
          fifo_rd_en_8               => rdEn(24*1+19),
          fifo_empty_8               => empty(24*1+19),
          -- DATA[5][0]
@@ -1676,7 +1683,7 @@ begin
          rx_inc_6                   => inc(24*1+20),
          rx_load_6                  => load(24*1+20),
          rx_en_vtc_6                => vtc(24*1+20),
-         fifo_rd_clk_6              => clock160MHz(0),
+         fifo_rd_clk_6              => readClk,
          fifo_rd_en_6               => rdEn(24*1+20),
          fifo_empty_6               => empty(24*1+20),
          -- DATA[5][1]
@@ -1687,7 +1694,7 @@ begin
          rx_inc_4                   => inc(24*1+21),
          rx_load_4                  => load(24*1+21),
          rx_en_vtc_4                => vtc(24*1+21),
-         fifo_rd_clk_4              => clock160MHz(0),
+         fifo_rd_clk_4              => readClk,
          fifo_rd_en_4               => rdEn(24*1+21),
          fifo_empty_4               => empty(24*1+21),
          -- DATA[5][2]
@@ -1698,7 +1705,7 @@ begin
          rx_inc_2                   => inc(24*1+22),
          rx_load_2                  => load(24*1+22),
          rx_en_vtc_2                => vtc(24*1+22),
-         fifo_rd_clk_2              => clock160MHz(0),
+         fifo_rd_clk_2              => readClk,
          fifo_rd_en_2               => rdEn(24*1+22),
          fifo_empty_2               => empty(24*1+22),
          -- DATA[5][3]
@@ -1709,7 +1716,7 @@ begin
          rx_inc_0                   => inc(24*1+23),
          rx_load_0                  => load(24*1+23),
          rx_en_vtc_0                => vtc(24*1+23),
-         fifo_rd_clk_0              => clock160MHz(0),
+         fifo_rd_clk_0              => readClk,
          fifo_rd_en_0               => rdEn(24*1+23),
          fifo_empty_0               => empty(24*1+23));
 
@@ -1739,7 +1746,7 @@ begin
          rx_inc_26                  => inc(24*2+0),
          rx_load_26                 => load(24*2+0),
          rx_en_vtc_26               => vtc(24*2+0),
-         fifo_rd_clk_26             => clock160MHz(0),
+         fifo_rd_clk_26             => readClk,
          fifo_rd_en_26              => rdEn(24*2+0),
          fifo_empty_26              => empty(24*2+0),
          -- DATA[0][1]
@@ -1750,7 +1757,7 @@ begin
          rx_inc_28                  => inc(24*2+1),
          rx_load_28                 => load(24*2+1),
          rx_en_vtc_28               => vtc(24*2+1),
-         fifo_rd_clk_28             => clock160MHz(0),
+         fifo_rd_clk_28             => readClk,
          fifo_rd_en_28              => rdEn(24*2+1),
          fifo_empty_28              => empty(24*2+1),
          -- DATA[0][2]
@@ -1761,7 +1768,7 @@ begin
          rx_inc_30                  => inc(24*2+2),
          rx_load_30                 => load(24*2+2),
          rx_en_vtc_30               => vtc(24*2+2),
-         fifo_rd_clk_30             => clock160MHz(0),
+         fifo_rd_clk_30             => readClk,
          fifo_rd_en_30              => rdEn(24*2+2),
          fifo_empty_30              => empty(24*2+2),
          -- DATA[0][3]
@@ -1772,7 +1779,7 @@ begin
          rx_inc_32                  => inc(24*2+3),
          rx_load_32                 => load(24*2+3),
          rx_en_vtc_32               => vtc(24*2+3),
-         fifo_rd_clk_32             => clock160MHz(0),
+         fifo_rd_clk_32             => readClk,
          fifo_rd_en_32              => rdEn(24*2+3),
          fifo_empty_32              => empty(24*2+3),
          -- DATA[1][0]
@@ -1783,7 +1790,7 @@ begin
          rx_inc_34                  => inc(24*2+4),
          rx_load_34                 => load(24*2+4),
          rx_en_vtc_34               => vtc(24*2+4),
-         fifo_rd_clk_34             => clock160MHz(0),
+         fifo_rd_clk_34             => readClk,
          fifo_rd_en_34              => rdEn(24*2+4),
          fifo_empty_34              => empty(24*2+4),
          -- DATA[1][1]
@@ -1794,7 +1801,7 @@ begin
          rx_inc_36                  => inc(24*2+5),
          rx_load_36                 => load(24*2+5),
          rx_en_vtc_36               => vtc(24*2+5),
-         fifo_rd_clk_36             => clock160MHz(0),
+         fifo_rd_clk_36             => readClk,
          fifo_rd_en_36              => rdEn(24*2+5),
          fifo_empty_36              => empty(24*2+5),
          -- DATA[1][2]
@@ -1805,7 +1812,7 @@ begin
          rx_inc_39                  => inc(24*2+6),
          rx_load_39                 => load(24*2+6),
          rx_en_vtc_39               => vtc(24*2+6),
-         fifo_rd_clk_39             => clock160MHz(0),
+         fifo_rd_clk_39             => readClk,
          fifo_rd_en_39              => rdEn(24*2+6),
          fifo_empty_39              => empty(24*2+6),
          -- DATA[1][3]
@@ -1816,7 +1823,7 @@ begin
          rx_inc_41                  => inc(24*2+7),
          rx_load_41                 => load(24*2+7),
          rx_en_vtc_41               => vtc(24*2+7),
-         fifo_rd_clk_41             => clock160MHz(0),
+         fifo_rd_clk_41             => readClk,
          fifo_rd_en_41              => rdEn(24*2+7),
          fifo_empty_41              => empty(24*2+7),
          -- DATA[2][0]
@@ -1827,7 +1834,7 @@ begin
          rx_inc_43                  => inc(24*2+8),
          rx_load_43                 => load(24*2+8),
          rx_en_vtc_43               => vtc(24*2+8),
-         fifo_rd_clk_43             => clock160MHz(0),
+         fifo_rd_clk_43             => readClk,
          fifo_rd_en_43              => rdEn(24*2+8),
          fifo_empty_43              => empty(24*2+8),
          -- DATA[2][1]
@@ -1838,7 +1845,7 @@ begin
          rx_inc_45                  => inc(24*2+9),
          rx_load_45                 => load(24*2+9),
          rx_en_vtc_45               => vtc(24*2+9),
-         fifo_rd_clk_45             => clock160MHz(0),
+         fifo_rd_clk_45             => readClk,
          fifo_rd_en_45              => rdEn(24*2+9),
          fifo_empty_45              => empty(24*2+9),
          -- DATA[2][2]
@@ -1849,7 +1856,7 @@ begin
          rx_inc_47                  => inc(24*2+10),
          rx_load_47                 => load(24*2+10),
          rx_en_vtc_47               => vtc(24*2+10),
-         fifo_rd_clk_47             => clock160MHz(0),
+         fifo_rd_clk_47             => readClk,
          fifo_rd_en_47              => rdEn(24*2+10),
          fifo_empty_47              => empty(24*2+10),
          -- DATA[2][3]
@@ -1860,7 +1867,7 @@ begin
          rx_inc_49                  => inc(24*2+11),
          rx_load_49                 => load(24*2+11),
          rx_en_vtc_49               => vtc(24*2+11),
-         fifo_rd_clk_49             => clock160MHz(0),
+         fifo_rd_clk_49             => readClk,
          fifo_rd_en_49              => rdEn(24*2+11),
          fifo_empty_49              => empty(24*2+11),
          -- DATA[3][0]
@@ -1871,7 +1878,7 @@ begin
          rx_inc_23                  => inc(24*2+12),
          rx_load_23                 => load(24*2+12),
          rx_en_vtc_23               => vtc(24*2+12),
-         fifo_rd_clk_23             => clock160MHz(0),
+         fifo_rd_clk_23             => readClk,
          fifo_rd_en_23              => rdEn(24*2+12),
          fifo_empty_23              => empty(24*2+12),
          -- DATA[3][1]
@@ -1882,7 +1889,7 @@ begin
          rx_inc_21                  => inc(24*2+13),
          rx_load_21                 => load(24*2+13),
          rx_en_vtc_21               => vtc(24*2+13),
-         fifo_rd_clk_21             => clock160MHz(0),
+         fifo_rd_clk_21             => readClk,
          fifo_rd_en_21              => rdEn(24*2+13),
          fifo_empty_21              => empty(24*2+13),
          -- DATA[3][2]
@@ -1893,7 +1900,7 @@ begin
          rx_inc_19                  => inc(24*2+14),
          rx_load_19                 => load(24*2+14),
          rx_en_vtc_19               => vtc(24*2+14),
-         fifo_rd_clk_19             => clock160MHz(0),
+         fifo_rd_clk_19             => readClk,
          fifo_rd_en_19              => rdEn(24*2+14),
          fifo_empty_19              => empty(24*2+14),
          -- DATA[3][3]
@@ -1904,7 +1911,7 @@ begin
          rx_inc_17                  => inc(24*2+15),
          rx_load_17                 => load(24*2+15),
          rx_en_vtc_17               => vtc(24*2+15),
-         fifo_rd_clk_17             => clock160MHz(0),
+         fifo_rd_clk_17             => readClk,
          fifo_rd_en_17              => rdEn(24*2+15),
          fifo_empty_17              => empty(24*2+15),
          -- DATA[4][0]
@@ -1915,7 +1922,7 @@ begin
          rx_inc_15                  => inc(24*2+16),
          rx_load_15                 => load(24*2+16),
          rx_en_vtc_15               => vtc(24*2+16),
-         fifo_rd_clk_15             => clock160MHz(0),
+         fifo_rd_clk_15             => readClk,
          fifo_rd_en_15              => rdEn(24*2+16),
          fifo_empty_15              => empty(24*2+16),
          -- DATA[4][1]
@@ -1926,7 +1933,7 @@ begin
          rx_inc_13                  => inc(24*2+17),
          rx_load_13                 => load(24*2+17),
          rx_en_vtc_13               => vtc(24*2+17),
-         fifo_rd_clk_13             => clock160MHz(0),
+         fifo_rd_clk_13             => readClk,
          fifo_rd_en_13              => rdEn(24*2+17),
          fifo_empty_13              => empty(24*2+17),
          -- DATA[4][2]
@@ -1937,7 +1944,7 @@ begin
          rx_inc_10                  => inc(24*2+18),
          rx_load_10                 => load(24*2+18),
          rx_en_vtc_10               => vtc(24*2+18),
-         fifo_rd_clk_10             => clock160MHz(0),
+         fifo_rd_clk_10             => readClk,
          fifo_rd_en_10              => rdEn(24*2+18),
          fifo_empty_10              => empty(24*2+18),
          -- DATA[4][3]
@@ -1948,7 +1955,7 @@ begin
          rx_inc_8                   => inc(24*2+19),
          rx_load_8                  => load(24*2+19),
          rx_en_vtc_8                => vtc(24*2+19),
-         fifo_rd_clk_8              => clock160MHz(0),
+         fifo_rd_clk_8              => readClk,
          fifo_rd_en_8               => rdEn(24*2+19),
          fifo_empty_8               => empty(24*2+19),
          -- DATA[5][0]
@@ -1959,7 +1966,7 @@ begin
          rx_inc_6                   => inc(24*2+20),
          rx_load_6                  => load(24*2+20),
          rx_en_vtc_6                => vtc(24*2+20),
-         fifo_rd_clk_6              => clock160MHz(0),
+         fifo_rd_clk_6              => readClk,
          fifo_rd_en_6               => rdEn(24*2+20),
          fifo_empty_6               => empty(24*2+20),
          -- DATA[5][1]
@@ -1970,7 +1977,7 @@ begin
          rx_inc_4                   => inc(24*2+21),
          rx_load_4                  => load(24*2+21),
          rx_en_vtc_4                => vtc(24*2+21),
-         fifo_rd_clk_4              => clock160MHz(0),
+         fifo_rd_clk_4              => readClk,
          fifo_rd_en_4               => rdEn(24*2+21),
          fifo_empty_4               => empty(24*2+21),
          -- DATA[5][2]
@@ -1981,7 +1988,7 @@ begin
          rx_inc_2                   => inc(24*2+22),
          rx_load_2                  => load(24*2+22),
          rx_en_vtc_2                => vtc(24*2+22),
-         fifo_rd_clk_2              => clock160MHz(0),
+         fifo_rd_clk_2              => readClk,
          fifo_rd_en_2               => rdEn(24*2+22),
          fifo_empty_2               => empty(24*2+22),
          -- DATA[5][3]
@@ -1992,7 +1999,7 @@ begin
          rx_inc_0                   => inc(24*2+23),
          rx_load_0                  => load(24*2+23),
          rx_en_vtc_0                => vtc(24*2+23),
-         fifo_rd_clk_0              => clock160MHz(0),
+         fifo_rd_clk_0              => readClk,
          fifo_rd_en_0               => rdEn(24*2+23),
          fifo_empty_0               => empty(24*2+23));
 
@@ -2022,7 +2029,7 @@ begin
          rx_inc_26                  => inc(24*3+0),
          rx_load_26                 => load(24*3+0),
          rx_en_vtc_26               => vtc(24*3+0),
-         fifo_rd_clk_26             => clock160MHz(0),
+         fifo_rd_clk_26             => readClk,
          fifo_rd_en_26              => rdEn(24*3+0),
          fifo_empty_26              => empty(24*3+0),
          -- DATA[0][1]
@@ -2033,7 +2040,7 @@ begin
          rx_inc_28                  => inc(24*3+1),
          rx_load_28                 => load(24*3+1),
          rx_en_vtc_28               => vtc(24*3+1),
-         fifo_rd_clk_28             => clock160MHz(0),
+         fifo_rd_clk_28             => readClk,
          fifo_rd_en_28              => rdEn(24*3+1),
          fifo_empty_28              => empty(24*3+1),
          -- DATA[0][2]
@@ -2044,7 +2051,7 @@ begin
          rx_inc_30                  => inc(24*3+2),
          rx_load_30                 => load(24*3+2),
          rx_en_vtc_30               => vtc(24*3+2),
-         fifo_rd_clk_30             => clock160MHz(0),
+         fifo_rd_clk_30             => readClk,
          fifo_rd_en_30              => rdEn(24*3+2),
          fifo_empty_30              => empty(24*3+2),
          -- DATA[0][3]
@@ -2055,7 +2062,7 @@ begin
          rx_inc_32                  => inc(24*3+3),
          rx_load_32                 => load(24*3+3),
          rx_en_vtc_32               => vtc(24*3+3),
-         fifo_rd_clk_32             => clock160MHz(0),
+         fifo_rd_clk_32             => readClk,
          fifo_rd_en_32              => rdEn(24*3+3),
          fifo_empty_32              => empty(24*3+3),
          -- DATA[1][0]
@@ -2066,7 +2073,7 @@ begin
          rx_inc_34                  => inc(24*3+4),
          rx_load_34                 => load(24*3+4),
          rx_en_vtc_34               => vtc(24*3+4),
-         fifo_rd_clk_34             => clock160MHz(0),
+         fifo_rd_clk_34             => readClk,
          fifo_rd_en_34              => rdEn(24*3+4),
          fifo_empty_34              => empty(24*3+4),
          -- DATA[1][1]
@@ -2077,7 +2084,7 @@ begin
          rx_inc_36                  => inc(24*3+5),
          rx_load_36                 => load(24*3+5),
          rx_en_vtc_36               => vtc(24*3+5),
-         fifo_rd_clk_36             => clock160MHz(0),
+         fifo_rd_clk_36             => readClk,
          fifo_rd_en_36              => rdEn(24*3+5),
          fifo_empty_36              => empty(24*3+5),
          -- DATA[1][2]
@@ -2088,7 +2095,7 @@ begin
          rx_inc_39                  => inc(24*3+6),
          rx_load_39                 => load(24*3+6),
          rx_en_vtc_39               => vtc(24*3+6),
-         fifo_rd_clk_39             => clock160MHz(0),
+         fifo_rd_clk_39             => readClk,
          fifo_rd_en_39              => rdEn(24*3+6),
          fifo_empty_39              => empty(24*3+6),
          -- DATA[1][3]
@@ -2099,7 +2106,7 @@ begin
          rx_inc_41                  => inc(24*3+7),
          rx_load_41                 => load(24*3+7),
          rx_en_vtc_41               => vtc(24*3+7),
-         fifo_rd_clk_41             => clock160MHz(0),
+         fifo_rd_clk_41             => readClk,
          fifo_rd_en_41              => rdEn(24*3+7),
          fifo_empty_41              => empty(24*3+7),
          -- DATA[2][0]
@@ -2110,7 +2117,7 @@ begin
          rx_inc_43                  => inc(24*3+8),
          rx_load_43                 => load(24*3+8),
          rx_en_vtc_43               => vtc(24*3+8),
-         fifo_rd_clk_43             => clock160MHz(0),
+         fifo_rd_clk_43             => readClk,
          fifo_rd_en_43              => rdEn(24*3+8),
          fifo_empty_43              => empty(24*3+8),
          -- DATA[2][1]
@@ -2121,7 +2128,7 @@ begin
          rx_inc_45                  => inc(24*3+9),
          rx_load_45                 => load(24*3+9),
          rx_en_vtc_45               => vtc(24*3+9),
-         fifo_rd_clk_45             => clock160MHz(0),
+         fifo_rd_clk_45             => readClk,
          fifo_rd_en_45              => rdEn(24*3+9),
          fifo_empty_45              => empty(24*3+9),
          -- DATA[2][2]
@@ -2132,7 +2139,7 @@ begin
          rx_inc_47                  => inc(24*3+10),
          rx_load_47                 => load(24*3+10),
          rx_en_vtc_47               => vtc(24*3+10),
-         fifo_rd_clk_47             => clock160MHz(0),
+         fifo_rd_clk_47             => readClk,
          fifo_rd_en_47              => rdEn(24*3+10),
          fifo_empty_47              => empty(24*3+10),
          -- DATA[2][3]
@@ -2143,7 +2150,7 @@ begin
          rx_inc_49                  => inc(24*3+11),
          rx_load_49                 => load(24*3+11),
          rx_en_vtc_49               => vtc(24*3+11),
-         fifo_rd_clk_49             => clock160MHz(0),
+         fifo_rd_clk_49             => readClk,
          fifo_rd_en_49              => rdEn(24*3+11),
          fifo_empty_49              => empty(24*3+11),
          -- DATA[3][0]
@@ -2154,7 +2161,7 @@ begin
          rx_inc_23                  => inc(24*3+12),
          rx_load_23                 => load(24*3+12),
          rx_en_vtc_23               => vtc(24*3+12),
-         fifo_rd_clk_23             => clock160MHz(0),
+         fifo_rd_clk_23             => readClk,
          fifo_rd_en_23              => rdEn(24*3+12),
          fifo_empty_23              => empty(24*3+12),
          -- DATA[3][1]
@@ -2165,7 +2172,7 @@ begin
          rx_inc_21                  => inc(24*3+13),
          rx_load_21                 => load(24*3+13),
          rx_en_vtc_21               => vtc(24*3+13),
-         fifo_rd_clk_21             => clock160MHz(0),
+         fifo_rd_clk_21             => readClk,
          fifo_rd_en_21              => rdEn(24*3+13),
          fifo_empty_21              => empty(24*3+13),
          -- DATA[3][2]
@@ -2176,7 +2183,7 @@ begin
          rx_inc_19                  => inc(24*3+14),
          rx_load_19                 => load(24*3+14),
          rx_en_vtc_19               => vtc(24*3+14),
-         fifo_rd_clk_19             => clock160MHz(0),
+         fifo_rd_clk_19             => readClk,
          fifo_rd_en_19              => rdEn(24*3+14),
          fifo_empty_19              => empty(24*3+14),
          -- DATA[3][3]
@@ -2187,7 +2194,7 @@ begin
          rx_inc_17                  => inc(24*3+15),
          rx_load_17                 => load(24*3+15),
          rx_en_vtc_17               => vtc(24*3+15),
-         fifo_rd_clk_17             => clock160MHz(0),
+         fifo_rd_clk_17             => readClk,
          fifo_rd_en_17              => rdEn(24*3+15),
          fifo_empty_17              => empty(24*3+15),
          -- DATA[4][0]
@@ -2198,7 +2205,7 @@ begin
          rx_inc_15                  => inc(24*3+16),
          rx_load_15                 => load(24*3+16),
          rx_en_vtc_15               => vtc(24*3+16),
-         fifo_rd_clk_15             => clock160MHz(0),
+         fifo_rd_clk_15             => readClk,
          fifo_rd_en_15              => rdEn(24*3+16),
          fifo_empty_15              => empty(24*3+16),
          -- DATA[4][1]
@@ -2209,7 +2216,7 @@ begin
          rx_inc_13                  => inc(24*3+17),
          rx_load_13                 => load(24*3+17),
          rx_en_vtc_13               => vtc(24*3+17),
-         fifo_rd_clk_13             => clock160MHz(0),
+         fifo_rd_clk_13             => readClk,
          fifo_rd_en_13              => rdEn(24*3+17),
          fifo_empty_13              => empty(24*3+17),
          -- DATA[4][2]
@@ -2220,7 +2227,7 @@ begin
          rx_inc_10                  => inc(24*3+18),
          rx_load_10                 => load(24*3+18),
          rx_en_vtc_10               => vtc(24*3+18),
-         fifo_rd_clk_10             => clock160MHz(0),
+         fifo_rd_clk_10             => readClk,
          fifo_rd_en_10              => rdEn(24*3+18),
          fifo_empty_10              => empty(24*3+18),
          -- DATA[4][3]
@@ -2231,7 +2238,7 @@ begin
          rx_inc_8                   => inc(24*3+19),
          rx_load_8                  => load(24*3+19),
          rx_en_vtc_8                => vtc(24*3+19),
-         fifo_rd_clk_8              => clock160MHz(0),
+         fifo_rd_clk_8              => readClk,
          fifo_rd_en_8               => rdEn(24*3+19),
          fifo_empty_8               => empty(24*3+19),
          -- DATA[5][0]
@@ -2242,7 +2249,7 @@ begin
          rx_inc_6                   => inc(24*3+20),
          rx_load_6                  => load(24*3+20),
          rx_en_vtc_6                => vtc(24*3+20),
-         fifo_rd_clk_6              => clock160MHz(0),
+         fifo_rd_clk_6              => readClk,
          fifo_rd_en_6               => rdEn(24*3+20),
          fifo_empty_6               => empty(24*3+20),
          -- DATA[5][1]
@@ -2253,7 +2260,7 @@ begin
          rx_inc_4                   => inc(24*3+21),
          rx_load_4                  => load(24*3+21),
          rx_en_vtc_4                => vtc(24*3+21),
-         fifo_rd_clk_4              => clock160MHz(0),
+         fifo_rd_clk_4              => readClk,
          fifo_rd_en_4               => rdEn(24*3+21),
          fifo_empty_4               => empty(24*3+21),
          -- DATA[5][2]
@@ -2264,7 +2271,7 @@ begin
          rx_inc_2                   => inc(24*3+22),
          rx_load_2                  => load(24*3+22),
          rx_en_vtc_2                => vtc(24*3+22),
-         fifo_rd_clk_2              => clock160MHz(0),
+         fifo_rd_clk_2              => readClk,
          fifo_rd_en_2               => rdEn(24*3+22),
          fifo_empty_2               => empty(24*3+22),
          -- DATA[5][3]
@@ -2275,8 +2282,34 @@ begin
          rx_inc_0                   => inc(24*3+23),
          rx_load_0                  => load(24*3+23),
          rx_en_vtc_0                => vtc(24*3+23),
-         fifo_rd_clk_0              => clock160MHz(0),
+         fifo_rd_clk_0              => readClk,
          fifo_rd_en_0               => rdEn(24*3+23),
          fifo_empty_0               => empty(24*3+23));
+
+   -- SIM_TEST :
+   -- for i in 23 downto 0 generate
+   -- SIM_CH :
+   -- for j in 3 downto 0 generate
+   -- U_ISERDES : ISERDESE3
+   -- generic map (
+   -- DATA_WIDTH        => 8,
+   -- FIFO_ENABLE       => "TRUE",
+   -- FIFO_SYNC_MODE    => "FALSE",
+   -- IS_CLK_B_INVERTED => '1',
+   -- IS_CLK_INVERTED   => '0',
+   -- IS_RST_INVERTED   => '0',
+   -- SIM_DEVICE        => "ULTRASCALE_PLUS")
+   -- port map (
+   -- D           => dPortDataP(i)(j),
+   -- Q           => test(4*i+j),
+   -- CLK         => shared_pll0_clkoutphy_out(0),
+   -- CLK_B       => shared_pll0_clkoutphy_out(0),
+   -- CLKDIV      => clock160MHz(0),
+   -- RST         => reset160MHz(0),
+   -- FIFO_RD_CLK => clock160MHz(0),
+   -- FIFO_RD_EN  => '1',
+   -- FIFO_EMPTY  => open);
+   -- end generate SIM_CH;
+   -- end generate SIM_TEST;
 
 end mapping;

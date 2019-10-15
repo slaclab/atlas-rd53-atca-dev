@@ -166,7 +166,36 @@ architecture top_level of AtlasAtcaLinkAggRd53RtmAuroraSelectio is
    signal ref156Rst : sl;
    signal ipmiBsi   : BsiBusType;
 
+   signal dPortDataP : Slv4Array(23 downto 0);
+   signal dPortDataN : Slv4Array(23 downto 0);
+   signal dPortCmdP  : slv(23 downto 0);
+   signal dPortCmdN  : slv(23 downto 0);
+
+   signal i2cSelect : Slv6Array(3 downto 0);
+   signal i2cScl    : slv(3 downto 0);
+   signal i2cSda    : slv(3 downto 0);
+
 begin
+
+   U_RTM_Mapping : entity work.AtlasRd53RtmMapping
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         -- mDP DATA/CMD Interface
+         dPortDataP => dPortDataP,
+         dPortDataN => dPortDataN,
+         dPortCmdP  => dPortCmdP,
+         dPortCmdN  => dPortCmdN,
+         -- I2C Interface
+         i2cSelect  => i2cSelect,
+         i2cScl     => i2cScl,
+         i2cSda     => i2cSda,
+         -- RTM Ports
+         rtmIo      => rtmIo,
+         dpmToRtmP  => dpmToRtmP,
+         dpmToRtmN  => dpmToRtmN,
+         rtmToDpmP  => rtmToDpmP,
+         rtmToDpmN  => rtmToDpmN);
 
    U_App : entity work.Application
       generic map (
@@ -197,6 +226,15 @@ begin
          ref156Clk       => ref156Clk,
          ref156Rst       => ref156Rst,
          ipmiBsi         => ipmiBsi,
+         -- mDP DATA/CMD Interface
+         dPortDataP      => dPortDataP,
+         dPortDataN      => dPortDataN,
+         dPortCmdP       => dPortCmdP,
+         dPortCmdN       => dPortCmdN,
+         -- I2C Interface
+         i2cSelect       => i2cSelect,
+         i2cScl          => i2cScl,
+         i2cSda          => i2cSda,
          --------------------- 
          --  Application Ports
          --------------------- 
@@ -239,13 +277,7 @@ begin
          sfpTxP          => sfpTxP,
          sfpTxN          => sfpTxN,
          sfpRxP          => sfpRxP,
-         sfpRxN          => sfpRxN,
-         -- RTM Ports
-         rtmIo           => rtmIo,
-         dpmToRtmP       => dpmToRtmP,
-         dpmToRtmN       => dpmToRtmN,
-         rtmToDpmP       => rtmToDpmP,
-         rtmToDpmN       => rtmToDpmN);
+         sfpRxN          => sfpRxN);
 
    U_Core : entity work.AtlasAtcaLinkAggCore
       generic map (

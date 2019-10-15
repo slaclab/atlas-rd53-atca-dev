@@ -16,5 +16,6 @@ loadIpCore      -dir "$::DIR_PATH/ip"
 # Load the simulation testbed
 loadSource -sim_only -dir "$::DIR_PATH/tb"
 set_property top {ApplicationTb} [get_filesets sim_1]
+# set_property top {AtlasRd53HsSelectioBank66Tb} [get_filesets sim_1]
 
 set_property strategy Performance_ExplorePostRoutePhysOpt [get_runs impl_1]

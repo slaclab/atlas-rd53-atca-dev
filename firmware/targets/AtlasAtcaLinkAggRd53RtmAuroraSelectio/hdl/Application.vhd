@@ -56,6 +56,15 @@ entity Application is
       ref156Clk       : in    sl;
       ref156Rst       : in    sl;
       ipmiBsi         : in    BsiBusType;
+      -- mDP DATA/CMD Interface
+      dPortDataP      : in    Slv4Array(23 downto 0);
+      dPortDataN      : in    Slv4Array(23 downto 0);
+      dPortCmdP       : out   slv(23 downto 0);
+      dPortCmdN       : out   slv(23 downto 0);
+      -- I2C Interface
+      i2cSelect       : out   Slv6Array(3 downto 0);
+      i2cScl          : inout slv(3 downto 0);
+      i2cSda          : inout slv(3 downto 0);
       --------------------- 
       --  Application Ports
       --------------------- 
@@ -98,13 +107,7 @@ entity Application is
       sfpTxP          : out   slv(3 downto 0);
       sfpTxN          : out   slv(3 downto 0);
       sfpRxP          : in    slv(3 downto 0);
-      sfpRxN          : in    slv(3 downto 0);
-      -- RTM Ports
-      rtmIo          : inout Slv8Array(3 downto 0);
-      dpmToRtmP      : inout Slv16Array(3 downto 0);
-      dpmToRtmN      : inout Slv16Array(3 downto 0);
-      rtmToDpmP      : inout Slv16Array(3 downto 0);
-      rtmToDpmN      : inout Slv16Array(3 downto 0));
+      sfpRxN          : in    slv(3 downto 0));
 end Application;
 
 architecture mapping of Application is
@@ -155,16 +158,8 @@ architecture mapping of Application is
    signal emuTimingMasters : AxiStreamMasterArray(23 downto 0);
    signal emuTimingSlaves  : AxiStreamSlaveArray(23 downto 0);
 
-   signal dPortDataP : Slv4Array(23 downto 0);
-   signal dPortDataN : Slv4Array(23 downto 0);
-   signal dPortCmdP  : slv(23 downto 0);
-   signal dPortCmdN  : slv(23 downto 0);
-   signal serDesData : Slv8Array(95 downto 0);
-   signal dlySlip    : slv(95 downto 0);
-
-   signal i2cSelect : Slv6Array(3 downto 0);
-   signal i2cScl    : slv(3 downto 0);
-   signal i2cSda    : slv(3 downto 0);
+   signal serDesData : Slv8Array(95 downto 0) := (others => (others => '0'));
+   signal dlySlip    : slv(95 downto 0)       := (others => '0');
 
    signal ref160Clock : sl;
    signal ref160Clk   : sl;
@@ -265,29 +260,6 @@ begin
          clk    => ref160Clk,
          rstIn  => ref156Rst,
          rstOut => ref160Rst);
-
-   --------------
-   -- RTM Mapping
-   --------------
-   U_RTM_Mapping : entity work.AtlasRd53RtmMapping
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         -- mDP DATA/CMD Interface
-         dPortDataP => dPortDataP,
-         dPortDataN => dPortDataN,
-         dPortCmdP  => dPortCmdP,
-         dPortCmdN  => dPortCmdN,
-         -- I2C Interface
-         i2cSelect  => i2cSelect,
-         i2cScl     => i2cScl,
-         i2cSda     => i2cSda,
-         -- RTM Ports
-         rtmIo      => rtmIo,
-         dpmToRtmP  => dpmToRtmP,
-         dpmToRtmN  => dpmToRtmN,
-         rtmToDpmP  => rtmToDpmP,
-         rtmToDpmN  => rtmToDpmN);
 
    ------------------------------         
    -- High Speed SelectIO Modules

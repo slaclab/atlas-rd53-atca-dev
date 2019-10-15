@@ -87,16 +87,16 @@ architecture testbed of ApplicationTb is
    signal clk160P : sl := '0';
    signal clk160N : sl := '1';
 
-   signal axilReadMaster  : AxiLiteReadMasterType;
-   signal axilReadSlave   : AxiLiteReadSlaveType;
-   signal axilWriteMaster : AxiLiteWriteMasterType;
-   signal axilWriteSlave  : AxiLiteWriteSlaveType;
+   signal axilWriteMaster : AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
+   signal axilWriteSlave  : AxiLiteWriteSlaveType  := AXI_LITE_WRITE_SLAVE_EMPTY_OK_C;
+   signal axilReadMaster  : AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
+   signal axilReadSlave   : AxiLiteReadSlaveType   := AXI_LITE_READ_SLAVE_EMPTY_OK_C;
 
-   signal rtmIo     : Slv8Array(3 downto 0)  := (others => (others => 'Z'));
-   signal dpmToRtmP : Slv16Array(3 downto 0) := (others => (others => 'Z'));
-   signal dpmToRtmN : Slv16Array(3 downto 0) := (others => (others => 'Z'));
-   signal rtmToDpmP : Slv16Array(3 downto 0) := (others => (others => 'Z'));
-   signal rtmToDpmN : Slv16Array(3 downto 0) := (others => (others => 'Z'));
+   signal rtmIo     : Slv8Array(3 downto 0)  := (others => (others => '0'));
+   signal dpmToRtmP : Slv16Array(3 downto 0) := (others => (others => '0'));
+   signal dpmToRtmN : Slv16Array(3 downto 0) := (others => (others => '1'));
+   signal rtmToDpmP : Slv16Array(3 downto 0) := (others => (others => '0'));
+   signal rtmToDpmN : Slv16Array(3 downto 0) := (others => (others => '1'));
 
 begin
 
@@ -143,9 +143,9 @@ begin
 
    U_Clk160 : entity work.ClkRst
       generic map (
-         CLK_PERIOD_G      => 6.237 ns,
+         CLK_PERIOD_G      => 6.25 ns,
          RST_START_DELAY_G => 0 ns,
-         RST_HOLD_TIME_G   => 1000 ns)
+         RST_HOLD_TIME_G   => 5 us)
       port map (
          clkP => clk160P,
          clkN => clk160N,
@@ -161,33 +161,17 @@ begin
          clkN => clk156N,
          rst  => rst156);
 
-   U_RtmMapping : entity work.AtlasRd53RtmSimMapping
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         -- mDP DATA/CMD Interface
-         dPortDataP => dPortDataP,
-         dPortDataN => dPortDataN,
-         dPortCmdP  => dPortCmdP,
-         dPortCmdN  => dPortCmdN,
-         -- RTM Ports
-         rtmIo      => rtmIo,
-         dpmToRtmP  => dpmToRtmP,
-         dpmToRtmN  => dpmToRtmN,
-         rtmToDpmP  => rtmToDpmP,
-         rtmToDpmN  => rtmToDpmN);
-
-   U_TcpToAxiLite : entity work.RogueTcpMemoryWrap
-      generic map (
-         TPD_G      => TPD_G,
-         PORT_NUM_G => 7000)
-      port map (
-         axilClk         => clk156P,
-         axilRst         => rst156,
-         axilReadMaster  => axilReadMaster,
-         axilReadSlave   => axilReadSlave,
-         axilWriteMaster => axilWriteMaster,
-         axilWriteSlave  => axilWriteSlave);
+   -- U_TcpToAxiLite : entity work.RogueTcpMemoryWrap
+   -- generic map (
+   -- TPD_G      => TPD_G,
+   -- PORT_NUM_G => 7000)
+   -- port map (
+   -- axilClk         => clk156P,
+   -- axilRst         => rst156,
+   -- axilReadMaster  => axilReadMaster,
+   -- axilReadSlave   => axilReadSlave,
+   -- axilWriteMaster => axilWriteMaster,
+   -- axilWriteSlave  => axilWriteSlave);
 
    U_App : entity work.Application
       generic map (
@@ -208,6 +192,11 @@ begin
          ref156Clk       => clk156P,
          ref156Rst       => rst156,
          ipmiBsi         => BSI_BUS_INIT_C,
+         -- mDP DATA/CMD Interface
+         dPortDataP      => dPortDataP,
+         dPortDataN      => dPortDataN,
+         dPortCmdP       => dPortCmdP,
+         dPortCmdN       => dPortCmdN,
          --------------------- 
          --  Application Ports
          --------------------- 
@@ -250,12 +239,6 @@ begin
          sfpTxP          => open,
          sfpTxN          => open,
          sfpRxP          => (others => '0'),
-         sfpRxN          => (others => '1'),
-         -- RTM Ports
-         rtmIo           => rtmIo,
-         dpmToRtmP       => dpmToRtmP,
-         dpmToRtmN       => dpmToRtmN,
-         rtmToDpmP       => rtmToDpmP,
-         rtmToDpmN       => rtmToDpmN);
+         sfpRxN          => (others => '1'));
 
 end testbed;

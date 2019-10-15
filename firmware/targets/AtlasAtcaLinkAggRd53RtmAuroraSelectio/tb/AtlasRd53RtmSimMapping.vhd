@@ -30,16 +30,16 @@ entity AtlasRd53RtmSimMapping is
       TPD_G : time := 1 ns);
    port (
       -- mDP DATA/CMD Interface
-      dPortDataP : in    Slv4Array(23 downto 0);
-      dPortDataN : in    Slv4Array(23 downto 0);
-      dPortCmdP  : out   slv(23 downto 0);
-      dPortCmdN  : out   slv(23 downto 0);
+      dPortDataP : in    Slv4Array(23 downto 0) := (others => x"0");
+      dPortDataN : in    Slv4Array(23 downto 0) := (others => x"F");
+      dPortCmdP  : out   slv(23 downto 0)       := (others => '0');
+      dPortCmdN  : out   slv(23 downto 0)       := (others => '1');
       -- RTM Ports (188 diff. pairs to RTM interface)
-      rtmIo      : inout Slv8Array(3 downto 0);
-      dpmToRtmP  : inout Slv16Array(3 downto 0);
-      dpmToRtmN  : inout Slv16Array(3 downto 0);
-      rtmToDpmP  : inout Slv16Array(3 downto 0);
-      rtmToDpmN  : inout Slv16Array(3 downto 0));
+      rtmIo      : inout Slv8Array(3 downto 0)  := (others => x"00");
+      dpmToRtmP  : inout Slv16Array(3 downto 0) := (others => x"0000");
+      dpmToRtmN  : inout Slv16Array(3 downto 0) := (others => x"FFFF");
+      rtmToDpmP  : inout Slv16Array(3 downto 0) := (others => x"0000");
+      rtmToDpmN  : inout Slv16Array(3 downto 0) := (others => x"FFFF"));
 end AtlasRd53RtmSimMapping;
 
 architecture mapping of AtlasRd53RtmSimMapping is
@@ -51,36 +51,36 @@ begin
 
       GEN_VEC :
       for i in 2 downto 0 generate
-      
+
          dPortCmdP(6*dpm+0+i) <= dpmToRtmP(dpm)(i+12);
          dPortCmdN(6*dpm+0+i) <= dpmToRtmN(dpm)(i+12);
 
-         dpmToRtmP(dpm)(i*4+0) <= dPortDataP(6*dpm+0+i)(0);
-         dpmToRtmN(dpm)(i*4+0) <= dPortDataN(6*dpm+0+i)(0);
+         dpmToRtmP(dpm)(i*4+0) <= dPortDataN(6*dpm+0+i)(0);  -- Inverted in layout
+         dpmToRtmN(dpm)(i*4+0) <= dPortDataP(6*dpm+0+i)(0);  -- Inverted in layout
 
-         dpmToRtmP(dpm)(i*4+1) <= dPortDataP(6*dpm+0+i)(1);
-         dpmToRtmN(dpm)(i*4+1) <= dPortDataN(6*dpm+0+i)(1);
+         dpmToRtmP(dpm)(i*4+1) <= dPortDataN(6*dpm+0+i)(1);  -- Inverted in layout
+         dpmToRtmN(dpm)(i*4+1) <= dPortDataP(6*dpm+0+i)(1);  -- Inverted in layout
 
-         dpmToRtmP(dpm)(i*4+2) <= dPortDataP(6*dpm+0+i)(2);
-         dpmToRtmN(dpm)(i*4+2) <= dPortDataN(6*dpm+0+i)(2);
+         dpmToRtmP(dpm)(i*4+2) <= dPortDataN(6*dpm+0+i)(2);  -- Inverted in layout
+         dpmToRtmN(dpm)(i*4+2) <= dPortDataP(6*dpm+0+i)(2);  -- Inverted in layout
 
-         dpmToRtmP(dpm)(i*4+3) <= dPortDataP(6*dpm+0+i)(3);
-         dpmToRtmN(dpm)(i*4+3) <= dPortDataN(6*dpm+0+i)(3);
+         dpmToRtmP(dpm)(i*4+3) <= dPortDataN(6*dpm+0+i)(3);  -- Inverted in layout
+         dpmToRtmN(dpm)(i*4+3) <= dPortDataP(6*dpm+0+i)(3);  -- Inverted in layout
 
          dPortCmdP(6*dpm+3+i) <= rtmToDpmP(dpm)(i+12);
          dPortCmdN(6*dpm+3+i) <= rtmToDpmN(dpm)(i+12);
 
-         rtmToDpmP(dpm)(i*4+0) <= dPortDataP(6*dpm+3+i)(0);
-         rtmToDpmN(dpm)(i*4+0) <= dPortDataN(6*dpm+3+i)(0);
+         rtmToDpmP(dpm)(i*4+0) <= dPortDataN(6*dpm+3+i)(0);  -- Inverted in layout
+         rtmToDpmN(dpm)(i*4+0) <= dPortDataP(6*dpm+3+i)(0);  -- Inverted in layout
 
-         rtmToDpmP(dpm)(i*4+1) <= dPortDataP(6*dpm+3+i)(1);
-         rtmToDpmN(dpm)(i*4+1) <= dPortDataN(6*dpm+3+i)(1);
+         rtmToDpmP(dpm)(i*4+1) <= dPortDataN(6*dpm+3+i)(1);  -- Inverted in layout
+         rtmToDpmN(dpm)(i*4+1) <= dPortDataP(6*dpm+3+i)(1);  -- Inverted in layout
 
-         rtmToDpmP(dpm)(i*4+2) <= dPortDataP(6*dpm+3+i)(2);
-         rtmToDpmN(dpm)(i*4+2) <= dPortDataN(6*dpm+3+i)(2);
+         rtmToDpmP(dpm)(i*4+2) <= dPortDataN(6*dpm+3+i)(2);  -- Inverted in layout
+         rtmToDpmN(dpm)(i*4+2) <= dPortDataP(6*dpm+3+i)(2);  -- Inverted in layout
 
-         rtmToDpmP(dpm)(i*4+3) <= dPortDataP(6*dpm+3+i)(3);
-         rtmToDpmN(dpm)(i*4+3) <= dPortDataN(6*dpm+3+i)(3);           
+         rtmToDpmP(dpm)(i*4+3) <= dPortDataN(6*dpm+3+i)(3);  -- Inverted in layout
+         rtmToDpmN(dpm)(i*4+3) <= dPortDataP(6*dpm+3+i)(3);  -- Inverted in layout
 
       end generate GEN_VEC;
 
