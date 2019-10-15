@@ -45,7 +45,7 @@ $ git clone --recursive git@github.com:slaclab/atlas-rd53-atca-dev
 
 1) Setup Xilinx licensing (if you are on the SLAC network)
 ```
-$ source cameralink-gateway/firmware/setup_env_slac.sh
+$ source atlas-rd53-atca-dev/firmware/setup_env_slac.sh
 ```
 
 2) Go to the target directory:
@@ -104,7 +104,7 @@ $ source /path/to/my/anaconda3/etc/profile.d/conda.sh
 $ source setup_env.sh
 
 # Launch the PyQT GUI
-$ python scripts/gui.py --ip <List of IP addresses> --mcs <PATH_TO_MCS_FILE>
+$ python scripts/gui.py --ip <List of IP addresses>
 ```
 
 <!--- ######################################################## -->
