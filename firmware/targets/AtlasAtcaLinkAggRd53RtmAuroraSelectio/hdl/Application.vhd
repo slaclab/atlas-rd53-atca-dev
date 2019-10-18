@@ -158,8 +158,9 @@ architecture mapping of Application is
    signal emuTimingMasters : AxiStreamMasterArray(23 downto 0);
    signal emuTimingSlaves  : AxiStreamSlaveArray(23 downto 0);
 
-   signal serDesData : Slv8Array(95 downto 0) := (others => (others => '0'));
-   signal dlySlip    : slv(95 downto 0)       := (others => '0');
+   signal serDesData : Slv8Array(95 downto 0);
+   signal dlyLoad    : slv(95 downto 0);
+   signal dlyCfg     : Slv9Array(95 downto 0);
 
    signal ref160Clock : sl;
    signal ref160Clk   : sl;
@@ -170,6 +171,16 @@ architecture mapping of Application is
 
    signal smaClk       : sl;
    signal pllToFpgaClk : sl;
+
+   signal iDelayCtrlRdy : sl;
+   signal refClk300MHz  : sl;
+   signal refRst300MHz  : sl;
+
+   attribute IODELAY_GROUP                 : string;
+   attribute IODELAY_GROUP of U_IDELAYCTRL : label is "rd53_aurora";
+
+   attribute KEEP_HIERARCHY                 : string;
+   attribute KEEP_HIERARCHY of U_IDELAYCTRL : label is "TRUE";
 
 begin
 
@@ -203,30 +214,37 @@ begin
          clkOutP => fpgaToPllClkP,
          clkOutN => fpgaToPllClkN);
 
-   U_TERM_GTs : entity work.Gthe4ChannelDummy
-      generic map (
-         TPD_G   => TPD_G,
-         WIDTH_G => 4)
-      port map (
-         refClk => ref156Clk,
-         gtRxP  => sfpRxP,
-         gtRxN  => sfpRxN,
-         gtTxP  => sfpTxP,
-         gtTxN  => sfpTxN);
+   --------------------------
+   -- Reference 300 MHz clock 
+   --------------------------
+   U_MMCM : entity work.ClockManagerUltraScale
+      generic map(
+         TPD_G              => TPD_G,
+         SIMULATION_G       => SIMULATION_G,
+         TYPE_G             => "MMCM",
+         INPUT_BUFG_G       => false,
+         FB_BUFG_G          => true,
+         RST_IN_POLARITY_G  => '1',
+         NUM_CLOCKS_G       => 1,
+         -- MMCM attributes
+         BANDWIDTH_G        => "OPTIMIZED",
+         CLKIN_PERIOD_G     => 6.4,
+         DIVCLK_DIVIDE_G    => 1,
+         CLKFBOUT_MULT_F_G  => 6.0,
+         CLKOUT0_DIVIDE_F_G => 3.125)   -- 300 MHz = 937.5 MHz/3.125
+      port map(
+         clkIn     => axilClk,
+         rstIn     => axilRst,
+         clkOut(0) => refClk300MHz,
+         rstOut(0) => refRst300MHz);
 
-   GEN_QSFP :
-   for i in 1 downto 0 generate
-      U_TERM_GTs : entity work.Gtye4ChannelDummy
-         generic map (
-            TPD_G   => TPD_G,
-            WIDTH_G => 4)
-         port map (
-            refClk => ref156Clk,
-            gtRxP  => qsfpRxP(i),
-            gtRxN  => qsfpRxN(i),
-            gtTxP  => qsfpTxP(i),
-            gtTxN  => qsfpTxN(i));
-   end generate GEN_QSFP;
+   U_IDELAYCTRL : IDELAYCTRL
+      generic map (
+         SIM_DEVICE => "ULTRASCALE")
+      port map (
+         RDY    => iDelayCtrlRdy,
+         REFCLK => refClk300MHz,
+         RST    => refRst300MHz);
 
    -----------
    -- Clocking
@@ -269,17 +287,19 @@ begin
          TPD_G        => TPD_G,
          SIMULATION_G => SIMULATION_G)
       port map (
-         ref160Clk  => ref160Clk,
-         ref160Rst  => ref160Rst,
+         ref160Clk     => ref160Clk,
+         ref160Rst     => ref160Rst,
          -- Deserialization Interface
-         serDesData => serDesData,
-         dlySlip    => dlySlip,
+         serDesData    => serDesData,
+         dlyLoad       => dlyLoad,
+         dlyCfg        => dlyCfg,
+         iDelayCtrlRdy => iDelayCtrlRdy,
          -- mDP DATA Interface
-         dPortDataP => dPortDataP,
-         dPortDataN => dPortDataN,
+         dPortDataP    => dPortDataP,
+         dPortDataN    => dPortDataN,
          -- Timing Clock/Reset Interface
-         clk160MHz  => clk160MHz,
-         rst160MHz  => rst160MHz);
+         clk160MHz     => clk160MHz,
+         rst160MHz     => rst160MHz);
 
    --------------------
    -- AXI-Lite Crossbar
@@ -321,6 +341,37 @@ begin
          mAxiReadSlaves      => rxPhyReadSlaves);
 
    NOT_SIM : if (SIMULATION_G = false) generate
+   
+      ----------------------------------------------------
+      -- https://www.xilinx.com/support/answers/70060.html
+      ----------------------------------------------------
+      U_TERM_GTs : entity work.Gthe4ChannelDummy
+         generic map (
+            TPD_G   => TPD_G,
+            WIDTH_G => 4)
+         port map (
+            refClk => ref156Clk,
+            gtRxP  => sfpRxP,
+            gtRxN  => sfpRxN,
+            gtTxP  => sfpTxP,
+            gtTxN  => sfpTxN);
+
+      ----------------------------------------------------
+      -- https://www.xilinx.com/support/answers/70060.html
+      ----------------------------------------------------
+      GEN_QSFP :
+      for i in 1 downto 0 generate
+         U_TERM_GTs : entity work.Gtye4ChannelDummy
+            generic map (
+               TPD_G   => TPD_G,
+               WIDTH_G => 4)
+            port map (
+               refClk => ref156Clk,
+               gtRxP  => qsfpRxP(i),
+               gtRxN  => qsfpRxN(i),
+               gtTxP  => qsfpTxP(i),
+               gtTxN  => qsfpTxN(i));
+      end generate GEN_QSFP;   
 
       ----------------------
       -- AXI-Lite: Power I2C
@@ -413,7 +464,8 @@ begin
             rst160MHz       => rst160MHz,
             -- Deserialization Interface
             serDesData      => serDesData(4*i+3 downto 4*i),
-            dlySlip         => dlySlip(4*i+3 downto 4*i),
+            dlyLoad         => dlyLoad(4*i+3 downto 4*i),
+            dlyCfg          => dlyCfg(4*i+3 downto 4*i),
             -- RD53 ASIC Serial Ports
             dPortCmdP       => dPortCmdP(i),
             dPortCmdN       => dPortCmdN(i));

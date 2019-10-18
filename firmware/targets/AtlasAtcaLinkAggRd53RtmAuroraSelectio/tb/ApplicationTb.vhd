@@ -131,14 +131,14 @@ begin
             ------------------------------------------------
             -- 4x serial output data links @ 1.28 Gb/s [CML]
             ------------------------------------------------
-            GTX0_P_PAD      => dPortDataP(i)(0),
-            GTX0_N_PAD      => dPortDataN(i)(0),
-            GTX1_P_PAD      => dPortDataP(i)(1),
-            GTX1_N_PAD      => dPortDataN(i)(1),
-            GTX2_P_PAD      => dPortDataP(i)(2),
-            GTX2_N_PAD      => dPortDataN(i)(2),
-            GTX3_P_PAD      => dPortDataP(i)(3),
-            GTX3_N_PAD      => dPortDataN(i)(3));
+            GTX0_P_PAD      => dPortDataN(i)(0),   -- Inverter in layout
+            GTX0_N_PAD      => dPortDataP(i)(0),   -- Inverter in layout
+            GTX1_P_PAD      => dPortDataN(i)(1),   -- Inverter in layout
+            GTX1_N_PAD      => dPortDataP(i)(1),   -- Inverter in layout
+            GTX2_P_PAD      => dPortDataN(i)(2),   -- Inverter in layout
+            GTX2_N_PAD      => dPortDataP(i)(2),   -- Inverter in layout
+            GTX3_P_PAD      => dPortDataN(i)(3),   -- Inverter in layout
+            GTX3_N_PAD      => dPortDataP(i)(3));  -- Inverter in layout
    end generate GEN_VEC;
 
    U_Clk160 : entity work.ClkRst
@@ -161,17 +161,17 @@ begin
          clkN => clk156N,
          rst  => rst156);
 
-   -- U_TcpToAxiLite : entity work.RogueTcpMemoryWrap
-   -- generic map (
-   -- TPD_G      => TPD_G,
-   -- PORT_NUM_G => 7000)
-   -- port map (
-   -- axilClk         => clk156P,
-   -- axilRst         => rst156,
-   -- axilReadMaster  => axilReadMaster,
-   -- axilReadSlave   => axilReadSlave,
-   -- axilWriteMaster => axilWriteMaster,
-   -- axilWriteSlave  => axilWriteSlave);
+   U_TcpToAxiLite : entity work.RogueTcpMemoryWrap
+      generic map (
+         TPD_G      => TPD_G,
+         PORT_NUM_G => 7000)
+      port map (
+         axilClk         => clk156P,
+         axilRst         => rst156,
+         axilReadMaster  => axilReadMaster,
+         axilReadSlave   => axilReadSlave,
+         axilWriteMaster => axilWriteMaster,
+         axilWriteSlave  => axilWriteSlave);
 
    U_App : entity work.Application
       generic map (

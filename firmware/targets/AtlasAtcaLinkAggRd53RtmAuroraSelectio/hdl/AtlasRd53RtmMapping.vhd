@@ -30,20 +30,20 @@ entity AtlasRd53RtmMapping is
       TPD_G : time := 1 ns);
    port (
       -- mDP DATA/CMD Interface
-      dPortDataP : out   Slv4Array(23 downto 0) := (others => x"0");
-      dPortDataN : out   Slv4Array(23 downto 0) := (others => x"F");
-      dPortCmdP  : in    slv(23 downto 0)       := (others => '0');
-      dPortCmdN  : in    slv(23 downto 0)       := (others => '1');
+      dPortDataP : out   Slv4Array(23 downto 0);
+      dPortDataN : out   Slv4Array(23 downto 0);
+      dPortCmdP  : in    slv(23 downto 0);
+      dPortCmdN  : in    slv(23 downto 0);
       -- I2C Interface
-      i2cSelect  : in    Slv6Array(3 downto 0)  := (others => (others => '0'));
-      i2cScl     : inout slv(3 downto 0)        := (others => '1');
-      i2cSda     : inout slv(3 downto 0)        := (others => '1');
+      i2cSelect  : in    Slv6Array(3 downto 0);
+      i2cScl     : inout slv(3 downto 0);
+      i2cSda     : inout slv(3 downto 0);
       -- RTM Ports
-      rtmIo      : inout Slv8Array(3 downto 0)  := (others => x"00");
-      dpmToRtmP  : inout Slv16Array(3 downto 0) := (others => x"0000");
-      dpmToRtmN  : inout Slv16Array(3 downto 0) := (others => x"FFFF");
-      rtmToDpmP  : inout Slv16Array(3 downto 0) := (others => x"0000");
-      rtmToDpmN  : inout Slv16Array(3 downto 0) := (others => x"FFFF"));
+      rtmIo      : inout Slv8Array(3 downto 0);
+      dpmToRtmP  : inout Slv16Array(3 downto 0);
+      dpmToRtmN  : inout Slv16Array(3 downto 0);
+      rtmToDpmP  : inout Slv16Array(3 downto 0);
+      rtmToDpmN  : inout Slv16Array(3 downto 0));
 end AtlasRd53RtmMapping;
 
 architecture mapping of AtlasRd53RtmMapping is
