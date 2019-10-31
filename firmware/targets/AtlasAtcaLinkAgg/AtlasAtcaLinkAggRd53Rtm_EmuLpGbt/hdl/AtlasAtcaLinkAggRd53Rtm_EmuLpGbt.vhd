@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AtlasAtcaLinkAggRd53Rtm_LpGbt.vhd
+-- File       : AtlasAtcaLinkAggRd53Rtm_EmuLpGbt.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: Top Level Firmware for reading out RD53 on 24 mDP via RTM
@@ -24,7 +24,7 @@ use work.AtlasAtcaLinkAggPkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity AtlasAtcaLinkAggRd53Rtm_LpGbt is
+entity AtlasAtcaLinkAggRd53Rtm_EmuLpGbt is
    generic (
       TPD_G        : time    := 1 ns;
       SIMULATION_G : boolean := false;
@@ -120,9 +120,9 @@ entity AtlasAtcaLinkAggRd53Rtm_LpGbt is
       -- SYSMON Ports
       vPIn           : in    sl;
       vNIn           : in    sl);
-end AtlasAtcaLinkAggRd53Rtm_LpGbt;
+end AtlasAtcaLinkAggRd53Rtm_EmuLpGbt;
 
-architecture top_level of AtlasAtcaLinkAggRd53Rtm_LpGbt is
+architecture top_level of AtlasAtcaLinkAggRd53Rtm_EmuLpGbt is
 
    constant ETH_CONFIG_C : EthConfigArray := (
       -----------------------------------------------------------------------------------

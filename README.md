@@ -41,70 +41,122 @@ $ git clone --recursive git@github.com:slaclab/atlas-rd53-atca-dev
 
 <!--- ######################################################## -->
 
-# How to build the simple SMGII example firmware
+# Setup Xilinx licensing for Vivado
 
-1) Setup Xilinx licensing (if you are on the SLAC network)
+Use the script to setup Xilinx licensing (if you are on the SLAC network)
+
 ```
 $ source atlas-rd53-atca-dev/firmware/setup_env_slac.sh
 ```
 
-2) Go to the target directory:
+<!--- ######################################################## -->
+
+# How to build the ZCU102 LpGBT firmware
+
+Go to the target directory:
+
 ```
-$ cd atlas-rd53-atca-dev/firmware/targets/AtlasAtcaLinkAggSgmii/
+$ cd atlas-rd53-atca-dev/firmware/targets/XilinxZcu102/XilinxZcu102LpGbt
 ```
 
 Optional#1: Build the firmware in batch mode
+
 ```
 $ make
 ```
 
 Optional#2: Build the firmware in GUI mode
+
 ```
 $ make gui
 ```
 
 <!--- ######################################################## -->
 
-# How to install the Rogue With Anaconda
+# How to build the KCU105 (RD53 FMC card + Emulation LpGBT) firmware
 
-- Rogue is the `rapid prototyping` software used at SLAC
-
-> https://slaclab.github.io/rogue/installing/anaconda.html
-
-<!--- ######################################################## -->
-
-# How to reprogram the FPGA PROM via Rogue software
+Go to the target directory:
 
 ```
-# Go to software directory
-$ cd atlas-rd53-atca-dev/software
+$ cd atlas-rd53-atca-dev/firmware/targets/XilinxKcu105/AtlasRd53FmcXilinxKcu105_EmuLpGbt
+```
 
-# Activate Rogue conda Environment 
-$ source /path/to/my/anaconda3/etc/profile.d/conda.sh
+Optional#1: Build the firmware in batch mode
 
-# Setup the Python Environment
-$ source setup_env.sh
+```
+$ make
+```
 
-# Reprogram the FPGA
-$ python3 scripts/updateFpgaProm.py --ip <List of IP addresses> --mcs <PATH_TO_MCS_FILE>
+Optional#2: Build the firmware in GUI mode
+
+```
+$ make gui
 ```
 
 <!--- ######################################################## -->
 
-# How to run the Rogue PyQT GUI
+# How to build the RCE's DPM RUDP Node (includes RUDP client and RUDP server)
+
+Go to the target directory:
 
 ```
-# Go to software directory
-$ cd atlas-rd53-atca-dev/software
+$ cd atlas-rd53-atca-dev/firmware/targets/RceDpm/DpmRudpNode
+```
 
-# Activate Rogue conda Environment 
-$ source /path/to/my/anaconda3/etc/profile.d/conda.sh
+Optional#1: Build the firmware in batch mode
 
-# Setup the Python Environment
-$ source setup_env.sh
+```
+$ make
+```
 
-# Launch the PyQT GUI
-$ python scripts/gui.py --ip <List of IP addresses>
+Optional#2: Build the firmware in GUI mode
+
+```
+$ make gui
+```
+
+<!--- ######################################################## -->
+
+# How to build the AtlasAtcaLinkAgg (24 mDP RD53 RTM + Emulation LpGBT) firmware
+
+Go to the target directory:
+
+```
+$ cd atlas-rd53-atca-dev/firmware/targets/AtlasAtcaLinkAgg/AtlasAtcaLinkAggRd53Rtm_EmuLpGbt
+```
+
+Optional#1: Build the firmware in batch mode
+
+```
+$ make
+```
+
+Optional#2: Build the firmware in GUI mode
+
+```
+$ make gui
+```
+
+<!--- ######################################################## -->
+
+# How to build the AtlasAtcaLinkAgg (24 mDP RD53 RTM + backplane ETH to DpmRudpNode) firmware
+
+Go to the target directory:
+
+```
+$ cd atlas-rd53-atca-dev/firmware/targets/AtlasAtcaLinkAgg/AtlasAtcaLinkAggRd53Rtm_BackplaneEth
+```
+
+Optional#1: Build the firmware in batch mode
+
+```
+$ make
+```
+
+Optional#2: Build the firmware in GUI mode
+
+```
+$ make gui
 ```
 
 <!--- ######################################################## -->

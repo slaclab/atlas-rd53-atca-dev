@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AtlasRd53FmcXilinxKcu105_LpGbt.vhd
+-- File       : AtlasRd53FmcXilinxKcu105_EmuLpGbt.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: 
@@ -25,7 +25,7 @@ use work.I2cPkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity AtlasRd53FmcXilinxKcu105_LpGbt is
+entity AtlasRd53FmcXilinxKcu105_EmuLpGbt is
    generic (
       TPD_G        : time := 1 ns;
       BUILD_INFO_G : BuildInfoType);
@@ -49,9 +49,9 @@ entity AtlasRd53FmcXilinxKcu105_LpGbt is
       sfpTxN       : out   slv(1 downto 0);
       sfpRxP       : in    slv(1 downto 0);
       sfpRxN       : in    slv(1 downto 0));
-end AtlasRd53FmcXilinxKcu105_LpGbt;
+end AtlasRd53FmcXilinxKcu105_EmuLpGbt;
 
-architecture top_level of AtlasRd53FmcXilinxKcu105_LpGbt is
+architecture top_level of AtlasRd53FmcXilinxKcu105_EmuLpGbt is
 
    constant XIL_DEVICE_C : string := "ULTRASCALE";
 
