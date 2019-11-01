@@ -49,6 +49,7 @@ entity AtlasRd53EmuLpGbtLane is
       serDesData      : in  Slv8Array(NUM_ELINK_G-1 downto 0);
       rxLinkUp        : in  slv(NUM_ELINK_G-1 downto 0);
       -- SFP Interface
+      refClk320       : in  sl;  -- Using jitter clean FMC 320 MHz reference
       gtRefClk320     : in  sl;  -- Using jitter clean FMC 320 MHz reference
       sfpTxP          : out sl;
       sfpTxN          : out sl;
@@ -74,15 +75,18 @@ architecture rtl of AtlasRd53EmuLpGbtLane is
    signal downlinkEcData   : slv(1 downto 0)  := (others => '0');
    signal downlinkIcData   : slv(1 downto 0)  := (others => '0');
    signal downlinkReady    : sl;
+   signal donwlinkClk      : sl;
+   signal downlinkRst      : sl;
+   signal downlinkClkEn    : sl;
 
    signal uplinkUserData : slv(229 downto 0) := (others => '0');
    signal uplinkEcData   : slv(1 downto 0)   := (others => '0');
    signal uplinkIcData   : slv(1 downto 0)   := (others => '0');
    signal uplinkReady    : sl;
+   signal uplinkClk      : sl;
+   signal uplinkRst      : sl;
+   signal uplinkClkEn    : sl;
 
-   signal clk320      : sl;
-   signal rst320      : sl;
-   signal clkEn40     : sl;
    signal reset160MHz : sl;
 
 begin
@@ -94,6 +98,17 @@ begin
          clk    => clk160MHz,
          rstIn  => rst160MHz,
          rstOut => reset160MHz);
+
+   -------------------------
+   -- Generate the uplinkRst
+   -------------------------
+   U_uplinkRst : entity work.PwrUpRst
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         arst   => axilRst,
+         clk    => uplinkClk,
+         rstOut => uplinkRst);
 
    -------------------------
    -- DATA Generation Module
@@ -123,11 +138,11 @@ begin
             slaveValid  => '1',
             slaveReady  => open,
             -- Master Interface
-            masterClk   => clk320,
-            masterRst   => rst320,
+            masterClk   => uplinkClk,
+            masterRst   => uplinkRst,
             masterData  => uplinkUserData((i*32)+31 downto i*32),
             masterValid => open,
-            masterReady => clkEn40);
+            masterReady => uplinkClkEn);
 
    end generate GEN_DATA;
 
@@ -138,24 +153,24 @@ begin
       generic map (
          FEC => FEC12)
       port map (
-         -- Clocks
-         donwlinkClk_i       => clk320,
-         downlinkClkEn_i     => clkEn40,
-         uplinkClk_o         => clk320,
-         uplinkClkEn_o       => clkEn40,
-         downlinkRst_i       => rst320,
-         uplinkRst_i         => rst320,
-         -- Down link
-         downlinkUserData_o  => downlinkUserData,
-         downlinkEcData_o    => downlinkEcData,
-         downlinkIcData_o    => downlinkIcData,
-         downlinkReady_o     => downlinkReady,
          -- Up link
+         uplinkClk_o         => uplinkClk,      -- 320 MHz
+         uplinkClkEn_o       => uplinkClkEn,    -- 40 MHz strobe
+         uplinkRst_i         => uplinkRst,
          uplinkUserData_i    => uplinkUserData,
          uplinkEcData_i      => uplinkEcData,
          uplinkIcData_i      => uplinkIcData,
          uplinkReady_o       => uplinkReady,
+         -- Down link
+         donwlinkClk_o       => donwlinkClk,    -- 320 MHz
+         downlinkClkEn_o     => downlinkClkEn,  -- 40 MHz strobe
+         downlinkRst_i       => downlinkRst,
+         downlinkUserData_o  => downlinkUserData,
+         downlinkEcData_o    => downlinkEcData,
+         downlinkIcData_o    => downlinkIcData,
+         downlinkReady_o     => downlinkReady,
          -- MGT
+         clk_refclk_i        => refClk320,
          clk_mgtrefclk_i     => gtRefClk320,
          clk_mgtfreedrpclk_i => axilClk,
          mgt_rxn_i           => sfpRxN,
@@ -163,13 +178,16 @@ begin
          mgt_txn_o           => sfpTxN,
          mgt_txp_o           => sfpTxP);
 
-   U_rst320 : entity work.PwrUpRst
+   ---------------------------
+   -- Generate the downlinkRst
+   ---------------------------
+   U_downlinkRst : entity work.PwrUpRst
       generic map (
          TPD_G => TPD_G)
       port map (
-         arst   => rst160MHz,
-         clk    => clk320,
-         rstOut => rst320);
+         arst   => axilRst,
+         clk    => donwlinkClk,
+         rstOut => downlinkRst);
 
    ------------------------
    -- CMD Generation Module
@@ -190,10 +208,10 @@ begin
             FIFO_ADDR_WIDTH_G    => 5)
          port map (
             -- Slave Interface
-            slaveClk      => clk320,
-            slaveRst      => rst320,
+            slaveClk      => donwlinkClk,
+            slaveRst      => downlinkRst,
             slaveData     => downlinkUserData((i*4)+3 downto i*4),
-            slaveValid    => clkEn40,
+            slaveValid    => downlinkClkEn,
             slaveReady    => open,
             -- Master Interface
             masterClk     => clk160MHz,

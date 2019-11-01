@@ -18,3 +18,6 @@ loadSource -sim_only -dir "$::DIR_PATH/tb"
 set_property top {ApplicationTb} [get_filesets sim_1]
 
 set_property strategy Performance_ExplorePostRoutePhysOpt [get_runs impl_1]
+
+# Adding the common Si5345 configuration
+add_files -norecurse "$::DIR_PATH/pll-config/AtlasAtcaLinkAggRd53Rtm_EmuLpGbt.mem"

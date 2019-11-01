@@ -15,6 +15,8 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.std_logic_arith.all;
+use ieee.std_logic_unsigned.all;
 
 use work.lpgbtfpga_package.all;
 
@@ -25,14 +27,10 @@ entity LpGbtFpga10g24 is
    generic (
       FEC : integer range 0 to 2);      --! FEC selection can be: FEC5 or FEC12
    port (
-      -- Clocks
-      donwlinkClk_i               : in  std_logic;  --! Downlink datapath clock (either 320 or 40MHz)
-      downlinkClkEn_i             : in  std_logic;  --! Clock enable (1 over 8 when encoding runs @ 320Mhz, '1' @ 40MHz)
-      uplinkClk_o                 : out std_logic;  --! Clock provided by the Rx serdes: in phase with data
-      uplinkClkEn_o               : out std_logic;  --! Clock enable pulsed when new data is ready
-      downlinkRst_i               : in  std_logic;  --! Reset the downlink path
-      uplinkRst_i                 : in  std_logic;  --! Reset the uplink path
       -- Down link
+      donwlinkClk_o               : out std_logic;  --! Downlink datapath clock (either 320 or 40MHz)
+      downlinkClkEn_o             : out std_logic;  --! Clock enable (1 over 8 when encoding runs @ 320Mhz, '1' @ 40MHz)
+      downlinkRst_i               : in  std_logic;  --! Reset the downlink path
       downlinkUserData_i          : in  std_logic_vector(31 downto 0);  --! Downlink data (user)
       downlinkEcData_i            : in  std_logic_vector(1 downto 0);  --! Downlink EC field
       downlinkIcData_i            : in  std_logic_vector(1 downto 0);  --! Downlink IC field
@@ -41,6 +39,9 @@ entity LpGbtFpga10g24 is
       downLinkBypassScrambler_i   : in  std_logic                    := '0';  --! Bypass downlink scrambler (test purpose only)
       downlinkReady_o             : out std_logic;  --! Downlink ready status
       -- Up link
+      uplinkClk_o                 : out std_logic;  --! Clock provided by the Rx serdes: in phase with data
+      uplinkClkEn_o               : out std_logic;  --! Clock enable pulsed when new data is ready
+      uplinkRst_i                 : in  std_logic;  --! Reset the uplink path
       uplinkUserData_o            : out std_logic_vector(229 downto 0);  --! Uplink data (user)
       uplinkEcData_o              : out std_logic_vector(1 downto 0);  --! Uplink EC field
       uplinkIcData_o              : out std_logic_vector(1 downto 0);  --! Uplink IC field
@@ -49,6 +50,7 @@ entity LpGbtFpga10g24 is
       uplinkBypassScrambler_i     : in  std_logic                    := '0';  --! Bypass uplink scrambler (test purpose only)
       uplinkReady_o               : out std_logic;  --! Uplink ready status
       -- MGT
+      clk_refclk_i                : in  std_logic;  --! Transceiver serial clock
       clk_mgtrefclk_i             : in  std_logic;  --! Transceiver serial clock
       clk_mgtfreedrpclk_i         : in  std_logic;
       mgt_rxn_i                   : in  std_logic;
@@ -68,9 +70,31 @@ architecture mapping of LpGbtFpga10g24 is
    signal mgt_rxslide_s      : std_logic;
    signal mgt_txrdy_s        : std_logic;
    signal mgt_rxrdy_s        : std_logic;
-   signal clk_mgtRxClk_s     : std_logic;
+
+   signal downlinkClk_s   : std_logic;
+   signal downlinkClkEn_s : std_logic;
+   signal downlinkCnt_s   : std_logic_vector(2 downto 0) := (others => '0');
+
+   signal uplinkClk_s   : std_logic;
+   signal uplinkClkEn_s : std_logic;
+   signal uplinkCnt_s   : std_logic_vector(2 downto 0) := (others => '0');
 
 begin
+
+   donwlinkClk_o   <= downlinkClk_s;
+   downlinkClkEn_o <= downlinkClkEn_s;
+
+   process(downlinkClk_s)
+   begin
+      if rising_edge(downlinkClk_s) then
+         if downlinkCnt_s = 0 then
+            downlinkClkEn_s <= '1';
+         else
+            downlinkClkEn_s <= '0';
+         end if;
+         downlinkCnt_s <= downlinkCnt_s + 1;
+      end if;
+   end process;
 
    downlink_inst : entity work.lpgbtfpga_Downlink
       generic map(
@@ -80,8 +104,8 @@ begin
          c_outputWidth    => 32)
       port map(
          -- Clocks
-         clk_i               => donwlinkClk_i,
-         clkEn_i             => downlinkClkEn_i,
+         clk_i               => downlinkClk_s,
+         clkEn_i             => downlinkClkEn_s,
          rst_n_i             => mgt_txrdy_s,
          -- Down link
          userData_i          => downlinkUserData_i,
@@ -97,15 +121,15 @@ begin
          rdy_o               => downlinkReady_o);
 
    mgt_inst : entity work.xlx_ku_mgt_10g24
-      generic map(
-         USRCLK_DOMAIN_SEL => true)     -- true: rxoutclk,
       port map(
          --=============--
          -- Clocks      --
          --=============--
          MGT_REFCLK_i      => clk_mgtrefclk_i,
+         MGT_REFCLK_BUFG_i => clk_refclk_i,
          MGT_FREEDRPCLK_i  => clk_mgtfreedrpclk_i,
-         MGT_USRCLK_o      => clk_mgtRxClk_s,
+         MGT_TXUSRCLK_o    => downlinkClk_s,
+         MGT_RXUSRCLK_o    => uplinkClk_s,
          --=============--
          -- Resets      --
          --=============--
@@ -135,7 +159,8 @@ begin
          TXn_o             => mgt_txn_o,
          TXp_o             => mgt_txp_o);
 
-   uplinkClk_o <= clk_mgtRxClk_s;
+   uplinkClk_o   <= uplinkClk_s;
+   uplinkClkEn_o <= uplinkClkEn_s;
 
    uplink_inst : entity work.lpgbtfpga_Uplink
       generic map(
@@ -154,8 +179,8 @@ begin
       port map(
          -- Clock and reset
          clk_freeRunningClk_i => clk_mgtfreedrpclk_i,
-         uplinkClk_i          => clk_mgtRxClk_s,
-         uplinkClkOutEn_o     => uplinkClkEn_o,
+         uplinkClk_i          => uplinkClk_s,
+         uplinkClkOutEn_o     => uplinkClkEn_s,
          uplinkRst_n_i        => mgt_rxrdy_s,
          -- Input
          mgt_word_o           => uplink_mgtword_s,

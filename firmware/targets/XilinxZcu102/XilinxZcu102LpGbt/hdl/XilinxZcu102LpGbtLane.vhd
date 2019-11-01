@@ -45,6 +45,7 @@ entity XilinxZcu102LpGbtLane is
       dmaObMaster     : in  AxiStreamMasterType;
       dmaObSlave      : out AxiStreamSlaveType;
       -- SFP Interface
+      refClk320       : in  sl;  -- Using jitter clean FMC 320 MHz reference
       gtRefClk320     : in  sl;  -- Using jitter clean FMC 320 MHz reference
       sfpTxP          : out sl;
       sfpTxN          : out sl;
@@ -70,6 +71,13 @@ architecture rtl of XilinxZcu102LpGbtLane is
          tDestBits => 0,
          tUserBits => 2);
 
+   constant AXIL_XBAR_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_ELINK_C-1 downto 0) := genAxiLiteConfig(NUM_ELINK_C, AXIL_BASE_ADDR_G, 20, 16);
+
+   signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_ELINK_C-1 downto 0);
+   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_ELINK_C-1 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_SLVERR_C);
+   signal axilReadMasters  : AxiLiteReadMasterArray(NUM_ELINK_C-1 downto 0);
+   signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_ELINK_C-1 downto 0)  := (others => AXI_LITE_READ_SLAVE_EMPTY_SLVERR_C);
+
    signal dmaObMasters : AxiStreamMasterArray(NUM_ELINK_C-1 downto 0);
    signal dmaObSlaves  : AxiStreamSlaveArray(NUM_ELINK_C-1 downto 0);
 
@@ -91,51 +99,68 @@ architecture rtl of XilinxZcu102LpGbtLane is
    signal downlinkEcData   : slv(1 downto 0)  := (others => '0');
    signal downlinkIcData   : slv(1 downto 0)  := (others => '0');
    signal downlinkReady    : sl;
+   signal donwlinkClk      : sl;
+   signal downlinkRst      : sl;
+   signal downlinkClkEn    : sl;
 
    signal uplinkUserData : slv(229 downto 0) := (others => '0');
    signal uplinkEcData   : slv(1 downto 0)   := (others => '0');
    signal uplinkIcData   : slv(1 downto 0)   := (others => '0');
    signal uplinkReady    : sl;
+   signal uplinkClk      : sl;
+   signal uplinkRst      : sl;
+   signal uplinkClkEn    : sl;
 
-   signal rxAligned : slv(NUM_ELINK_C-1 downto 0);
-   signal rxBitSlip : slv(NUM_ELINK_C-1 downto 0);
-   signal rxValid   : slv(NUM_ELINK_C-1 downto 0);
+   signal rxAligned : Slv4Array(NUM_ELINK_C-1 downto 0) := (others => x"0");
+   signal rxBitSlip : Slv4Array(NUM_ELINK_C-1 downto 0) := (others => x"0");
+   signal rxValid   : Slv4Array(NUM_ELINK_C-1 downto 0) := (others => x"0");
    signal rxHeader  : Slv2Array(NUM_ELINK_C-1 downto 0);
    signal rxData    : Slv64Array(NUM_ELINK_C-1 downto 0);
 
-   signal unscramblerValid : slv(NUM_ELINK_C-1 downto 0);
+   signal unscramblerValid : Slv4Array(NUM_ELINK_C-1 downto 0) := (others => x"0");
    signal rawHeader        : Slv2Array(NUM_ELINK_C-1 downto 0);
    signal rawData          : Slv64Array(NUM_ELINK_C-1 downto 0);
 
-   signal valid  : slv(NUM_ELINK_C-1 downto 0);
+   signal valid  : Slv4Array(NUM_ELINK_C-1 downto 0) := (others => x"0");
    signal header : Slv2Array(NUM_ELINK_C-1 downto 0);
    signal data   : Slv64Array(NUM_ELINK_C-1 downto 0);
 
-   signal clk320   : sl;
-   signal rst320   : sl;
-   signal clkEn40  : sl;
    signal clkEn160 : sl;
 
-   signal batchSize   : slv(15 downto 0) := (others => '0');
-   signal timerConfig : slv(15 downto 0) := (others => '0');
+   signal batchSize    : Slv16Array(NUM_ELINK_C-1 downto 0);
+   signal timerConfig  : Slv16Array(NUM_ELINK_C-1 downto 0);
+   signal chBond       : slv(NUM_ELINK_C-1 downto 0);
+   signal wrdSent      : slv(NUM_ELINK_C-1 downto 0);
+   signal singleHdrDet : slv(NUM_ELINK_C-1 downto 0);
+   signal doubleHdrDet : slv(NUM_ELINK_C-1 downto 0);
+   signal singleHitDet : slv(NUM_ELINK_C-1 downto 0);
+   signal doubleHitDet : slv(NUM_ELINK_C-1 downto 0);
+   signal linkUp       : Slv4Array(NUM_ELINK_C-1 downto 0);
+   signal hdrErrDet    : Slv4Array(NUM_ELINK_C-1 downto 0);
 
 begin
 
-   U_rst320 : entity work.PwrUpRst
+   ---------------------------
+   -- Generate the downlinkRst
+   ---------------------------
+   U_downlinkRst : entity work.PwrUpRst
       generic map (
          TPD_G => TPD_G)
       port map (
          arst   => axilRst,
-         clk    => clk320,
-         rstOut => rst320);
+         clk    => donwlinkClk,
+         rstOut => downlinkRst);
 
-   process(clk320)
+   ------------------------
+   -- Generate the clkEn160
+   ------------------------
+   process(donwlinkClk)
    begin
-      if rising_edge(clk320) then
-         if rst320 = '1' then
+      if rising_edge(donwlinkClk) then
+         if downlinkRst = '1' then
             clkEn160 <= '0' after TPD_G;
          else
-            if (clkEn160 = '0') or (clkEn40 = '1') then
+            if (clkEn160 = '0') or (downlinkClkEn = '1') then
                clkEn160 <= '1' after TPD_G;
             else
                clkEn160 <= '0' after TPD_G;
@@ -143,6 +168,78 @@ begin
          end if;
       end if;
    end process;
+
+   --------------------
+   -- AXI-Lite Crossbar
+   --------------------
+   U_XBAR : entity work.AxiLiteCrossbar
+      generic map (
+         TPD_G              => TPD_G,
+         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_MASTER_SLOTS_G => NUM_ELINK_C,
+         MASTERS_CONFIG_G   => AXIL_XBAR_CONFIG_C)
+      port map (
+         axiClk              => axilClk,
+         axiClkRst           => axilRst,
+         sAxiWriteMasters(0) => axilWriteMaster,
+         sAxiWriteSlaves(0)  => axilWriteSlave,
+         sAxiReadMasters(0)  => axilReadMaster,
+         sAxiReadSlaves(0)   => axilReadSlave,
+         mAxiWriteMasters    => axilWriteMasters,
+         mAxiWriteSlaves     => axilWriteSlaves,
+         mAxiReadMasters     => axilReadMasters,
+         mAxiReadSlaves      => axilReadSlaves);
+
+   -------------------------
+   -- Control/Monitor Module
+   -------------------------
+   GEN_CTRL_STATUS :
+   for i in NUM_ELINK_C-1 downto 0 generate
+
+      U_Ctrl : entity work.AtlasRd53Ctrl
+         generic map (
+            TPD_G => TPD_G)
+         port map (
+            -- Monitoring Interface (clk160MHz domain)
+            clk160MHz       => donwlinkClk,
+            rst160MHz       => downlinkRst,
+            autoReadReg     => (others => (others => '0')),
+            dataDrop        => dataCtrl(i).overflow,
+            configDrop      => '0',
+            chBond          => chBond(i),
+            wrdSent         => wrdSent(i),
+            singleHdrDet    => singleHdrDet(i),
+            doubleHdrDet    => doubleHdrDet(i),
+            singleHitDet    => singleHitDet(i),
+            doubleHitDet    => doubleHitDet(i),
+            dlyCfg          => (others => (others => '0')),
+            hdrErrDet       => hdrErrDet(i),
+            linkUp          => linkUp(i),
+            bitSlip         => rxBitSlip(i),
+            enable          => open,
+            selectRate      => open,
+            invData         => open,
+            invCmd          => open,
+            dlyCmd          => open,
+            rxPhyXbar       => open,
+            debugStream     => open,
+            enUsrDlyCfg     => open,
+            usrDlyCfg       => open,
+            eyescanCfg      => open,
+            lockingCntCfg   => open,
+            pllRst          => open,
+            localRst        => open,
+            batchSize       => batchSize(i),
+            timerConfig     => timerConfig(i),
+            -- AXI-Lite Interface (axilClk domain)
+            axilClk         => axilClk,
+            axilRst         => axilRst,
+            axilReadMaster  => axilReadMasters(i),
+            axilReadSlave   => axilReadSlaves(i),
+            axilWriteMaster => axilWriteMasters(i),
+            axilWriteSlave  => axilWriteSlaves(i));
+
+   end generate GEN_CTRL_STATUS;
 
    ---------------------------------------------------------------------
    -- Demux the DMA outbound stream into different steam CMD AXI Streams
@@ -184,8 +281,8 @@ begin
             sConfigSlave    => dmaObSlaves(i),
             -- Timing Interface
             clkEn160MHz     => clkEn160,
-            clk160MHz       => clk320,
-            rst160MHz       => rst320,
+            clk160MHz       => donwlinkClk,
+            rst160MHz       => downlinkRst,
             -- Command Serial Interface (clk160MHz domain)
             cmdOut          => cmd(i));
 
@@ -195,8 +292,8 @@ begin
             SLAVE_WIDTH_G  => 1,
             MASTER_WIDTH_G => 4)
          port map (
-            clk          => clk320,
-            rst          => rst320,
+            clk          => donwlinkClk,
+            rst          => downlinkRst,
             -- Slave Interface
             slaveData(0) => cmd(i),
             slaveValid   => clkEn160,
@@ -204,7 +301,7 @@ begin
             -- Master Interface
             masterData   => downlinkUserData((i*4)+3 downto i*4),
             masterValid  => open,
-            masterReady  => clkEn40);
+            masterReady  => downlinkClkEn);
 
    end generate GEN_CMD;
 
@@ -215,30 +312,41 @@ begin
       generic map (
          FEC => FEC12)
       port map (
-         -- Clocks
-         donwlinkClk_i       => clk320,
-         downlinkClkEn_i     => clkEn40,
-         uplinkClk_o         => clk320,
-         uplinkClkEn_o       => clkEn40,
-         downlinkRst_i       => rst320,
-         uplinkRst_i         => rst320,
          -- Down link
+         donwlinkClk_o       => donwlinkClk,    -- 320 MHz
+         downlinkClkEn_o     => downlinkClkEn,  -- 40 MHz strobe
+         downlinkRst_i       => downlinkRst,
          downlinkUserData_i  => downlinkUserData,
          downlinkEcData_i    => downlinkEcData,
          downlinkIcData_i    => downlinkIcData,
          downlinkReady_o     => downlinkReady,
          -- Up link
+         uplinkClk_o         => uplinkClk,      -- 320 MHz
+         uplinkClkEn_o       => uplinkClkEn,    -- 40 MHz strobe
+         uplinkRst_i         => uplinkRst,
          uplinkUserData_o    => uplinkUserData,
          uplinkEcData_o      => uplinkEcData,
          uplinkIcData_o      => uplinkIcData,
          uplinkReady_o       => uplinkReady,
          -- MGT
+         clk_refclk_i        => refClk320,
          clk_mgtrefclk_i     => gtRefClk320,
          clk_mgtfreedrpclk_i => axilClk,
          mgt_rxn_i           => sfpRxN,
          mgt_rxp_i           => sfpRxP,
          mgt_txn_o           => sfpTxN,
          mgt_txp_o           => sfpTxP);
+
+   -------------------------
+   -- Generate the uplinkRst
+   -------------------------
+   U_uplinkRst : entity work.PwrUpRst
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         arst   => axilRst,
+         clk    => uplinkClk,
+         rstOut => uplinkRst);
 
    -------------------------
    -- DATA Generation Module
@@ -252,17 +360,17 @@ begin
             SLAVE_WIDTH_G  => 32,
             MASTER_WIDTH_G => 66)
          port map (
-            clk                     => clk320,
-            rst                     => rst320,
-            slip                    => rxBitSlip(i),
+            clk                     => uplinkClk,
+            rst                     => uplinkRst,
+            slip                    => rxBitSlip(i)(0),
             -- Slave Interface
             slaveData(31 downto 0)  => uplinkUserData((i*32)+31 downto i*32),
-            slaveValid              => clkEn40,
+            slaveValid              => uplinkClkEn,
             slaveReady              => open,
             -- Master Interface
             masterData(1 downto 0)  => rxHeader(i),
             masterData(65 downto 2) => rxData(i),
-            masterValid             => rxValid(i),
+            masterValid             => rxValid(i)(0),
             masterReady             => '1');
 
       ------------------
@@ -272,17 +380,18 @@ begin
          generic map (
             TPD_G => TPD_G)
          port map (
-            clk           => clk320,
-            rst           => rst320,
+            clk           => uplinkClk,
+            rst           => uplinkRst,
             rxHeader      => rxHeader(i),
-            rxHeaderValid => rxValid(i),
-            bitSlip       => rxBitSlip(i),
-            locked        => rxAligned(i));
+            rxHeaderValid => rxValid(i)(0),
+            bitSlip       => rxBitSlip(i)(0),
+            hdrErrDet     => hdrErrDet(i)(0),
+            locked        => rxAligned(i)(0));
 
       ---------------------------------
       -- Unscramble the data for 64b66b
       ---------------------------------
-      unscramblerValid(i) <= rxAligned(i) and rxValid(i);
+      unscramblerValid(i)(0) <= rxAligned(i)(0) and rxValid(i)(0);
       U_Descrambler : entity work.Scrambler
          generic map (
             TPD_G            => TPD_G,
@@ -291,14 +400,14 @@ begin
             SIDEBAND_WIDTH_G => 2,
             TAPS_G           => SCRAMBLER_TAPS_C)
          port map (
-            clk            => clk320,
-            rst            => rst320,
+            clk            => uplinkClk,
+            rst            => uplinkRst,
             -- Inbound Interface
-            inputValid     => unscramblerValid(i),
+            inputValid     => unscramblerValid(i)(0),
             inputData      => rxData(i),
             inputSideband  => rxHeader(i),
             -- Outbound Interface
-            outputValid    => valid(i),
+            outputValid    => valid(i)(0),
             outputData     => rawData(i),
             outputSideband => rawHeader(i));
 
@@ -313,21 +422,26 @@ begin
             TPD_G => TPD_G)
          port map (
             -- Timing Interface
-            clk160MHz            => clk320,
-            rst160MHz            => rst320,
+            clk160MHz          => uplinkClk,
+            rst160MHz          => uplinkRst,
             -- Parallel Interface
-            rxLinkUp(0)          => rxAligned(i),
-            rxLinkUp(3 downto 1) => (others => '0'),
-            valid(0)             => valid(i),
-            valid(3 downto 1)    => (others => '0'),
-            header(0)            => header(i),
-            header(3 downto 1)   => (others => (others => '0')),
-            data(0)              => data(i),
-            data(3 downto 1)     => (others => (others => '0')),
+            rxLinkUp           => rxAligned(i),
+            valid              => valid(i),
+            header(0)          => header(i),
+            header(3 downto 1) => (others => (others => '0')),
+            data(0)            => data(i),
+            data(3 downto 1)   => (others => (others => '0')),
             -- Status/Control Interface
-            enable               => x"1",  -- Only using 1 of the 4 links per chip
+            enable             => x"1",  -- Only using 1 of the 4 links per chip
+            linkUp             => linkUp(i),
+            chBond             => chBond(i),
+            wrdSent            => wrdSent(i),
+            singleHdrDet       => singleHdrDet(i),
+            doubleHdrDet       => doubleHdrDet(i),
+            singleHitDet       => singleHitDet(i),
+            doubleHitDet       => doubleHitDet(i),
             -- AutoReg and Read back Interface
-            dataMaster           => dataMasters(i));
+            dataMaster         => dataMasters(i));
 
       ---------------------         
       -- Outbound Data FIFO
@@ -348,8 +462,8 @@ begin
             MASTER_AXI_CONFIG_G => INT_AXIS_CONFIG_C)
          port map (
             -- Slave Port
-            sAxisClk    => clk320,
-            sAxisRst    => rst320,
+            sAxisClk    => uplinkClk,
+            sAxisRst    => uplinkRst,
             sAxisMaster => dataMasters(i),
             sAxisCtrl   => dataCtrl(i),
             -- Master Port
@@ -370,8 +484,8 @@ begin
             axisClk     => axilClk,
             axisRst     => axilRst,
             -- Configuration/Status Interface
-            batchSize   => batchSize,
-            timerConfig => timerConfig,
+            batchSize   => batchSize(i),
+            timerConfig => timerConfig(i),
             -- AXI Streaming Interface
             sDataMaster => txDataMasters(i),
             sDataSlave  => txDataSlaves(i),
@@ -392,7 +506,7 @@ begin
             SYNTH_MODE_G        => "xpm",
             MEMORY_TYPE_G       => "block",
             GEN_SYNC_FIFO_G     => true,
-            FIFO_ADDR_WIDTH_G   => 9,
+            FIFO_ADDR_WIDTH_G   => 10,
             -- AXI Stream Port Configurations
             SLAVE_AXI_CONFIG_G  => INT_AXIS_CONFIG_C,
             MASTER_AXI_CONFIG_G => AXIS_CONFIG_G)

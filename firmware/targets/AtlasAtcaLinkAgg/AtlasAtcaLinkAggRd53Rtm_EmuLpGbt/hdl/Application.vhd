@@ -137,8 +137,11 @@ architecture mapping of Application is
    signal rst160MHz : sl;
 
    signal smaClk       : sl;
-   signal pllToFpgaClk : sl;
-   signal gtRefClk320  : sl;
+   signal smaClock       : sl;
+
+   signal gtRefClk320    : sl;
+   signal gtRefClk320div : sl;
+   signal refClk320      : sl;
 
    signal iDelayCtrlRdy : sl;
    signal refClk300MHz  : sl;
@@ -151,36 +154,6 @@ architecture mapping of Application is
    attribute KEEP_HIERARCHY of U_IDELAYCTRL : label is "TRUE";
 
 begin
-
-   -------------------------
-   -- Terminate Unused Ports
-   -------------------------
-   U_smaClk : IBUFDS_GTE4
-      generic map (
-         REFCLK_EN_TX_PATH  => '0',
-         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
-         REFCLK_ICNTL_RX    => "00")
-      port map (
-         I     => smaClkP,
-         IB    => smaClkN,
-         CEB   => '0',
-         ODIV2 => smaClk,
-         O     => open);
-
-   U_pllToFpgaClk : IBUFDS
-      port map (
-         I  => pllToFpgaClkP,
-         IB => pllToFpgaClkN,
-         O  => pllToFpgaClk);
-
-   U_fpgaToPllClk : entity work.ClkOutBufDiff
-      generic map (
-         TPD_G        => TPD_G,
-         XIL_DEVICE_G => XIL_DEVICE_C)
-      port map (
-         clkIn   => '0',
-         clkOutP => fpgaToPllClkP,
-         clkOutN => fpgaToPllClkN);
 
    NOT_SIM : if (SIMULATION_G = false) generate
       ----------------------------------------------------
@@ -200,6 +173,87 @@ begin
                gtTxN  => qsfpTxN(i));
       end generate GEN_QSFP;
    end generate;
+   
+   ---------------------------------------------------------------------------------
+   -- External Reference clock (required for synchronizing to remote LpGBT receiver) 
+   ---------------------------------------------------------------------------------
+   U_IBUFDS_smaClk : IBUFDS_GTE4
+      generic map (
+         REFCLK_EN_TX_PATH  => '0',
+         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
+         REFCLK_ICNTL_RX    => "00")
+      port map (
+         I     => smaClkP,
+         IB    => smaClkN,
+         CEB   => '0',
+         ODIV2 => smaClock,
+         O     => open);
+         
+   U_BUFG_smaClk : BUFG_GT
+      port map (
+         I       => smaClock,
+         CE      => '1',
+         CEMASK  => '1',
+         CLR     => '0',
+         CLRMASK => '1',
+         DIV     => "000",
+         O       => smaClk);            
+         
+   U_fpgaToPllClk : entity work.ClkOutBufDiff
+      generic map (
+         TPD_G        => TPD_G,
+         XIL_DEVICE_G => XIL_DEVICE_C)
+      port map (
+         clkIn   => smaClk,
+         clkOutP => fpgaToPllClkP,
+         clkOutN => fpgaToPllClkN);   
+   
+   --------------------------
+   -- 160 MHz Reference Clock
+   --------------------------
+   U_IBUFDS_ref160Clk : IBUFDS
+      port map (
+         I  => pllToFpgaClkP,
+         IB => pllToFpgaClkN,
+         O  => ref160Clock);
+         
+   U_BUFG_ref160Clk : BUFG
+      port map (
+         I       => ref160Clock,
+         O       => ref160Clk);         
+
+   U_ref160Rst : entity work.RstPipeline
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk    => ref160Clk,
+         rstIn  => ref156Rst,
+         rstOut => ref160Rst);
+
+   --------------------------------
+   -- 320 MHz LpGBT Reference Clock
+   --------------------------------
+   U_IBUFDS_refClk320 : IBUFDS_GTE4
+      generic map (
+         REFCLK_EN_TX_PATH  => '0',
+         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
+         REFCLK_ICNTL_RX    => "00")
+      port map (
+         I     => sfpPllClkP,
+         IB    => sfpPllClkN,
+         CEB   => '0',
+         ODIV2 => gtRefClk320div,
+         O     => gtRefClk320);
+
+   U_BUFG_refClk320 : BUFG_GT
+      port map (
+         I       => gtRefClk320div,
+         CE      => '1',
+         CEMASK  => '1',
+         CLR     => '0',
+         CLRMASK => '1',
+         DIV     => "000",
+         O       => refClk320);   
 
    --------------------------
    -- Reference 300 MHz clock 
@@ -232,50 +286,6 @@ begin
          RDY    => iDelayCtrlRdy,
          REFCLK => refClk300MHz,
          RST    => refRst300MHz);
-
-   --------------------------
-   -- 160 MHz Reference Clock
-   --------------------------
-   U_IBUFDS_GTE4 : IBUFDS_GTE4
-      generic map (
-         REFCLK_EN_TX_PATH  => '0',
-         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
-         REFCLK_ICNTL_RX    => "00")
-      port map (
-         I     => qsfpRef160ClkP,
-         IB    => qsfpRef160ClkN,
-         CEB   => '0',
-         ODIV2 => ref160Clock,
-         O     => open);
-
-   U_BUFG_GT : BUFG_GT
-      port map (
-         I       => ref160Clock,
-         CE      => '1',
-         CEMASK  => '1',
-         CLR     => '0',
-         CLRMASK => '1',
-         DIV     => "000",
-         O       => ref160Clk);
-
-   U_ref160Rst : entity work.RstPipeline
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         clk    => ref160Clk,
-         rstIn  => ref156Rst,
-         rstOut => ref160Rst);
-
-   --------------------------------
-   -- 320 MHz LpGBT Reference Clock
-   --------------------------------
-   U_gtRefClk320 : IBUFDS_GTE4
-      port map (
-         I     => sfpPllClkP,
-         IB    => sfpPllClkN,
-         CEB   => '0',
-         ODIV2 => open,
-         O     => gtRefClk320);
 
    --------------------
    -- AXI-Lite Crossbar
@@ -380,6 +390,7 @@ begin
             rxLinkUp(4)     => rxLinkUp(24*i+4*4),
             rxLinkUp(5)     => rxLinkUp(24*i+4*5),
             -- SFP Interface
+            refClk320       => refClk320,
             gtRefClk320     => gtRefClk320,
             sfpTxP          => sfpTxP(i),
             sfpTxN          => sfpTxN(i),

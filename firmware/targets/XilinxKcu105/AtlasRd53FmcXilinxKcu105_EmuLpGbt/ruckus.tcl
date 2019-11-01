@@ -11,3 +11,6 @@ loadRuckusTcl $::env(TOP_DIR)/common
 loadSource      -dir  "$::DIR_PATH/hdl"
 loadConstraints -path "$::env(TOP_DIR)/submodules/axi-pcie-core/hardware/XilinxKcu105/xdc/XilinxKcu105App.xdc"
 loadConstraints -dir  "$::DIR_PATH/hdl"
+
+# Adding the common Si5345 configuration
+add_files -norecurse "$::DIR_PATH/pll-config/AtlasRd53FmcXilinxKcu105_EmuLpGbt.mem"

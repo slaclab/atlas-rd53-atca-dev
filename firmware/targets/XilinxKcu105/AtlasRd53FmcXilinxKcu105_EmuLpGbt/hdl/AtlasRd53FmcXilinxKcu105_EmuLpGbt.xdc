@@ -45,18 +45,23 @@ set_property PACKAGE_PIN K5 [get_ports { gtRefClk320N }]
 # Timing Constraints
 ####################
 
+create_clock -name smaClkP      -period 6.237 [get_ports {smaClkP}]
 create_clock -name fmcHpcLaP0   -period 6.237 [get_ports {fmcHpcLaP[0]}]
 create_clock -name fmcHpcLaP1   -period 6.237 [get_ports {fmcHpcLaP[1]}]
 create_clock -name gtRefClk320P -period 3.118 [get_ports {gtRefClk320P}]
 create_clock -name sysClk300P   -period 3.333 [get_ports {sysClk300P}]
 
-create_generated_clock -name clk300MHz [get_pins {U_MMCM/MmcmGen.U_Mmcm/CLKOUT0}]
-
 create_generated_clock -name clk640MHz [get_pins {U_FmcMapping/U_Selectio/GEN_REAL.U_PLL/CLKOUT0}]
 create_generated_clock -name clk160MHz [get_pins {U_FmcMapping/U_Selectio/U_Bufg160/O}]
 
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Bufg160/O]] -group [get_clocks gtRefClk320P]
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Bufg160/O]] -group [get_clocks -of_objects [get_pins {U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/xlx_ku_mgt_std_i/inst/gen_gtwizard_gthe3_top.xlx_ku_mgt_ip_10g24_gtwizard_gthe3_inst/gen_gtwizard_gthe3.gen_channel_container[0].gen_enabled_channel.gthe3_channel_wrapper_inst/channel_inst/gthe3_channel_gen.gen_gthe3_channel_inst[0].GTHE3_CHANNEL_PRIM_INST/TXOUTCLK}]]
 set_clock_groups -asynchronous -group [get_clocks sfpClk156P] -group [get_clocks -of_objects [get_pins {U_RUDP/U_10GigE/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_TenGigEthRst/CLK156_BUFG_GT/O}]]
+
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Bufg160/O]] -group [get_clocks -of_objects [get_pins {U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/xlx_ku_mgt_std_i/inst/gen_gtwizard_gthe3_top.xlx_ku_mgt_ip_10g24_gtwizard_gthe3_inst/gen_gtwizard_gthe3.gen_channel_container[0].gen_enabled_channel.gthe3_channel_wrapper_inst/channel_inst/gthe3_channel_gen.gen_gthe3_channel_inst[0].GTHE3_CHANNEL_PRIM_INST/RXOUTCLK}]]
+set_clock_groups -asynchronous -group [get_clocks gtRefClk320P] -group [get_clocks -of_objects [get_pins {U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/xlx_ku_mgt_std_i/inst/gen_gtwizard_gthe3_top.xlx_ku_mgt_ip_10g24_gtwizard_gthe3_inst/gen_gtwizard_gthe3.gen_channel_container[0].gen_enabled_channel.gthe3_channel_wrapper_inst/channel_inst/gthe3_channel_gen.gen_gthe3_channel_inst[0].GTHE3_CHANNEL_PRIM_INST/RXOUTCLK}]]
+set_clock_groups -asynchronous -group [get_clocks sfpClk156P] -group [get_clocks gtRefClk320P]
+set_clock_groups -asynchronous -group [get_clocks sfpClk156P] -group [get_clocks -of_objects [get_pins {U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/xlx_ku_mgt_std_i/inst/gen_gtwizard_gthe3_top.xlx_ku_mgt_ip_10g24_gtwizard_gthe3_inst/gen_gtwizard_gthe3.gen_channel_container[0].gen_enabled_channel.gthe3_channel_wrapper_inst/channel_inst/gthe3_channel_gen.gen_gthe3_channel_inst[0].GTHE3_CHANNEL_PRIM_INST/RXOUTCLK}]]
 
 set_property CLOCK_DELAY_GROUP RD53_CLK_GRP [get_nets {U_FmcMapping/U_Selectio/clk160MHz[*]}] [get_nets {U_FmcMapping/U_Selectio/clk640MHz[*]}]
 

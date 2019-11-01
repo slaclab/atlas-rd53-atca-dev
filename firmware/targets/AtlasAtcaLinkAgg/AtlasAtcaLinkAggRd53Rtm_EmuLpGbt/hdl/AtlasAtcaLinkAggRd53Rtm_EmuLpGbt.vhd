@@ -270,10 +270,11 @@ begin
 
    U_Core : entity work.AtlasAtcaLinkAggCore
       generic map (
-         TPD_G        => TPD_G,
-         SIMULATION_G => SIMULATION_G,
-         BUILD_INFO_G => BUILD_INFO_G,
-         ETH_CONFIG_G => ETH_CONFIG_C)
+         TPD_G              => TPD_G,
+         SIMULATION_G       => SIMULATION_G,
+         BUILD_INFO_G       => BUILD_INFO_G,
+         MEMORY_INIT_FILE_G => "AtlasAtcaLinkAggRd53Rtm_EmuLpGbt.mem",
+         ETH_CONFIG_G       => ETH_CONFIG_C)
       port map (
          -----------------------------
          --  Interfaces to Application

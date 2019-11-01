@@ -32,6 +32,9 @@ entity AtlasRd53FmcXilinxKcu105_EmuLpGbt is
    port (
       extRst       : in    sl;
       led          : out   slv(7 downto 0);
+      -- External Reference clock (required for synchronizing to remote LpGBT receiver) 
+      smaClkP      : in    sl;
+      smaClkN      : in    sl;
       -- 300Mhz System Clock
       sysClk300P   : in    sl;
       sysClk300N   : in    sl;
@@ -98,12 +101,18 @@ architecture top_level of AtlasRd53FmcXilinxKcu105_EmuLpGbt is
    signal refClk300MHz  : sl;
    signal refRst300MHz  : sl;
    signal iDelayCtrlRdy : sl;
-   signal gtRefClk320   : sl;
+
+   signal gtRefClk320div : sl;
+   signal gtRefClk320    : sl;
+   signal refClk320      : sl;
 
    signal phyReady : sl;
 
    signal clk160MHz : sl;
    signal rst160MHz : sl;
+
+   signal smaClk       : sl;
+   signal fpgaPllClkIn : sl;
 
    signal pllCsL : sl;
    signal pllSck : sl;
@@ -141,13 +150,52 @@ begin
    --------------------------------
    -- 320 MHz LpGBT Reference Clock
    --------------------------------
-   U_gtRefClk320 : IBUFDS_GTE3
+   U_IBUFDS_refClk320 : IBUFDS_GTE3
+      generic map (
+         REFCLK_EN_TX_PATH  => '0',
+         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
+         REFCLK_ICNTL_RX    => "00")
       port map (
          I     => gtRefClk320P,
          IB    => gtRefClk320N,
          CEB   => '0',
-         ODIV2 => open,
+         ODIV2 => gtRefClk320div,
          O     => gtRefClk320);
+
+   U_BUFG_refClk320 : BUFG_GT
+      port map (
+         I       => gtRefClk320div,
+         CE      => '1',
+         CEMASK  => '1',
+         CLR     => '0',
+         CLRMASK => '1',
+         DIV     => "000",
+         O       => refClk320);
+
+   --------------------------------
+   -- 160 MHz External Reference Clock
+   --------------------------------
+   U_IBUFDS_refClk160 : IBUFDS_GTE3
+      generic map (
+         REFCLK_EN_TX_PATH  => '0',
+         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
+         REFCLK_ICNTL_RX    => "00")
+      port map (
+         I     => smaClkP,
+         IB    => smaClkN,
+         CEB   => '0',
+         ODIV2 => smaClk,
+         O     => open);
+
+   U_BUFG_refClk160 : BUFG_GT
+      port map (
+         I       => smaClk,
+         CE      => '1',
+         CEMASK  => '1',
+         CLR     => '0',
+         CLRMASK => '1',
+         DIV     => "000",
+         O       => fpgaPllClkIn);
 
    -----------------------------
    -- 300 IDELAY Reference Clock
@@ -246,7 +294,7 @@ begin
          clk160MHz     => clk160MHz,
          rst160MHz     => rst160MHz,
          -- PLL Clocking Interface
-         fpgaPllClkIn  => '0',
+         fpgaPllClkIn  => fpgaPllClkIn,
          -- PLL SPI Interface
          pllRst        => x"0",
          pllCsL        => pllCsL,
@@ -286,7 +334,7 @@ begin
    U_PLL : entity work.Si5345
       generic map (
          TPD_G              => TPD_G,
-         MEMORY_INIT_FILE_G => "Si5345-RevD-Registers-160MHz.mem",
+         MEMORY_INIT_FILE_G => "AtlasRd53FmcXilinxKcu105_EmuLpGbt.mem",
          CLK_PERIOD_G       => (1/AXIL_CLK_FREQ_C),
          SPI_SCLK_PERIOD_G  => (1/10.0E+6))  -- 1/(10 MHz SCLK)
       port map (
@@ -376,6 +424,7 @@ begin
          rxLinkUp(2)     => rxLinkUp(4*2),
          rxLinkUp(3)     => rxLinkUp(4*3),
          -- SFP Interface
+         refClk320       => refClk320,
          gtRefClk320     => gtRefClk320,
          sfpTxP          => sfpTxP(1),
          sfpTxN          => sfpTxN(1),
