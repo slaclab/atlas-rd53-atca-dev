@@ -3,19 +3,10 @@
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: RUDP DPM: Top Level Firmware
--------------------------------------------------------------------------------
--- Application Register Space Mapping:
---    0xA0000000:0xA000FFFF = https://github.com/slaclab/surf/blob/master/python/surf/ethernet/udp/_UdpEngine.py
---    0xA0010000:0xA001FFFF = https://github.com/slaclab/surf/blob/master/python/surf/protocols/rssi/_RssiCore.py (client)
---    0xA0020000:0xA002FFFF = https://github.com/slaclab/surf/blob/master/python/surf/protocols/rssi/_RssiCore.py (server)
--------------------------------------------------------------------------------
--- DMA Mapping:
---    DMA[0] = RUDP Client
---    DMA[1] = RUDP Server
---    DMA[2] = Loopback
--------------------------------------------------------------------------------
--- Note requires RCE IP address register to be set after DHCP (not included in kernel):
---    https://github.com/slaclab/dpm-remote-ibert-tester#python-to-set-the-rce-ip-address-register
+-- 
+-- Refer to atlas-rd53-atca-dev/firmware/targets/RceDpm/DpmRudpNode/README.md 
+-- for how to setup the RCE and how to establish the RUDP connections
+-- 
 -------------------------------------------------------------------------------
 -- This file is part of 'RCE Development Firmware'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -385,7 +376,7 @@ begin
          mTspAxisMaster_o     => ibClientMasters(0),
          mTspAxisSlave_i      => ibClientSlaves(0),
          -- High level  Application side interface
-         openRq_i             => '0',   -- Enabled via software
+         openRq_i             => '1',  -- Automatically start the connection without SW
          closeRq_i            => '0',
          inject_i             => '0',
          -- AXI-Lite Interface
@@ -395,7 +386,6 @@ begin
          axilReadSlave        => axilReadSlaves(CLT_INDEX_C),
          axilWriteMaster      => axilWriteMasters(CLT_INDEX_C),
          axilWriteSlave       => axilWriteSlaves(CLT_INDEX_C));
-
 
    ----------
    -- RTM GTs
