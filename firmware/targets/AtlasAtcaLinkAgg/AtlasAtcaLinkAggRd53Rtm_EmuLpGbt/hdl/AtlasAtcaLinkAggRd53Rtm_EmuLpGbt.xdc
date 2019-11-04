@@ -50,7 +50,8 @@ set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 DQS_BIAS TRUE EQUALI
 # Timing Constraints
 ####################
 
-create_clock -name smaClkP -period 6.237 [get_ports {smaClkP}]
+create_clock -name smaClkP       -period 6.237 [get_ports {smaClkP}]
+create_clock -name pllToFpgaClkP -period 6.237 [get_ports {pllToFpgaClkP}]
 
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_App/U_Selectio/U_Bufg160/O]] -group [get_clocks -of_objects [get_pins {U_App/GEN_SFP[*].U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/xlx_ku_mgt_std_i/inst/gen_gtwizard_gthe4_top.xlx_ku_mgt_ip_10g24_gtwizard_gthe4_inst/gen_gtwizard_gthe4.gen_channel_container[1].gen_enabled_channel.gthe4_channel_wrapper_inst/channel_inst/gthe4_channel_gen.gen_gthe4_channel_inst[0].GTHE4_CHANNEL_PRIM_INST/TXOUTCLK}]]
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_App/U_Selectio/U_Bufg160/O]] -group [get_clocks -of_objects [get_pins {U_App/GEN_SFP[*].U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/xlx_ku_mgt_std_i/inst/gen_gtwizard_gthe4_top.xlx_ku_mgt_ip_10g24_gtwizard_gthe4_inst/gen_gtwizard_gthe4.gen_channel_container[1].gen_enabled_channel.gthe4_channel_wrapper_inst/channel_inst/gthe4_channel_gen.gen_gthe4_channel_inst[0].GTHE4_CHANNEL_PRIM_INST/TXOUTCLKPCS}]]
@@ -61,3 +62,5 @@ set_clock_groups -asynchronous -group [get_clocks sfpPllClkP] -group [get_clocks
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_Core/U_ClkRst/GEN_REAL.U_PLL/CLKOUT0]] -group [get_clocks sfpPllClkP]
 
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_App/U_Selectio/U_Bufg160/O]] -group [get_clocks sfpPllClkP]
+
+set_clock_groups -asynchronous -group [get_clocks fabEthRefClkP] -group [get_clocks pllToFpgaClkP]

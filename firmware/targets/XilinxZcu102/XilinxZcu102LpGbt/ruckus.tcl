@@ -11,3 +11,4 @@ loadRuckusTcl $::env(TOP_DIR)/common
 # Load local Source Code and constraints
 loadSource      -dir "$::DIR_PATH/hdl"
 loadConstraints -dir "$::DIR_PATH/hdl"
+loadIpCore      -dir "$::DIR_PATH/ip"

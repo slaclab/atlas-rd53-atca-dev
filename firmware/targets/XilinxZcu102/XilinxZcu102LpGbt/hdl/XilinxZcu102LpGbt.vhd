@@ -32,8 +32,10 @@ entity XilinxZcu102LpGbt is
       BUILD_INFO_G : BuildInfoType);
    port (
       -- Broadcast External Timing Clock
-      smaClkP      : out   sl;
-      smaClkN      : out   sl;
+      smaTxP       : out   sl;
+      smaTxN       : out   sl;
+      smaRxP       : in    sl;          -- RX unused
+      smaRxN       : in    sl;          -- RX unused      
       -- Clocks
       gtRefClk320P : in    sl;          -- FMC_HPC0_GBTCLK0_M2C_C_P
       gtRefClk320N : in    sl;          -- FMC_HPC0_GBTCLK0_M2C_C_N
@@ -106,6 +108,7 @@ architecture TOP_LEVEL of XilinxZcu102LpGbt is
 
    signal clk160MHz : sl;
    signal rst160MHz : sl;
+   signal pllClkOut : sl;
 
    signal pllCsL : sl;
    signal pllSck : sl;
@@ -114,6 +117,9 @@ architecture TOP_LEVEL of XilinxZcu102LpGbt is
 
    signal i2cScl : sl;
    signal i2cSda : sl;
+
+   signal dPortCmdP : slv(3 downto 0);
+   signal dPortCmdN : slv(3 downto 0);
 
    signal iDelayCtrlRdy : sl;
    signal refClk300MHz  : sl;
@@ -286,6 +292,7 @@ begin
          -- Timing/Trigger Interface
          clk160MHz     => clk160MHz,
          rst160MHz     => rst160MHz,
+         pllClkOut     => pllClkOut,
          -- PLL Clocking Interface
          fpgaPllClkIn  => '0',
          -- PLL SPI Interface
@@ -295,8 +302,8 @@ begin
          pllSdi        => pllSdi,
          pllSdo        => pllSdo,
          -- mDP CMD Interface
-         dPortCmdP     => (others => '0'),
-         dPortCmdN     => (others => '0'),
+         dPortCmdP     => dPortCmdP,
+         dPortCmdN     => dPortCmdN,
          -- I2C Interface
          i2cScl        => i2cScl,
          i2cSda        => i2cSda,
@@ -307,12 +314,19 @@ begin
    ----------------------------
    -- Broadcast Reference Clock
    ----------------------------
-   U_OBUFDS_smaClk : OBUFDS_GTE4
+   U_SmaTxClkout : entity work.SmaTxClkout
+      generic map (
+         TPD_G => TPD_G)
       port map (
-         I   => clk160MHz,
-         CEB => '0',
-         O   => smaClkP,
-         OB  => smaClkN);
+         -- Clocks and Resets
+         gtRefClk => pllClkOut,
+         drpClk   => clk160MHz,
+         drpRst   => rst160MHz,
+         -- Broadcast External Timing Clock
+         smaTxP   => smaTxP,
+         smaTxN   => smaTxN,
+         smaRxP   => smaRxP,
+         smaRxN   => smaRxN);
 
    --------------------------------
    -- 320 MHz LpGBT Reference Clock
@@ -393,5 +407,17 @@ begin
          coreSDin       => pllSdo,
          coreSDout      => pllSdi,
          coreCsb        => pllCsL);
+
+   ----------------------------
+   -- Drive the unused CMD line
+   ----------------------------
+   GEN_CMD :
+   for i in 3 downto 0 generate
+      U_OBUFDS : OBUFDS
+         port map (
+            I  => '0',
+            O  => dPortCmdP(i),
+            OB => dPortCmdN(i));
+   end generate GEN_CMD;
 
 end TOP_LEVEL;

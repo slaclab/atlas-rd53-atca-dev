@@ -8,14 +8,6 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
-set_property PACKAGE_PIN G8 [get_ports { gtRefClk320P }]
-set_property PACKAGE_PIN G7 [get_ports { gtRefClk320N }]
-
-set_property PACKAGE_PIN L27 [get_ports { userClk156P }]
-set_property PACKAGE_PIN L28 [get_ports { userClk156N }]
-
-##############################################################################
-
 set_property -dict { IOSTANDARD LVDS DIFF_TERM TRUE } [get_ports { fmcHpc0LaP[0] fmcHpc0LaN[0] }]; # PLL_CLK_IN[0]
 set_property -dict { IOSTANDARD LVDS DIFF_TERM TRUE } [get_ports { fmcHpc0LaP[1] fmcHpc0LaN[1] }]; # PLL_CLK_IN[1]
 set_property -dict { IOSTANDARD LVDS } [get_ports { fmcHpc0LaP[2] fmcHpc0LaN[2] }]; # PLL_CLK_OUT
@@ -46,6 +38,14 @@ set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 DQS_BIAS TRUE EQUALI
 
 ##############################################################################
 
+set_property PACKAGE_PIN G8 [get_ports { gtRefClk320P }]
+set_property PACKAGE_PIN G7 [get_ports { gtRefClk320N }]
+
+set_property PACKAGE_PIN L27 [get_ports { userClk156P }]
+set_property PACKAGE_PIN L28 [get_ports { userClk156N }]
+
+##############################################################################
+
 ####################
 # Timing Constraints
 ####################
@@ -73,6 +73,10 @@ set_clock_groups -asynchronous \
    -group [get_clocks {clk125}]
 
 set_clock_groups -asynchronous -group [get_clocks gtRefClk320P] -group [get_clocks -of_objects [get_pins {GEN_SFP[*].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/xlx_ku_mgt_std_i/inst/gen_gtwizard_gthe4_top.xlx_ku_mgt_ip_10g24_gtwizard_gthe4_inst/gen_gtwizard_gthe4.gen_channel_container[1].gen_enabled_channel.gthe4_channel_wrapper_inst/channel_inst/gthe4_channel_gen.gen_gthe4_channel_inst[0].GTHE4_CHANNEL_PRIM_INST/RXOUTCLK}]]
+
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Bufg160/O]] -group [get_clocks -of_objects [get_pins {U_SmaTxClkout/U_GTH/inst/gen_gtwizard_gthe4_top.sma_tx_clkout_gtwizard_gthe4_inst/gen_gtwizard_gthe4.gen_channel_container[1].gen_enabled_channel.gthe4_channel_wrapper_inst/channel_inst/gthe4_channel_gen.gen_gthe4_channel_inst[0].GTHE4_CHANNEL_PRIM_INST/TXOUTCLK}]]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Bufg160/O]] -group [get_clocks -of_objects [get_pins {U_SmaTxClkout/U_GTH/inst/gen_gtwizard_gthe4_top.sma_tx_clkout_gtwizard_gthe4_inst/gen_gtwizard_gthe4.gen_channel_container[1].gen_enabled_channel.gthe4_channel_wrapper_inst/channel_inst/gthe4_channel_gen.gen_gthe4_channel_inst[0].GTHE4_CHANNEL_PRIM_INST/RXOUTCLK}]]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins {U_SmaTxClkout/U_GTH/inst/gen_gtwizard_gthe4_top.sma_tx_clkout_gtwizard_gthe4_inst/gen_gtwizard_gthe4.gen_channel_container[1].gen_enabled_channel.gthe4_channel_wrapper_inst/channel_inst/gthe4_channel_gen.gen_gthe4_channel_inst[0].GTHE4_CHANNEL_PRIM_INST/RXOUTCLKPCS}]] -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Bufg160/O]]
 
 set_property UNAVAILABLE_DURING_CALIBRATION TRUE [get_ports fmcHpc0LaP[20]]
 

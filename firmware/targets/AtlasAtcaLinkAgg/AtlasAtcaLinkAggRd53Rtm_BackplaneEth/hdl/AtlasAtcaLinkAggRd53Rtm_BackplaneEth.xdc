@@ -49,3 +49,7 @@ set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 DQS_BIAS TRUE EQUALI
 ####################
 # Timing Constraints
 ####################
+
+create_clock -name smaClkP       -period 6.237 [get_ports {smaClkP}]
+create_clock -name pllToFpgaClkP -period 6.237 [get_ports {pllToFpgaClkP}]
+
