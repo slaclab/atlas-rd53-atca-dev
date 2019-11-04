@@ -6,7 +6,7 @@
 ```
 DMA[0] = RUDP Client @ Port = 9000
 DMA[1] = RUDP Server @ Port = 8192
-DMA[2] = Loopback
+DMA[2] = Internal Loopback (no RDUP)
 ```
 
 <!--- ######################################################## -->
