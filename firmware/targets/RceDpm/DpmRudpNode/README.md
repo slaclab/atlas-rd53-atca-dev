@@ -56,8 +56,9 @@ After the `RCE IP address register` is set, no other register are required to se
 <!--- ######################################################## -->
 
 ### DMA Mapping:
+```
 DMA[0] = RUDP Client
 DMA[1] = RUDP Server
 DMA[2] = Loopback
-
+```
 <!--- ######################################################## -->
