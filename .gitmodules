@@ -22,3 +22,6 @@
 [submodule "firmware/submodules/axi-pcie-core"]
 	path = firmware/submodules/axi-pcie-core
 	url = git@github.com:slaclab/axi-pcie-core
+[submodule "firmware/submodules/lpgbt/lpgbt-emul"]
+	path = firmware/submodules/lpgbt/lpgbt-emul
+	url = https://gitlab.cern.ch/gbt-fpga/lpgbt-emul

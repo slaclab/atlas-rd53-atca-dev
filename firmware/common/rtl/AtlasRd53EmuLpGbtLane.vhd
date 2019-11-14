@@ -150,8 +150,6 @@ begin
    -- Emulation LpGBT FPGA
    -----------------------
    lpgbtFpga_top_inst : entity work.EmuLpGbtFpga10g24
-      generic map (
-         FEC => FEC12)
       port map (
          -- Up link
          uplinkClk_o         => uplinkClk,      -- 320 MHz

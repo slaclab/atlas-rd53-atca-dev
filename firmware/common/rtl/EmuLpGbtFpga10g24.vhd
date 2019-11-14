@@ -24,8 +24,6 @@ library unisim;
 use unisim.vcomponents.all;
 
 entity EmuLpGbtFpga10g24 is
-   generic (
-      FEC : integer range 0 to 2);      --! FEC selection can be: FEC5 or FEC12
    port (
       -- Up link
       uplinkClk_o                 : out std_logic;  --! Clock provided by the Rx serdes: in phase with data
@@ -48,6 +46,8 @@ entity EmuLpGbtFpga10g24 is
       downLinkBypassInterleaver_i : in  std_logic                    := '0';  --! Bypass downlink interleaver (test purpose only)
       downLinkBypassFECEncoder_i  : in  std_logic                    := '0';  --! Bypass downlink FEC (test purpose only)
       downLinkBypassScrambler_i   : in  std_logic                    := '0';  --! Bypass downlink scrambler (test purpose only)
+      enableFECErrCounter_i       : in  std_logic                    := '0';
+      fecCorrectionCount_o        : out std_logic_vector(15 downto 0);
       downlinkReady_o             : out std_logic;  --! Downlink ready status
       -- MGT
       clk_refclk_i                : in  std_logic;  --! Transceiver serial clock
@@ -96,44 +96,8 @@ begin
       end if;
    end process;
 
-   -- uplink_inst : entity work.lpgbtfpga_Uplink
-   -- generic map(
-   -- -- General configuration
-   -- DATARATE                  => DATARATE_10G24,
-   -- FEC                       => FEC,
-   -- -- Expert parameters
-   -- c_multicyleDelay          => 3,
-   -- c_clockRatio              => 8,
-   -- c_mgtWordWidth            => 32,
-   -- c_allowedFalseHeader      => 5,
-   -- c_allowedFalseHeaderOverN => 64,
-   -- c_requiredTrueHeader      => 30,
-   -- c_bitslip_mindly          => 1,
-   -- c_bitslip_waitdly         => 40)
-   -- port map(
-   -- -- Clock and reset
-   -- clk_freeRunningClk_i => clk_mgtfreedrpclk_i,
-   -- uplinkClk_i          => clk_mgtTxClk_s,
-   -- uplinkClkOutEn_o     => uplinkClkEn_o,
-   -- uplinkRst_n_i        => mgt_rxrdy_s,
-   -- -- Input
-   -- mgt_word_o           => uplink_mgtword_s,
-   -- -- Data
-   -- userData_o           => uplinkUserData_o,
-   -- EcData_o             => uplinkEcData_o,
-   -- IcData_o             => uplinkIcData_o,
-   -- -- Control
-   -- bypassInterleaver_i  => uplinkBypassInterleaver_i,
-   -- bypassFECEncoder_i   => uplinkBypassFECEncoder_i,
-   -- bypassScrambler_i    => uplinkBypassScrambler_i,
-   -- -- Transceiver control
-   -- mgt_bitslipCtrl_o    => mgt_rxslide_s,
-   -- -- Status
-   -- dataCorrected_o      => open,
-   -- IcCorrected_o        => open,
-   -- EcCorrected_o        => open,
-   -- rdy_o                => uplinkReady_o);
-
+   donwlinkClk_o   <= downlinkClk_s;
+   downlinkClkEn_o <= downlinkClkEn_s;
 
    mgt_inst : entity work.xlx_ku_mgt_10g24
       port map(
@@ -174,43 +138,48 @@ begin
          TXn_o             => mgt_txn_o,
          TXp_o             => mgt_txp_o);
 
-   donwlinkClk_o   <= downlinkClk_s;
-   downlinkClkEn_o <= downlinkClkEn_s;
-
-   process(downlinkClk_s)
-   begin
-      if rising_edge(downlinkClk_s) then
-         if downlinkCnt_s = 0 then
-            downlinkClkEn_s <= '1';
-         else
-            downlinkClkEn_s <= '0';
-         end if;
-         downlinkCnt_s <= downlinkCnt_s + 1;
-      end if;
-   end process;
-
-   -- downlink_inst : entity work.lpgbtfpga_Downlink
-   -- generic map(
-   -- -- Expert parameters
-   -- c_multicyleDelay => 3,
-   -- c_clockRatio     => 8,
-   -- c_outputWidth    => 32)
-   -- port map(
-   -- -- Clocks
-   -- clk_i               => donwlinkClk_i,
-   -- clkEn_i             => downlinkClkEn_i,
-   -- rst_n_i             => mgt_txrdy_s,
-   -- -- Down link
-   -- userData_i          => downlinkUserData_i,
-   -- ECData_i            => downlinkEcData_i,
-   -- ICData_i            => downlinkIcData_i,
-   -- -- Output
-   -- mgt_word_o          => downlink_mgtword_s,
-   -- -- Configuration
-   -- interleaverBypass_i => downLinkBypassInterleaver_i,
-   -- encoderBypass_i     => downLinkBypassFECEncoder_i,
-   -- scramblerBypass_i   => downLinkBypassScrambler_i,
-   -- -- Status
-   -- rdy_o               => downlinkReady_o);
+   U_lpgbtemul : entity work.lpgbtemul_top
+      port map(
+         -- DownLink
+         downlinkClkEn_o             => downlinkClkEn_s,
+         rst_downlink_i              => downlinkRst_i,
+         downLinkDataGroup0          => downlinkUserData_o(15 downto 0),
+         downLinkDataGroup1          => downlinkUserData_o(31 downto 16),
+         downLinkDataEc              => downlinkEcData_o,
+         downLinkDataIc              => downlinkIcData_o,
+         downLinkBypassDeinterleaver => downLinkBypassInterleaver_i,
+         downLinkBypassFECDecoder    => downLinkBypassFECEncoder_i,
+         downLinkBypassDescsrambler  => downLinkBypassScrambler_i,
+         enableFECErrCounter         => enableFECErrCounter_i,
+         fecCorrectionCount          => fecCorrectionCount_o,
+         downlinkRdy_o               => downlinkReady_o,
+         -- uplink data        
+         uplinkClkEn_i               => uplinkClkEn_s,
+         rst_uplink_i                => uplinkRst_i,
+         upLinkData0                 => uplinkUserData_i(31 downto 0),
+         upLinkData1                 => uplinkUserData_i(63 downto 32),
+         upLinkData2                 => uplinkUserData_i(95 downto 64),
+         upLinkData3                 => uplinkUserData_i(127 downto 96),
+         upLinkData4                 => uplinkUserData_i(159 downto 128),
+         upLinkData5                 => uplinkUserData_i(191 downto 160),
+         upLinkData6                 => uplinkUserData_i(223 downto 192),
+         upLinkDataIC                => uplinkIcData_i,
+         upLinkDataEC                => uplinkEcData_i,
+         upLinkScramblerBypass       => uplinkBypassScrambler_i,
+         upLinkScramblerReset        => uplinkRst_i,
+         upLinkFecBypass             => uplinkBypassFECEncoder_i,
+         upLinkInterleaverBypass     => uplinkBypassInterleaver_i,
+         uplinkRdy_o                 => uplinkReady_o,
+         -- MGT
+         GT_RXUSRCLK_IN              => downlinkClk_s,
+         GT_TXUSRCLK_IN              => uplinkClk_s,
+         GT_RXSLIDE_OUT              => mgt_rxslide_s,
+         GT_TXREADY_IN               => mgt_txrdy_s,
+         GT_RXREADY_IN               => mgt_rxrdy_s,
+         GT_TXDATA_OUT               => uplink_mgtword_s,
+         GT_RXDATA_IN                => downlink_mgtword_s,
+         -- General Configuration
+         fecMode                     => '1',   -- ‘1’ - FEC 12
+         txDataRate                  => '1');  -- ‘1’ - 10.24 Gb/s
 
 end mapping;

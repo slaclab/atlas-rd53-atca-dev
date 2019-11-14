@@ -24,8 +24,6 @@ library unisim;
 use unisim.vcomponents.all;
 
 entity LpGbtFpga10g24 is
-   generic (
-      FEC : integer range 0 to 2);      --! FEC selection can be: FEC5 or FEC12
    port (
       -- Down link
       donwlinkClk_o               : out std_logic;  --! Downlink datapath clock (either 320 or 40MHz)
@@ -166,7 +164,7 @@ begin
       generic map(
          -- General configuration
          DATARATE                  => DATARATE_10G24,
-         FEC                       => FEC,
+         FEC                       => FEC12,
          -- Expert parameters
          c_multicyleDelay          => 3,
          c_clockRatio              => 8,

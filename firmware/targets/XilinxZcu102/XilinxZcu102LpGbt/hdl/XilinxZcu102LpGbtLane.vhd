@@ -309,8 +309,6 @@ begin
    -- LpGBT FPGA
    -------------
    lpgbtFpga_top_inst : entity work.LpGbtFpga10g24
-      generic map (
-         FEC => FEC12)
       port map (
          -- Down link
          donwlinkClk_o       => donwlinkClk,    -- 320 MHz
