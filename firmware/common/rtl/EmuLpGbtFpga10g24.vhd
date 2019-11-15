@@ -46,7 +46,7 @@ entity EmuLpGbtFpga10g24 is
       downLinkBypassInterleaver_i : in  std_logic                    := '0';  --! Bypass downlink interleaver (test purpose only)
       downLinkBypassFECEncoder_i  : in  std_logic                    := '0';  --! Bypass downlink FEC (test purpose only)
       downLinkBypassScrambler_i   : in  std_logic                    := '0';  --! Bypass downlink scrambler (test purpose only)
-      enableFECErrCounter_i       : in  std_logic                    := '0';
+      enableFECErrCounter_i       : in  std_logic                    := '1';
       fecCorrectionCount_o        : out std_logic_vector(15 downto 0);
       downlinkReady_o             : out std_logic;  --! Downlink ready status
       -- MGT
@@ -59,8 +59,8 @@ entity EmuLpGbtFpga10g24 is
       mgt_txp_o                   : out std_logic;
       mgt_txcaliben_i             : in  std_logic                    := '0';
       mgt_txcalib_i               : in  std_logic_vector(6 downto 0) := (others => '0');
-      mgt_txaligned_o             : out std_logic;
-      mgt_txphase_o               : out std_logic_vector(6 downto 0));
+      mgt_txaligned_o             : out std_logic                    := '0';
+      mgt_txphase_o               : out std_logic_vector(6 downto 0) := (others => '0'));
 end EmuLpGbtFpga10g24;
 
 architecture mapping of EmuLpGbtFpga10g24 is
@@ -128,8 +128,8 @@ begin
          --==============--
          -- Data         --
          --==============--
-         MGT_USRWORD_i     => downlink_mgtword_s,
-         MGT_USRWORD_o     => uplink_mgtword_s,
+         MGT_USRWORD_i     => uplink_mgtword_s,
+         MGT_USRWORD_o     => downlink_mgtword_s,
          --===============--
          -- Serial intf.  --
          --===============--

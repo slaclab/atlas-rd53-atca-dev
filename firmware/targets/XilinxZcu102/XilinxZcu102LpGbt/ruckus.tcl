@@ -12,3 +12,6 @@ loadRuckusTcl $::env(TOP_DIR)/common
 loadSource      -dir "$::DIR_PATH/hdl"
 loadConstraints -dir "$::DIR_PATH/hdl"
 loadIpCore      -dir "$::DIR_PATH/ip"
+
+# Load the simulation testbed
+set_property top {LpGbt2EmuLpGbt_LinkingWithGthTb} [get_filesets sim_1]

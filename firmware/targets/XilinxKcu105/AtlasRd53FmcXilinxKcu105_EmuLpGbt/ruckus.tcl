@@ -14,3 +14,6 @@ loadConstraints -dir  "$::DIR_PATH/hdl"
 
 # Adding the common Si5345 configuration
 add_files -norecurse "$::DIR_PATH/pll-config/AtlasRd53FmcXilinxKcu105_EmuLpGbt.mem"
+
+# Load the simulation testbed
+set_property top {LpGbt2EmuLpGbt_LinkingWithGthTb} [get_filesets sim_1]

@@ -15,7 +15,9 @@ if { ${family} eq {kintexuplus} ||
      ${family} eq {zynquplusRFSOC} } {
    set fpgaType "UltraScale+"
 }
-loadSource -dir  "$::DIR_PATH/rtl"
+loadSource -dir           "$::DIR_PATH/rtl"
+loadSource -sim_only -dir "$::DIR_PATH/tb"
+
 loadSource -path "$::DIR_PATH/ip/${fpgaType}/xlx_ku_mgt_10g24.vhd"
 loadIpCore -path "$::DIR_PATH/ip/${fpgaType}/xlx_ku_mgt_ip_10g24.xci"
 
