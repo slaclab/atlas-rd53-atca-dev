@@ -228,7 +228,8 @@ begin                 --========####   Architecture Body   ####========--
           port map (
              O                                        => rx_wordclk_sig, 
              I                                        => rxoutclk_sig,
-             CE                                       => not(gtwiz_userclk_rx_reset_int),
+             -- CE                                       => not(gtwiz_userclk_rx_reset_int),
+             CE                                       => rxpmaresetdone,
              DIV                                      => "000",
              CLR                                      => '0',
              CLRMASK                                  => '0',
@@ -289,7 +290,7 @@ begin                 --========####   Architecture Body   ####========--
              
              gtwiz_userclk_tx_active_in(0)         => gtwiz_userclk_tx_active_int,    
              gtwiz_userclk_rx_active_in(0)         => gtwiz_userclk_rx_active_int,
-             gtwiz_userclk_tx_reset_in(0)          => '0',
+             gtwiz_userclk_tx_reset_in(0)          => tx_reset_sig,
              
              --gtwiz_buffbypass_tx_reset_in(0)       => gtwiz_buffbypass_tx_reset_in_s,
              --gtwiz_buffbypass_tx_start_user_in(0)  => '0',
