@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : XilinxZcu102LpGbtLane.vhd
+-- File       : AtlasRd53LpGbtLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: Top Level Firmware Target
@@ -25,7 +25,7 @@ use work.lpgbtfpga_package.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity XilinxZcu102LpGbtLane is
+entity AtlasRd53LpGbtLane is
    generic (
       TPD_G            : time     := 1 ns;
       AXIS_CONFIG_G    : AxiStreamConfigType;
@@ -47,13 +47,15 @@ entity XilinxZcu102LpGbtLane is
       -- SFP Interface
       refClk320       : in  sl;  -- Using jitter clean FMC 320 MHz reference
       gtRefClk320     : in  sl;  -- Using jitter clean FMC 320 MHz reference
+      downlinkUp      : out sl;
+      uplinkUp        : out sl;
       sfpTxP          : out sl;
       sfpTxN          : out sl;
       sfpRxP          : in  sl;
       sfpRxN          : in  sl);
-end XilinxZcu102LpGbtLane;
+end AtlasRd53LpGbtLane;
 
-architecture rtl of XilinxZcu102LpGbtLane is
+architecture rtl of AtlasRd53LpGbtLane is
 
    ------------------------------------------------------------------------------------------------------
    -- Scrambler Taps: G(x) = 1 + x^39 + x^58 (Equation 5-1)
@@ -139,6 +141,9 @@ architecture rtl of XilinxZcu102LpGbtLane is
    signal hdrErrDet    : Slv4Array(NUM_ELINK_C-1 downto 0);
 
 begin
+
+   downlinkUp <= downlinkReady;
+   uplinkUp   <= uplinkReady;
 
    ---------------------------
    -- Generate the downlinkRst

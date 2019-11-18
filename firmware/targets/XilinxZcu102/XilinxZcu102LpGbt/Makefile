@@ -1,4 +1,4 @@
-export TIG_PULSE = 1
+export GEN_BIN_IMAGE = 1
 
 # Define target output
 target: bit

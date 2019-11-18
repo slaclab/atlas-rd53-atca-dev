@@ -130,6 +130,9 @@ architecture top_level of AtlasRd53FmcXilinxKcu105_EmuLpGbt is
    signal i2cScl : sl;
    signal i2cSda : sl;
 
+   signal uplinkUp   : sl;
+   signal downlinkUp : sl;
+
    attribute IODELAY_GROUP                 : string;
    attribute IODELAY_GROUP of U_IDELAYCTRL : label is "rd53_aurora";
 
@@ -139,13 +142,13 @@ architecture top_level of AtlasRd53FmcXilinxKcu105_EmuLpGbt is
 begin
 
    led(7) <= '1';
-   led(6) <= '0';
-   led(5) <= '0';
-   led(4) <= '0';
-   led(3) <= phyReady;
-   led(2) <= phyReady;
-   led(1) <= phyReady;
-   led(0) <= phyReady;
+   led(6) <= downlinkUp;
+   led(5) <= uplinkUp;
+   led(4) <= phyReady;
+   led(3) <= rxLinkUp(4*3);
+   led(2) <= rxLinkUp(4*2);
+   led(1) <= rxLinkUp(4*1);
+   led(0) <= rxLinkUp(4*0);
 
    --------------------------------
    -- 320 MHz LpGBT Reference Clock
@@ -426,6 +429,8 @@ begin
          -- SFP Interface
          refClk320       => refClk320,
          gtRefClk320     => gtRefClk320,
+         downlinkUp      => downlinkUp,
+         uplinkUp        => uplinkUp,
          sfpTxP          => sfpTxP(1),
          sfpTxN          => sfpTxN(1),
          sfpRxP          => sfpRxP(1),

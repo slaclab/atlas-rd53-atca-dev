@@ -139,6 +139,9 @@ begin
          TXp_o             => mgt_txp_o);
 
    U_lpgbtemul : entity work.lpgbtemul_top
+      generic map(
+         rxslide_pulse_duration => 2,
+         rxslide_pulse_delay    => 512)
       port map(
          -- DownLink
          downlinkClkEn_o             => downlinkClkEn_s,

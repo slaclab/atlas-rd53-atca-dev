@@ -74,9 +74,11 @@ begin
    ---------------------------
    U_refClk320 : entity work.ClkRst
       generic map (
-         CLK_PERIOD_G      => 3.125 ns,  -- 320 MHz
+         -- CLK_PERIOD_G      => 3.12498 ns,  -- 320 MHz
+         CLK_PERIOD_G      => 6.25 ns,  -- 320 MHz
          RST_START_DELAY_G => 0 ns,
-         RST_HOLD_TIME_G   => 100 us)
+         -- RST_HOLD_TIME_G   => 100 us)
+         RST_HOLD_TIME_G   => 1 us)
       port map (
          clkP => refClk320,
          rst  => usrRst);

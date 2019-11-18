@@ -51,6 +51,8 @@ entity AtlasRd53EmuLpGbtLane is
       -- SFP Interface
       refClk320       : in  sl;  -- Using jitter clean FMC 320 MHz reference
       gtRefClk320     : in  sl;  -- Using jitter clean FMC 320 MHz reference
+      downlinkUp      : out sl;
+      uplinkUp        : out sl;
       sfpTxP          : out sl;
       sfpTxN          : out sl;
       sfpRxP          : in  sl;
@@ -90,6 +92,9 @@ architecture rtl of AtlasRd53EmuLpGbtLane is
    signal reset160MHz : sl;
 
 begin
+
+   downlinkUp <= downlinkReady;
+   uplinkUp   <= uplinkReady;
 
    U_rst160MHz : entity work.RstPipeline
       generic map (

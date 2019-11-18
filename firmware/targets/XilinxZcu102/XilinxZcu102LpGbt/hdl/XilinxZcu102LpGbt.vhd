@@ -31,6 +31,8 @@ entity XilinxZcu102LpGbt is
       TPD_G        : time := 1 ns;
       BUILD_INFO_G : BuildInfoType);
    port (
+      extRst       : in    sl;
+      led          : out   slv(7 downto 0);
       -- Broadcast External Timing Clock
       smaTxP       : out   sl;
       smaTxN       : out   sl;
@@ -121,6 +123,9 @@ architecture TOP_LEVEL of XilinxZcu102LpGbt is
    signal dPortCmdP : slv(3 downto 0);
    signal dPortCmdN : slv(3 downto 0);
 
+   signal downlinkUp : slv(3 downto 0);
+   signal uplinkUp   : slv(3 downto 0);
+
    signal iDelayCtrlRdy : sl;
    signal refClk300MHz  : sl;
    signal refRst300MHz  : sl;
@@ -132,6 +137,9 @@ architecture TOP_LEVEL of XilinxZcu102LpGbt is
    attribute KEEP_HIERARCHY of U_IDELAYCTRL : label is "TRUE";
 
 begin
+
+   led(7 downto 4) <= downlinkUp;
+   led(3 downto 0) <= uplinkUp;
 
    -----------
    -- RCE Core
@@ -358,7 +366,7 @@ begin
    ------------------
    GEN_SFP :
    for i in 3 downto 0 generate
-      U_LpGbtLane : entity work.XilinxZcu102LpGbtLane
+      U_LpGbtLane : entity work.AtlasRd53LpGbtLane
          generic map (
             TPD_G            => TPD_G,
             AXIS_CONFIG_G    => ite((i = 2), RCEG3_AXIS_DMA_ACP_CONFIG_C, RCEG3_AXIS_DMA_CONFIG_C),
@@ -379,6 +387,8 @@ begin
             -- SFP Interface
             refClk320       => refClk320,
             gtRefClk320     => gtRefClk320,
+            downlinkUp      => downlinkUp(i),
+            uplinkUp        => uplinkUp(i),
             sfpTxP          => sfpTxP(i),
             sfpTxN          => sfpTxN(i),
             sfpRxP          => sfpRxP(i),
@@ -391,7 +401,7 @@ begin
    U_Si5345 : entity work.Si5345
       generic map (
          TPD_G              => TPD_G,
-         MEMORY_INIT_FILE_G => "Si5345-RevD-Registers-160MHz.mem",
+         MEMORY_INIT_FILE_G => "Si5345-RevD-Registers-160MHz.mem",  -- Use FMC on-board 160 MHz reference
          CLK_PERIOD_G       => (1/156.25E+6),
          SPI_SCLK_PERIOD_G  => (1/10.0E+6))  -- 1/(10 MHz SCLK)
       port map (
