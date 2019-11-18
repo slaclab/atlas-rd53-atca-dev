@@ -74,9 +74,9 @@ begin
    ---------------------------
    U_refClk320 : entity work.ClkRst
       generic map (
-         CLK_PERIOD_G      => 6.25 ns,  -- 160 MHz
+         CLK_PERIOD_G      => 3.125 ns,  -- 320 MHz
          RST_START_DELAY_G => 0 ns,
-         RST_HOLD_TIME_G   => 1 us)
+         RST_HOLD_TIME_G   => 100 us)
       port map (
          clkP => refClk320,
          rst  => usrRst);
@@ -95,29 +95,29 @@ begin
    U_LpGbtFpga10g24 : entity work.LpGbtFpga10g24
       port map (
          -- Down link
-         donwlinkClk_o      => downlinkClk(0),
-         downlinkClkEn_o    => downlinkClkEn(0),
-         downlinkRst_i      => usrRst,
-         downlinkUserData_i => downlinkCnt(0)(31 downto 0),
-         downlinkEcData_i   => downlinkCnt(0)(33 downto 32),
-         downlinkIcData_i   => downlinkCnt(0)(35 downto 34),
-         downlinkReady_o    => downlinkReady(0),
+         donwlinkClk_o       => downlinkClk(0),
+         downlinkClkEn_o     => downlinkClkEn(0),
+         downlinkRst_i       => usrRst,
+         downlinkUserData_i  => downlinkCnt(0)(31 downto 0),
+         downlinkEcData_i    => downlinkCnt(0)(33 downto 32),
+         downlinkIcData_i    => downlinkCnt(0)(35 downto 34),
+         downlinkReady_o     => downlinkReady(0),
          -- Up link
-         uplinkClk_o        => uplinkClk(0),
-         uplinkClkEn_o      => uplinkClkEn(0),
-         uplinkRst_i        => usrRst,
-         uplinkUserData_o   => uplinkCnt(0)(229 downto 0),
-         uplinkEcData_o     => uplinkCnt(0)(231 downto 230),
-         uplinkIcData_o     => uplinkCnt(0)(233 downto 232),
-         uplinkReady_o      => uplinkReady(0),
+         uplinkClk_o         => uplinkClk(0),
+         uplinkClkEn_o       => uplinkClkEn(0),
+         uplinkRst_i         => usrRst,
+         uplinkUserData_o    => uplinkCnt(0)(229 downto 0),
+         uplinkEcData_o      => uplinkCnt(0)(231 downto 230),
+         uplinkIcData_o      => uplinkCnt(0)(233 downto 232),
+         uplinkReady_o       => uplinkReady(0),
          -- MGT
-         clk_refclk_i       => refClk320,
-         clk_mgtrefclk_i    => refClk320,
+         clk_refclk_i        => refClk320,
+         clk_mgtrefclk_i     => refClk320,
          clk_mgtfreedrpclk_i => axilClk,
-         mgt_rxn_i          => gtEmuToLpN,
-         mgt_rxp_i          => gtEmuToLpP,
-         mgt_txn_o          => gtLpToEmuN,
-         mgt_txp_o          => gtLpToEmuP);
+         mgt_rxn_i           => gtEmuToLpN,
+         mgt_rxp_i           => gtEmuToLpP,
+         mgt_txn_o           => gtLpToEmuN,
+         mgt_txp_o           => gtLpToEmuP);
 
    -----------------------
    -- Emulation LpGBT FPGA
