@@ -18,11 +18,16 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.I2cPkg.all;
-use work.AtlasAtcaLinkAggPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.I2cPkg.all;
+
+library atlas_rd53_fw_lib;
+
+library atlas_atca_link_agg_fw_lib;
+use atlas_atca_link_agg_fw_lib.AtlasAtcaLinkAggPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -205,7 +210,7 @@ begin
          IB => pllToFpgaClkN,
          O  => pllToFpgaClk);
 
-   U_fpgaToPllClk : entity work.ClkOutBufDiff
+   U_fpgaToPllClk : entity surf.ClkOutBufDiff
       generic map (
          TPD_G        => TPD_G,
          XIL_DEVICE_G => XIL_DEVICE_C)
@@ -217,7 +222,7 @@ begin
    --------------------------
    -- Reference 300 MHz clock 
    --------------------------
-   U_MMCM : entity work.ClockManagerUltraScale
+   U_MMCM : entity surf.ClockManagerUltraScale
       generic map(
          TPD_G              => TPD_G,
          SIMULATION_G       => SIMULATION_G,
@@ -271,7 +276,7 @@ begin
          DIV     => "000",
          O       => ref160Clk);
 
-   U_ref160Rst : entity work.RstPipeline
+   U_ref160Rst : entity surf.RstPipeline
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -282,7 +287,7 @@ begin
    ------------------------------         
    -- High Speed SelectIO Modules
    ------------------------------         
-   U_Selectio : entity work.AtlasRd53HsSelectio
+   U_Selectio : entity atlas_rd53_fw_lib.AtlasRd53HsSelectio
       generic map(
          TPD_G        => TPD_G,
          SIMULATION_G => SIMULATION_G,
@@ -306,7 +311,7 @@ begin
    --------------------
    -- AXI-Lite Crossbar
    --------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -324,7 +329,7 @@ begin
          mAxiReadMasters     => axilReadMasters,
          mAxiReadSlaves      => axilReadSlaves);
 
-   U_RX_PHY_XBAR : entity work.AxiLiteCrossbar
+   U_RX_PHY_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -347,7 +352,7 @@ begin
       ----------------------------------------------------
       -- https://www.xilinx.com/support/answers/70060.html
       ----------------------------------------------------
-      U_TERM_GTs : entity work.Gthe4ChannelDummy
+      U_TERM_GTs : entity surf.Gthe4ChannelDummy
          generic map (
             TPD_G   => TPD_G,
             WIDTH_G => 4)
@@ -363,7 +368,7 @@ begin
       ----------------------------------------------------
       GEN_QSFP :
       for i in 1 downto 0 generate
-         U_TERM_GTs : entity work.Gtye4ChannelDummy
+         U_TERM_GTs : entity surf.Gtye4ChannelDummy
             generic map (
                TPD_G   => TPD_G,
                WIDTH_G => 4)
@@ -381,7 +386,7 @@ begin
       GEN_I2C :
       for i in 3 downto 0 generate
 
-         U_DS32EV400 : entity work.AxiI2cRegMaster
+         U_DS32EV400 : entity surf.AxiI2cRegMaster
             generic map (
                TPD_G          => TPD_G,
                DEVICE_MAP_G   => I2C_CONFIG_C,
@@ -408,7 +413,7 @@ begin
    ----------------------------------
    -- Emulation Timing/Trigger Module
    ----------------------------------
-   U_EmuTiming : entity work.AtlasRd53EmuTiming
+   U_EmuTiming : entity atlas_rd53_fw_lib.AtlasRd53EmuTiming
       generic map(
          TPD_G         => TPD_G,
          NUM_AXIS_G    => 24,
@@ -434,7 +439,7 @@ begin
    ------------------------   
    GEN_mDP :
    for i in 23 downto 0 generate
-      U_Core : entity work.AtlasRd53Core
+      U_Core : entity atlas_rd53_fw_lib.AtlasRd53Core
          generic map (
             TPD_G         => TPD_G,
             SIMULATION_G  => SIMULATION_G,
@@ -473,7 +478,7 @@ begin
             dPortCmdN       => dPortCmdN(i));
    end generate GEN_mDP;
 
-   U_MuxConfig : entity work.AxiStreamMux
+   U_MuxConfig : entity surf.AxiStreamMux
       generic map (
          TPD_G          => TPD_G,
          NUM_SLAVES_G   => 24,
@@ -491,7 +496,7 @@ begin
          mAxisMaster  => mConfigMaster,
          mAxisSlave   => mConfigSlave);
 
-   U_MuxData : entity work.AxiStreamMux
+   U_MuxData : entity surf.AxiStreamMux
       generic map (
          TPD_G          => TPD_G,
          NUM_SLAVES_G   => 24,
@@ -509,7 +514,7 @@ begin
          mAxisMaster  => mDataMaster,
          mAxisSlave   => mDataSlave);
 
-   U_Mux : entity work.AxiStreamMux
+   U_Mux : entity surf.AxiStreamMux
       generic map (
          TPD_G                => TPD_G,
          NUM_SLAVES_G         => 2,
@@ -531,7 +536,7 @@ begin
          mAxisMaster     => srvIbMasters(0)(0),
          mAxisSlave      => srvIbSlaves(0)(0));
 
-   U_DeMux : entity work.AxiStreamDeMux
+   U_DeMux : entity surf.AxiStreamDeMux
       generic map (
          TPD_G         => TPD_G,
          NUM_MASTERS_G => 24,

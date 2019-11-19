@@ -17,6 +17,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+library surf;
+
 library unisim;
 use unisim.vcomponents.all;
 
@@ -26,7 +28,6 @@ entity xlx_ku_mgt_10g24 is
       -- Clocks      --
       --=============--
       MGT_REFCLK_i      : in std_logic;
-      MGT_REFCLK_BUFG_i : in std_logic;
       MGT_FREEDRPCLK_i  : in std_logic;
 
       MGT_RXUSRCLK_o : out std_logic;
@@ -57,8 +58,8 @@ entity xlx_ku_mgt_10g24 is
       --==============--
       -- Data         --
       --==============--
-      MGT_USRWORD_i    : in  std_logic_vector(31 downto 0);
-      MGT_USRWORD_o    : out std_logic_vector(31 downto 0);
+      MGT_USRWORD_i    : in  std_logic_vector(63 downto 0);
+      MGT_USRWORD_o    : out std_logic_vector(63 downto 0);
 
       --===============--
       -- Serial intf.  --
@@ -96,8 +97,8 @@ architecture structural of xlx_ku_mgt_10g24 is
          gtwiz_reset_rx_cdr_stable_out      : out std_logic_vector(0 downto 0);
          gtwiz_reset_tx_done_out            : out std_logic_vector(0 downto 0);
          gtwiz_reset_rx_done_out            : out std_logic_vector(0 downto 0);
-         gtwiz_userdata_tx_in               : in  std_logic_vector(31 downto 0);
-         gtwiz_userdata_rx_out              : out std_logic_vector(31 downto 0);
+         gtwiz_userdata_tx_in               : in  std_logic_vector(63 downto 0);
+         gtwiz_userdata_rx_out              : out std_logic_vector(63 downto 0);
          drpaddr_in                         : in  std_logic_vector(9 downto 0);
          drpclk_in                          : in  std_logic_vector(0 downto 0);
          drpdi_in                           : in  std_logic_vector(15 downto 0);
@@ -125,57 +126,67 @@ architecture structural of xlx_ku_mgt_10g24 is
          rxpmaresetdone_out                 : out std_logic_vector(0 downto 0);
          txbufstatus_out                    : out std_logic_vector(1 downto 0);
          txoutclk_out                       : out std_logic_vector(0 downto 0);
-         txoutclkpcs_out                    : out std_logic_vector(0 downto 0);
          txpmaresetdone_out                 : out std_logic_vector(0 downto 0)
          );
    end component;
 
+   component xlx_ku_mgt_ip_10g24_example_gtwiz_userclk_tx is
+      generic (
+         P_CONTENTS                     : natural := 0;
+         P_FREQ_RATIO_SOURCE_TO_USRCLK  : natural := 1;
+         P_FREQ_RATIO_USRCLK_TO_USRCLK2 : natural := 2);
+      port (
+         gtwiz_userclk_tx_srcclk_in   : in  std_logic;
+         gtwiz_userclk_tx_reset_in    : in  std_logic;
+         gtwiz_userclk_tx_usrclk_out  : out std_logic;
+         gtwiz_userclk_tx_usrclk2_out : out std_logic;
+         gtwiz_userclk_tx_active_out  : out std_logic);
+   end component;
+
+   component xlx_ku_mgt_ip_10g24_example_gtwiz_userclk_rx is
+      generic (
+         P_CONTENTS                     : natural := 0;
+         P_FREQ_RATIO_SOURCE_TO_USRCLK  : natural := 1;
+         P_FREQ_RATIO_USRCLK_TO_USRCLK2 : natural := 2);
+      port (
+         gtwiz_userclk_rx_srcclk_in   : in  std_logic;
+         gtwiz_userclk_rx_reset_in    : in  std_logic;
+         gtwiz_userclk_rx_usrclk_out  : out std_logic;
+         gtwiz_userclk_rx_usrclk2_out : out std_logic;
+         gtwiz_userclk_rx_active_out  : out std_logic);
+   end component;
+
    -- Reset signals
-   signal tx_reset_done    : std_logic;
-   signal tx_rdy_done      : std_logic;
-   signal rx_reset_done    : std_logic;
-   signal rxfsm_reset_done : std_logic;
+   signal tx_reset_done    : std_logic := '0';
+   signal rx_reset_done    : std_logic := '0';
+   signal rxfsm_reset_done : std_logic := '0';
 
-   signal rxBuffBypassRst                : std_logic;
-   signal gtwiz_userclk_rx_active_int    : std_logic;
-   signal gtwiz_buffbypass_rx_reset_in_s : std_logic;
-   signal gtwiz_userclk_tx_active_int    : std_logic;
-   signal gtwiz_buffbypass_tx_reset_in_s : std_logic;
+   signal rxBuffBypassRst                : std_logic := '0';
+   signal gtwiz_userclk_tx_active_int    : std_logic := '0';
+   signal gtwiz_userclk_rx_active_int    : std_logic := '0';
+   signal gtwiz_buffbypass_rx_reset_in_s : std_logic := '0';
 
-   signal gtwiz_userclk_tx_reset_int : std_logic;
-   signal gtwiz_userclk_rx_reset_int : std_logic;
-   signal txpmaresetdone             : std_logic;
-   signal rxpmaresetdone             : std_logic;
+   signal txpmaresetdone : std_logic := '0';
+   signal rxpmaresetdone : std_logic := '0';
 
-   signal rx_reset_sig : std_logic;
-   signal tx_reset_sig : std_logic;
+   signal rx_reset_sig : std_logic := '0';
+   signal tx_reset_sig : std_logic := '0';
 
-   signal MGT_USRWORD_s : std_logic_vector(31 downto 0);
+   signal MGT_USRWORD_s : std_logic_vector(63 downto 0) := (others => '0');
 
    -- Clock signals
-   signal rx_wordclk_sig : std_logic;
-   signal tx_wordclk_sig : std_logic;
-   signal rxoutclk_sig   : std_logic;
-   signal txoutclk_sig   : std_logic;
+   signal rx_wordclk_sig : std_logic := '0';
+   signal tx_wordclk_sig : std_logic := '0';
+
+   signal rx_wordclk_int_sig : std_logic := '0';
+   signal tx_wordclk_int_sig : std_logic := '0';
+
+   signal rxoutclk_sig : std_logic := '0';
+   signal txoutclk_sig : std_logic := '0';
 
    -- Tx phase aligner signals
-   signal txbufstatus_s : std_logic_vector(1 downto 0);
+   signal MGT_TX_ALIGNED_s : std_logic := '0';
 
-   signal txpippmen_s        : std_logic;
-   signal txpippmovrden_s    : std_logic;
-   signal txpippmsel_s       : std_logic;
-   signal txpippmpd_s        : std_logic;
-   signal txpippmstepsize_in : std_logic_vector(4 downto 0);
-
-   signal drpaddr_s : std_logic_vector(9 downto 0);
-   signal drpen_s   : std_logic;
-   signal drpdi_s   : std_logic_vector(15 downto 0);
-   signal drprdy_s  : std_logic;
-   signal drpdo_s   : std_logic_vector(15 downto 0);
-   signal drpwe_s   : std_logic;
-
-   signal mgt_rst_phaligner_s : std_logic;
-   signal MGT_TX_ALIGNED_s    : std_logic;
 --=================================================================================================--
 begin  --========####   Architecture Body   ####========-- 
 --=================================================================================================--
@@ -186,7 +197,6 @@ begin  --========####   Architecture Body   ####========--
    -- Assignments --
    --=============--              
    MGT_TXREADY_o    <= tx_reset_done and MGT_TX_ALIGNED_s;
-   tx_rdy_done      <= not(tx_reset_done);
    MGT_TX_ALIGNED_o <= MGT_TX_ALIGNED_s;
 
    MGT_RXREADY_o <= rx_reset_done and rxfsm_reset_done;
@@ -199,68 +209,11 @@ begin  --========####   Architecture Body   ####========--
 
    rxBuffBypassRst <= not(gtwiz_userclk_rx_active_int) or (not(tx_reset_done) and not(MGT_TX_ALIGNED_s));
 
-   resetDoneSynch_rx : entity work.RstSync
+   resetDoneSynch_rx : entity surf.RstSync
       port map(
          clk      => rx_wordClk_sig,
          asyncRst => rxBuffBypassRst,
-         syncRst  => gtwiz_buffbypass_rx_reset_in_s
-         );
-
-
---    resetSynch_tx: entity work.xlx_ku_mgt_ip_reset_synchronizer
---        PORT MAP(
---           clk_in                                   => tx_wordclk_sig,
---           rst_in                                   => not(gtwiz_userclk_tx_active_int),
---           rst_out                                  => gtwiz_buffbypass_tx_reset_in_s
---        );
-
-   gtwiz_userclk_tx_reset_int <= not(txpmaresetdone);
-   gtwiz_userclk_rx_reset_int <= not(rxpmaresetdone);
-
-   rxWordClkBuf_inst : bufg_gt
-      port map (
-         O       => rx_wordclk_sig,
-         I       => rxoutclk_sig,
-         -- CE                                       => not(gtwiz_userclk_rx_reset_int),
-         CE      => rxpmaresetdone,
-         DIV     => "000",
-         CLR     => '0',
-         CLRMASK => '0',
-         CEMASK  => '0'
-         );
-
-   tx_wordclk_sig <= MGT_REFCLK_BUFG_i;
---        txWordClkBuf_inst: bufg_gt
---          port map (
---             O                                        => tx_wordclk_sig, 
---             I                                        => txoutclk_sig,
---             CE                                       => not(gtwiz_userclk_tx_reset_int),
---             DIV                                      => "000",
---             CLR                                      => '0',
---             CLRMASK                                  => '0',
---             CEMASK                                   => '0'
---          );  
-
-   activetxUsrClk_proc : process(gtwiz_userclk_tx_reset_int, tx_wordclk_sig)
-   begin
-      if gtwiz_userclk_tx_reset_int = '1' then
-         gtwiz_userclk_tx_active_int <= '0';
-      elsif rising_edge(tx_wordclk_sig) then
-         gtwiz_userclk_tx_active_int <= '1';
-      end if;
-
-   end process;
-
-
-   activerxUsrClk_proc : process(gtwiz_userclk_rx_reset_int, rx_wordclk_sig)
-   begin
-      if gtwiz_userclk_rx_reset_int = '1' then
-         gtwiz_userclk_rx_active_int <= '0';
-      elsif rising_edge(rx_wordclk_sig) then
-         gtwiz_userclk_rx_active_int <= '1';
-      end if;
-
-   end process;
+         syncRst  => gtwiz_buffbypass_rx_reset_in_s);
 
    rxWordPipeline_proc : process(rx_reset_done, rx_wordclk_sig)
    begin
@@ -271,13 +224,28 @@ begin  --========####   Architecture Body   ####========--
       end if;
    end process;
 
+   gtwiz_userclk_tx_inst : xlx_ku_mgt_ip_10g24_example_gtwiz_userclk_tx
+      port map(
+         gtwiz_userclk_tx_srcclk_in   => txoutclk_sig,
+         gtwiz_userclk_tx_reset_in    => tx_reset_sig,
+         gtwiz_userclk_tx_usrclk_out  => tx_wordclk_int_sig,
+         gtwiz_userclk_tx_usrclk2_out => tx_wordclk_sig,
+         gtwiz_userclk_tx_active_out  => gtwiz_userclk_tx_active_int);
+
+   gtwiz_userclk_rx_inst : xlx_ku_mgt_ip_10g24_example_gtwiz_userclk_rx
+      port map(
+         gtwiz_userclk_rx_srcclk_in   => rxoutclk_sig,
+         gtwiz_userclk_rx_reset_in    => rx_reset_sig,
+         gtwiz_userclk_rx_usrclk_out  => rx_wordclk_int_sig,
+         gtwiz_userclk_rx_usrclk2_out => rx_wordclk_sig,
+         gtwiz_userclk_rx_active_out  => gtwiz_userclk_rx_active_int);
 
    xlx_ku_mgt_std_i : xlx_ku_mgt_ip_10g24
       port map (
-         rxusrclk_in(0)  => rx_wordclk_sig,
+         rxusrclk_in(0)  => rx_wordclk_int_sig,
          rxusrclk2_in(0) => rx_wordclk_sig,
          rxoutclk_out(0) => rxoutclk_sig,
-         txusrclk_in(0)  => tx_wordclk_sig,
+         txusrclk_in(0)  => tx_wordclk_int_sig,
          txusrclk2_in(0) => tx_wordclk_sig,
          txoutclk_out(0) => txoutclk_sig,
 
@@ -320,33 +288,23 @@ begin  --========####   Architecture Body   ####========--
          txpmaresetdone_out(0) => txpmaresetdone,
 
          -- DRP bus (used by the tx phase aligner)
-         drpaddr_in    => drpaddr_s,
-         drpdi_in      => drpdi_s,
-         drpen_in(0)   => drpen_s,
-         drpwe_in(0)   => drpwe_s,
-         drpdo_out     => drpdo_s,
-         drprdy_out(0) => drprdy_s,
+         drpaddr_in  => (others => '0'),
+         drpdi_in    => (others => '0'),
+         drpen_in(0) => '0',
+         drpwe_in(0) => '0',
+         drpdo_out   => open,
+         drprdy_out  => open,
 
          -- PI control / monitoring signals
-         txpippmen_in(0)     => txpippmen_s,
-         txpippmovrden_in(0) => txpippmovrden_s,
-         txpippmpd_in(0)     => txpippmpd_s,
-         txpippmsel_in(0)    => txpippmsel_s,
-         txpippmstepsize_in  => txpippmstepsize_in,
+         txpippmen_in(0)     => '0',
+         txpippmovrden_in(0) => '0',
+         txpippmpd_in(0)     => '0',
+         txpippmsel_in(0)    => '0',
+         txpippmstepsize_in  => (others => '0'),
 
          -- Tx buffer status
-         txbufstatus_out => txbufstatus_s);
+         txbufstatus_out => open);
 
-   txpippmen_s        <= '0';
-   txpippmovrden_s    <= '0';
-   txpippmsel_s       <= '0';
-   txpippmpd_s        <= '0';
-   txpippmstepsize_in <= (others => '0');
-
-   drpaddr_s        <= (others => '0');
-   drpen_s          <= '0';
-   drpdi_s          <= (others => '0');
-   drpwe_s          <= '0';
    MGT_TX_ALIGNED_s <= tx_reset_done;
 
 end structural;

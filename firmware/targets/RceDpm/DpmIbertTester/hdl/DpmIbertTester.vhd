@@ -16,11 +16,14 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.RceG3Pkg.all;
-use work.EthMacPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.EthMacPkg.all;
+
+library rce_gen3_fw_lib;
+use rce_gen3_fw_lib.RceG3Pkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -144,7 +147,7 @@ begin
    --------------------------------------------------
    -- PS + DMA + ETH MAC
    --------------------------------------------------
-   U_DpmCore : entity work.DpmCore
+   U_DpmCore : entity rce_gen3_fw_lib.DpmCore
       generic map (
          TPD_G              => TPD_G,
          RCE_DMA_MODE_G     => RCE_DMA_AXIS_C,
@@ -202,7 +205,7 @@ begin
    -----------
    -- IPv4/UDP
    -----------
-   U_UDP : entity work.UdpEngineWrapper
+   U_UDP : entity surf.UdpEngineWrapper
       generic map (
          -- Simulation Generics
          TPD_G          => TPD_G,
@@ -233,7 +236,7 @@ begin
    -----------------------
    -- XVC UDP Debug Bridge
    -----------------------
-   U_XVC_UDP_DEBUG_BRIDGE : entity work.UdpDebugBridgeWrapper
+   U_XVC_UDP_DEBUG_BRIDGE : entity surf.UdpDebugBridgeWrapper
       generic map (
          TPD_G => TPD_G)
       port map (

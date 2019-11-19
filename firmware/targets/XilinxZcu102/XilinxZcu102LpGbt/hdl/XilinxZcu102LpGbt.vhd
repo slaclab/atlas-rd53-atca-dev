@@ -16,12 +16,17 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiPkg.all;
-use work.AxiStreamPkg.all;
-use work.I2cPkg.all;
-use work.RceG3Pkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.I2cPkg.all;
+
+library rce_gen3_fw_lib;
+use rce_gen3_fw_lib.RceG3Pkg.all;
+
+library atlas_rd53_fw_lib;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -102,8 +107,6 @@ architecture TOP_LEVEL of XilinxZcu102LpGbt is
    signal dmaObMasters : AxiStreamMasterArray(3 downto 0);
    signal dmaObSlaves  : AxiStreamSlaveArray(3 downto 0);
 
-   signal gtRefClk320    : sl;
-   signal gtRefClk320div : sl;
    signal refClk320      : sl;
    signal userClk156     : sl;
    signal userClk156Bufg : sl;
@@ -144,7 +147,7 @@ begin
    -----------
    -- RCE Core
    -----------
-   U_Core : entity work.XilinxZcu102Core
+   U_Core : entity rce_gen3_fw_lib.XilinxZcu102Core
       generic map (
          TPD_G        => TPD_G,
          BUILD_INFO_G => BUILD_INFO_G)
@@ -170,7 +173,7 @@ begin
    ----------------------------------------         
    -- Move AXI-Lite to another clock domain
    ----------------------------------------         
-   U_AxiLiteAsync : entity work.AxiLiteAsync
+   U_AxiLiteAsync : entity surf.AxiLiteAsync
       generic map (
          TPD_G           => TPD_G,
          COMMON_CLK_G    => false,
@@ -194,7 +197,7 @@ begin
    --------------------
    -- AXI-Lite Crossbar
    --------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -237,7 +240,7 @@ begin
          DIV     => "000",
          O       => userClk156Bufg);
 
-   U_PLL : entity work.ClockManagerUltraScale
+   U_PLL : entity surf.ClockManagerUltraScale
       generic map(
          TPD_G            => TPD_G,
          TYPE_G           => "PLL",
@@ -256,7 +259,7 @@ begin
    --------------------------
    -- Reference 300 MHz clock 
    --------------------------
-   U_MMCM : entity work.ClockManagerUltraScale
+   U_MMCM : entity surf.ClockManagerUltraScale
       generic map(
          TPD_G              => TPD_G,
          TYPE_G             => "MMCM",
@@ -287,7 +290,7 @@ begin
    -------------------
    -- FMC Port Mapping
    -------------------
-   U_FmcMapping : entity work.AtlasRd53FmcMapping
+   U_FmcMapping : entity atlas_rd53_fw_lib.AtlasRd53FmcMapping
       generic map (
          TPD_G        => TPD_G,
          XIL_DEVICE_G => "ULTRASCALE_PLUS")
@@ -348,18 +351,8 @@ begin
          I     => gtRefClk320P,
          IB    => gtRefClk320N,
          CEB   => '0',
-         ODIV2 => gtRefClk320div,
-         O     => gtRefClk320);
-
-   U_BUFG_refClk320 : BUFG_GT
-      port map (
-         I       => gtRefClk320div,
-         CE      => '1',
-         CEMASK  => '1',
-         CLR     => '0',
-         CLRMASK => '1',
-         DIV     => "000",
-         O       => refClk320);
+         ODIV2 => open,
+         O     => refClk320);
 
    ------------------
    -- SFP LpGBT Lanes
@@ -386,7 +379,6 @@ begin
             dmaObSlave      => dmaObSlaves(i),
             -- SFP Interface
             refClk320       => refClk320,
-            gtRefClk320     => gtRefClk320,
             downlinkUp      => downlinkUp(i),
             uplinkUp        => uplinkUp(i),
             sfpTxP          => sfpTxP(i),
@@ -398,7 +390,7 @@ begin
    --------------------
    -- AXI-Lite: PLL SPI
    --------------------
-   U_Si5345 : entity work.Si5345
+   U_Si5345 : entity surf.Si5345
       generic map (
          TPD_G              => TPD_G,
          MEMORY_INIT_FILE_G => "Si5345-RevD-Registers-160MHz.mem",  -- Use FMC on-board 160 MHz reference

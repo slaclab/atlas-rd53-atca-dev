@@ -16,10 +16,13 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.AtlasAtcaLinkAggPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+
+library atlas_atca_link_agg_fw_lib;
+use atlas_atca_link_agg_fw_lib.AtlasAtcaLinkAggPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -268,7 +271,7 @@ begin
          sfpRxP          => sfpRxP,
          sfpRxN          => sfpRxN);
 
-   U_Core : entity work.AtlasAtcaLinkAggCore
+   U_Core : entity atlas_atca_link_agg_fw_lib.AtlasAtcaLinkAggCore
       generic map (
          TPD_G              => TPD_G,
          SIMULATION_G       => SIMULATION_G,

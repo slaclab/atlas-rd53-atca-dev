@@ -18,9 +18,11 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+
 use work.AtlasAtcaLinkAggPkg.all;
 
 entity ApplicationTb is end ApplicationTb;
@@ -141,7 +143,7 @@ begin
             GTX3_N_PAD      => dPortDataP(i)(3));  -- Inverter in layout
    end generate GEN_VEC;
 
-   U_Clk160 : entity work.ClkRst
+   U_Clk160 : entity surf.ClkRst
       generic map (
          CLK_PERIOD_G      => 6.25 ns,
          RST_START_DELAY_G => 0 ns,
@@ -151,7 +153,7 @@ begin
          clkN => clk160N,
          rstL => dPortRstL);
 
-   U_Clk156 : entity work.ClkRst
+   U_Clk156 : entity surf.ClkRst
       generic map (
          CLK_PERIOD_G      => 6.4 ns,
          RST_START_DELAY_G => 0 ns,
@@ -161,7 +163,7 @@ begin
          clkN => clk156N,
          rst  => rst156);
 
-   U_TcpToAxiLite : entity work.RogueTcpMemoryWrap
+   U_TcpToAxiLite : entity surf.RogueTcpMemoryWrap
       generic map (
          TPD_G      => TPD_G,
          PORT_NUM_G => 7000)

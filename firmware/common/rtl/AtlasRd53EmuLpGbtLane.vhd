@@ -17,10 +17,12 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+
 use work.lpgbtfpga_package.all;
 
 library unisim;
@@ -50,7 +52,6 @@ entity AtlasRd53EmuLpGbtLane is
       rxLinkUp        : in  slv(NUM_ELINK_G-1 downto 0);
       -- SFP Interface
       refClk320       : in  sl;  -- Using jitter clean FMC 320 MHz reference
-      gtRefClk320     : in  sl;  -- Using jitter clean FMC 320 MHz reference
       downlinkUp      : out sl;
       uplinkUp        : out sl;
       sfpTxP          : out sl;
@@ -96,7 +97,7 @@ begin
    downlinkUp <= downlinkReady;
    uplinkUp   <= uplinkReady;
 
-   U_rst160MHz : entity work.RstPipeline
+   U_rst160MHz : entity surf.RstPipeline
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -107,7 +108,7 @@ begin
    -------------------------
    -- Generate the uplinkRst
    -------------------------
-   U_uplinkRst : entity work.PwrUpRst
+   U_uplinkRst : entity surf.PwrUpRst
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -124,7 +125,7 @@ begin
       -- Only send the data (include invert) if the delay alignment is completed
       data(i) <= not(serDesData(i)) when(rxLinkUp(i) = '1') else x"00";
 
-      U_Gearbox_Data : entity work.AsyncGearbox
+      U_Gearbox_Data : entity surf.AsyncGearbox
          generic map (
             TPD_G                => TPD_G,
             SLAVE_WIDTH_G        => 8,
@@ -133,7 +134,7 @@ begin
             INPUT_PIPE_STAGES_G  => 0,
             OUTPUT_PIPE_STAGES_G => 0,
             -- Async FIFO generics
-            FIFO_BRAM_EN_G       => false,
+            FIFO_MEMORY_TYPE_G   => "distributed",
             FIFO_ADDR_WIDTH_G    => 5)
          port map (
             -- Slave Interface
@@ -174,7 +175,6 @@ begin
          downlinkReady_o     => downlinkReady,
          -- MGT
          clk_refclk_i        => refClk320,
-         clk_mgtrefclk_i     => gtRefClk320,
          clk_mgtfreedrpclk_i => axilClk,
          mgt_rxn_i           => sfpRxN,
          mgt_rxp_i           => sfpRxP,
@@ -184,7 +184,7 @@ begin
    ---------------------------
    -- Generate the downlinkRst
    ---------------------------
-   U_downlinkRst : entity work.PwrUpRst
+   U_downlinkRst : entity surf.PwrUpRst
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -198,7 +198,7 @@ begin
    GEN_CMD :
    for i in NUM_ELINK_G-1 downto 0 generate
 
-      U_Gearbox_Cmd : entity work.AsyncGearbox
+      U_Gearbox_Cmd : entity surf.AsyncGearbox
          generic map (
             TPD_G                => TPD_G,
             SLAVE_WIDTH_G        => 4,
@@ -207,7 +207,7 @@ begin
             INPUT_PIPE_STAGES_G  => 0,
             OUTPUT_PIPE_STAGES_G => 0,
             -- Async FIFO generics
-            FIFO_BRAM_EN_G       => false,
+            FIFO_MEMORY_TYPE_G   => "distributed",
             FIFO_ADDR_WIDTH_G    => 5)
          port map (
             -- Slave Interface

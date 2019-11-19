@@ -16,10 +16,14 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+
+library atlas_rd53_fw_lib;
+
 use work.lpgbtfpga_package.all;
 
 library unisim;
@@ -46,7 +50,6 @@ entity AtlasRd53LpGbtLane is
       dmaObSlave      : out AxiStreamSlaveType;
       -- SFP Interface
       refClk320       : in  sl;  -- Using jitter clean FMC 320 MHz reference
-      gtRefClk320     : in  sl;  -- Using jitter clean FMC 320 MHz reference
       downlinkUp      : out sl;
       uplinkUp        : out sl;
       sfpTxP          : out sl;
@@ -148,7 +151,7 @@ begin
    ---------------------------
    -- Generate the downlinkRst
    ---------------------------
-   U_downlinkRst : entity work.PwrUpRst
+   U_downlinkRst : entity surf.PwrUpRst
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -177,7 +180,7 @@ begin
    --------------------
    -- AXI-Lite Crossbar
    --------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -201,7 +204,7 @@ begin
    GEN_CTRL_STATUS :
    for i in NUM_ELINK_C-1 downto 0 generate
 
-      U_Ctrl : entity work.AtlasRd53Ctrl
+      U_Ctrl : entity atlas_rd53_fw_lib.AtlasRd53Ctrl
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -249,7 +252,7 @@ begin
    ---------------------------------------------------------------------
    -- Demux the DMA outbound stream into different steam CMD AXI Streams
    ---------------------------------------------------------------------
-   U_DeMux : entity work.AxiStreamDeMux
+   U_DeMux : entity surf.AxiStreamDeMux
       generic map (
          TPD_G         => TPD_G,
          NUM_MASTERS_G => NUM_ELINK_C,
@@ -271,7 +274,7 @@ begin
    GEN_CMD :
    for i in NUM_ELINK_C-1 downto 0 generate
 
-      U_Cmd : entity work.AtlasRd53TxCmdWrapper
+      U_Cmd : entity atlas_rd53_fw_lib.AtlasRd53TxCmdWrapper
          generic map (
             TPD_G         => TPD_G,
             AXIS_CONFIG_G => AXIS_CONFIG_G)
@@ -291,7 +294,7 @@ begin
             -- Command Serial Interface (clk160MHz domain)
             cmdOut          => cmd(i));
 
-      U_Gearbox_Cmd : entity work.Gearbox
+      U_Gearbox_Cmd : entity surf.Gearbox
          generic map (
             TPD_G          => TPD_G,
             SLAVE_WIDTH_G  => 1,
@@ -333,7 +336,6 @@ begin
          uplinkReady_o       => uplinkReady,
          -- MGT
          clk_refclk_i        => refClk320,
-         clk_mgtrefclk_i     => gtRefClk320,
          clk_mgtfreedrpclk_i => axilClk,
          mgt_rxn_i           => sfpRxN,
          mgt_rxp_i           => sfpRxP,
@@ -343,7 +345,7 @@ begin
    -------------------------
    -- Generate the uplinkRst
    -------------------------
-   U_uplinkRst : entity work.PwrUpRst
+   U_uplinkRst : entity surf.PwrUpRst
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -357,7 +359,7 @@ begin
    GEN_DATA :
    for i in NUM_ELINK_C-1 downto 0 generate
 
-      U_Gearbox_1280Mbps : entity work.Gearbox
+      U_Gearbox_1280Mbps : entity surf.Gearbox
          generic map (
             TPD_G          => TPD_G,
             SLAVE_WIDTH_G  => 32,
@@ -379,7 +381,7 @@ begin
       ------------------
       -- Gearbox aligner
       ------------------
-      U_GearboxAligner : entity work.AuroraRxGearboxAligner
+      U_GearboxAligner : entity atlas_rd53_fw_lib.AuroraRxGearboxAligner
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -395,7 +397,7 @@ begin
       -- Unscramble the data for 64b66b
       ---------------------------------
       unscramblerValid(i)(0) <= rxAligned(i)(0) and rxValid(i)(0);
-      U_Descrambler : entity work.Scrambler
+      U_Descrambler : entity surf.Scrambler
          generic map (
             TPD_G            => TPD_G,
             DIRECTION_G      => "DESCRAMBLER",
@@ -420,7 +422,7 @@ begin
       ------------------
       -- Gearbox aligner
       ------------------
-      U_AuroraRxCh : entity work.AuroraRxChannelFsm
+      U_AuroraRxCh : entity atlas_rd53_fw_lib.AuroraRxChannelFsm
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -449,7 +451,7 @@ begin
       ---------------------         
       -- Outbound Data FIFO
       ---------------------       
-      U_DataFifo : entity work.AxiStreamFifoV2
+      U_DataFifo : entity surf.AxiStreamFifoV2
          generic map (
             -- General Configurations
             TPD_G               => TPD_G,
@@ -478,7 +480,7 @@ begin
       ---------------------------------------------------------
       -- Batch Multiple 64-bit data words into large AXIS frame
       ---------------------------------------------------------
-      U_DataBatcher : entity work.AtlasRd53RxDataBatcher
+      U_DataBatcher : entity atlas_rd53_fw_lib.AtlasRd53RxDataBatcher
          generic map (
             TPD_G         => TPD_G,
             AXIS_CONFIG_G => INT_AXIS_CONFIG_C)
@@ -498,7 +500,7 @@ begin
       --------------------
       -- Resize/Burst FIFO
       --------------------
-      Burst_FIFO : entity work.AxiStreamFifoV2
+      Burst_FIFO : entity surf.AxiStreamFifoV2
          generic map (
             -- General Configurations
             TPD_G               => TPD_G,
@@ -530,7 +532,7 @@ begin
    --------------------------------------------------------
    -- MUX the data AXI streams into the DMA outbound stream
    --------------------------------------------------------
-   U_MuxData : entity work.AxiStreamMux
+   U_MuxData : entity surf.AxiStreamMux
       generic map (
          TPD_G          => TPD_G,
          NUM_SLAVES_G   => NUM_ELINK_C,

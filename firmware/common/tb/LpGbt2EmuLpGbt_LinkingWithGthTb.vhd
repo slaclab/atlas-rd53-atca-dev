@@ -18,7 +18,8 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
 
 entity LpGbt2EmuLpGbt_LinkingWithGthTb is
 end LpGbt2EmuLpGbt_LinkingWithGthTb;
@@ -72,22 +73,18 @@ begin
    ---------------------------
    -- Generate clock and reset
    ---------------------------
-   U_refClk320 : entity work.ClkRst
+   U_refClk320 : entity surf.ClkRst
       generic map (
-         -- CLK_PERIOD_G      => 3.12498 ns,  -- 320 MHz
-         CLK_PERIOD_G      => 6.25 ns,  -- 320 MHz
+         CLK_PERIOD_G      => 3.125 ns,  -- 320 MHz
          RST_START_DELAY_G => 0 ns,
-         -- RST_HOLD_TIME_G   => 100 us)
-         RST_HOLD_TIME_G   => 1 us)
+         RST_HOLD_TIME_G   => 10 us)
       port map (
          clkP => refClk320,
          rst  => usrRst);
 
-   U_axilClk : entity work.ClkRst
+   U_axilClk : entity surf.ClkRst
       generic map (
-         CLK_PERIOD_G      => 6.4 ns,   -- 156.25 MHz
-         RST_START_DELAY_G => 0 ns,
-         RST_HOLD_TIME_G   => 1 us)
+         CLK_PERIOD_G => 6.4 ns)        -- 156.25 MHz
       port map (
          clkP => axilClk);
 
@@ -114,7 +111,6 @@ begin
          uplinkReady_o       => uplinkReady(0),
          -- MGT
          clk_refclk_i        => refClk320,
-         clk_mgtrefclk_i     => refClk320,
          clk_mgtfreedrpclk_i => axilClk,
          mgt_rxn_i           => gtEmuToLpN,
          mgt_rxp_i           => gtEmuToLpP,
@@ -144,7 +140,6 @@ begin
          downlinkReady_o     => downlinkReady(1),
          -- MGT
          clk_refclk_i        => refClk320,
-         clk_mgtrefclk_i     => refClk320,
          clk_mgtfreedrpclk_i => axilClk,
          mgt_rxn_i           => gtLpToEmuN,
          mgt_rxp_i           => gtLpToEmuP,

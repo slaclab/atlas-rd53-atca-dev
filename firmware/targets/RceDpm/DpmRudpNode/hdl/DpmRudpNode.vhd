@@ -20,11 +20,14 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.RceG3Pkg.all;
-use work.EthMacPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.EthMacPkg.all;
+
+library rce_gen3_fw_lib;
+use rce_gen3_fw_lib.RceG3Pkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -147,7 +150,7 @@ begin
    --------------------------------------------------
    -- PS + DMA + ETH MAC
    --------------------------------------------------
-   U_DpmCore : entity work.DpmCore
+   U_DpmCore : entity rce_gen3_fw_lib.DpmCore
       generic map (
          TPD_G              => TPD_G,
          RCE_DMA_MODE_G     => RCE_DMA_AXISV2_C,  -- AXIS DMA Version2
@@ -210,7 +213,7 @@ begin
    ----------------------------------------         
    -- Move AXI-Lite to another clock domain
    ----------------------------------------         
-   U_AxiLiteAsync : entity work.AxiLiteAsync
+   U_AxiLiteAsync : entity surf.AxiLiteAsync
       generic map (
          TPD_G           => TPD_G,
          COMMON_CLK_G    => false,
@@ -234,7 +237,7 @@ begin
    --------------------
    -- AXI-Lite Crossbar
    --------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -255,7 +258,7 @@ begin
    -----------
    -- IPv4/UDP
    -----------
-   U_UDP : entity work.UdpEngineWrapper
+   U_UDP : entity surf.UdpEngineWrapper
       generic map (
          -- Simulation Generics
          TPD_G          => TPD_G,
@@ -298,7 +301,7 @@ begin
    -----------------------
    -- DMA[1] = RUDP Server
    -----------------------
-   U_RssiServer : entity work.RssiCoreWrapper
+   U_RssiServer : entity surf.RssiCoreWrapper
       generic map (
          TPD_G               => TPD_G,
          SERVER_G            => true,
@@ -344,7 +347,7 @@ begin
    -----------------------
    -- DMA[0] = RUDP Client
    -----------------------
-   U_RssiClient : entity work.RssiCoreWrapper
+   U_RssiClient : entity surf.RssiCoreWrapper
       generic map (
          TPD_G               => TPD_G,
          SERVER_G            => false,  -- false = Client mode
@@ -390,7 +393,7 @@ begin
    ----------
    -- RTM GTs
    ----------
-   U_TERM_GTs : entity work.Gtxe2ChannelDummy
+   U_TERM_GTs : entity surf.Gtxe2ChannelDummy
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => 12)

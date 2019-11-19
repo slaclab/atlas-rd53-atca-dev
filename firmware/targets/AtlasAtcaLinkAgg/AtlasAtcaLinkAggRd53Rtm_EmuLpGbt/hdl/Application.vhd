@@ -18,11 +18,16 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.I2cPkg.all;
-use work.AtlasAtcaLinkAggPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.I2cPkg.all;
+
+library atlas_rd53_fw_lib;
+
+library atlas_atca_link_agg_fw_lib;
+use atlas_atca_link_agg_fw_lib.AtlasAtcaLinkAggPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -136,12 +141,10 @@ architecture mapping of Application is
    signal clk160MHz : sl;
    signal rst160MHz : sl;
 
-   signal smaClk       : sl;
-   signal smaClock       : sl;
+   signal smaClk   : sl;
+   signal smaClock : sl;
 
-   signal gtRefClk320    : sl;
-   signal gtRefClk320div : sl;
-   signal refClk320      : sl;
+   signal refClk320 : sl;
 
    signal iDelayCtrlRdy : sl;
    signal refClk300MHz  : sl;
@@ -161,7 +164,7 @@ begin
       ----------------------------------------------------
       GEN_QSFP :
       for i in 1 downto 0 generate
-         U_TERM_GTs : entity work.Gtye4ChannelDummy
+         U_TERM_GTs : entity surf.Gtye4ChannelDummy
             generic map (
                TPD_G   => TPD_G,
                WIDTH_G => 4)
@@ -173,7 +176,7 @@ begin
                gtTxN  => qsfpTxN(i));
       end generate GEN_QSFP;
    end generate;
-   
+
    ---------------------------------------------------------------------------------
    -- External Reference clock (required for synchronizing to remote LpGBT receiver) 
    ---------------------------------------------------------------------------------
@@ -188,7 +191,7 @@ begin
          CEB   => '0',
          ODIV2 => smaClock,
          O     => open);
-         
+
    U_BUFG_smaClk : BUFG_GT
       port map (
          I       => smaClock,
@@ -197,17 +200,17 @@ begin
          CLR     => '0',
          CLRMASK => '1',
          DIV     => "000",
-         O       => smaClk);            
-         
-   U_fpgaToPllClk : entity work.ClkOutBufDiff
+         O       => smaClk);
+
+   U_fpgaToPllClk : entity surf.ClkOutBufDiff
       generic map (
          TPD_G        => TPD_G,
          XIL_DEVICE_G => XIL_DEVICE_C)
       port map (
          clkIn   => smaClk,
          clkOutP => fpgaToPllClkP,
-         clkOutN => fpgaToPllClkN);   
-   
+         clkOutN => fpgaToPllClkN);
+
    --------------------------
    -- 160 MHz Reference Clock
    --------------------------
@@ -216,13 +219,13 @@ begin
          I  => pllToFpgaClkP,
          IB => pllToFpgaClkN,
          O  => ref160Clock);
-         
+
    U_BUFG_ref160Clk : BUFG
       port map (
-         I       => ref160Clock,
-         O       => ref160Clk);         
+         I => ref160Clock,
+         O => ref160Clk);
 
-   U_ref160Rst : entity work.RstPipeline
+   U_ref160Rst : entity surf.RstPipeline
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -242,23 +245,13 @@ begin
          I     => sfpPllClkP,
          IB    => sfpPllClkN,
          CEB   => '0',
-         ODIV2 => gtRefClk320div,
-         O     => gtRefClk320);
-
-   U_BUFG_refClk320 : BUFG_GT
-      port map (
-         I       => gtRefClk320div,
-         CE      => '1',
-         CEMASK  => '1',
-         CLR     => '0',
-         CLRMASK => '1',
-         DIV     => "000",
-         O       => refClk320);   
+         ODIV2 => open,
+         O     => refClk320);
 
    --------------------------
    -- Reference 300 MHz clock 
    --------------------------
-   U_MMCM : entity work.ClockManagerUltraScale
+   U_MMCM : entity surf.ClockManagerUltraScale
       generic map(
          TPD_G              => TPD_G,
          SIMULATION_G       => SIMULATION_G,
@@ -290,7 +283,7 @@ begin
    --------------------
    -- AXI-Lite Crossbar
    --------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -311,7 +304,7 @@ begin
    ------------------------------         
    -- High Speed SelectIO Modules
    ------------------------------         
-   U_Selectio : entity work.AtlasRd53HsSelectio
+   U_Selectio : entity atlas_rd53_fw_lib.AtlasRd53HsSelectio
       generic map(
          TPD_G        => TPD_G,
          SIMULATION_G => SIMULATION_G,
@@ -336,7 +329,7 @@ begin
    -- Using AuroraRxLane for this is IDELAY alignment feature
    ----------------------------------------------------------
    GEN_LANE : for i in (24*4)-1 downto 0 generate
-      U_Rx : entity work.AuroraRxLane
+      U_Rx : entity atlas_rd53_fw_lib.AuroraRxLane
          generic map (
             TPD_G        => TPD_G,
             SIMULATION_G => SIMULATION_G)
@@ -391,7 +384,6 @@ begin
             rxLinkUp(5)     => rxLinkUp(24*i+4*5),
             -- SFP Interface
             refClk320       => refClk320,
-            gtRefClk320     => gtRefClk320,
             sfpTxP          => sfpTxP(i),
             sfpTxN          => sfpTxN(i),
             sfpRxP          => sfpRxP(i),

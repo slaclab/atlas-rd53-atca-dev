@@ -18,6 +18,8 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
+library surf;
+
 use work.lpgbtfpga_package.all;
 
 library unisim;
@@ -51,7 +53,6 @@ entity EmuLpGbtFpga10g24 is
       downlinkReady_o             : out std_logic;  --! Downlink ready status
       -- MGT
       clk_refclk_i                : in  std_logic;  --! Transceiver serial clock
-      clk_mgtrefclk_i             : in  std_logic;  --! Transceiver serial clock
       clk_mgtfreedrpclk_i         : in  std_logic;
       mgt_rxn_i                   : in  std_logic;
       mgt_rxp_i                   : in  std_logic;
@@ -65,19 +66,24 @@ end EmuLpGbtFpga10g24;
 
 architecture mapping of EmuLpGbtFpga10g24 is
 
-   signal downlink_mgtword_s : std_logic_vector(31 downto 0);
-   signal uplink_mgtword_s   : std_logic_vector(31 downto 0);
-   signal mgt_rxslide_s      : std_logic;
-   signal mgt_txrdy_s        : std_logic;
-   signal mgt_rxrdy_s        : std_logic;
+   signal uplink_mgtword_s      : std_logic_vector(63 downto 0);
+   signal downlink_mgtword_s    : std_logic_vector(63 downto 0);
+   signal downlink_mgtword_gt_s : std_logic_vector(63 downto 0);
+
+   signal simDbgUplink   : std_logic_vector(255 downto 0);
+   signal simDbgDownlink : std_logic_vector(255 downto 0);
+
+   signal mgt_rxslide_s : std_logic;
+   signal mgt_txrdy_s   : std_logic;
+   signal mgt_rxrdy_s   : std_logic;
 
    signal uplinkClk_s   : std_logic;
    signal uplinkClkEn_s : std_logic;
-   signal uplinkCnt_s   : std_logic_vector(2 downto 0) := (others => '0');
+   signal uplinkCnt_s   : std_logic_vector(1 downto 0) := (others => '0');
 
    signal downlinkClk_s   : std_logic;
    signal downlinkClkEn_s : std_logic;
-   signal downlinkCnt_s   : std_logic_vector(2 downto 0) := (others => '0');
+   signal downlinkCnt_s   : std_logic_vector(1 downto 0) := (others => '0');
 
 begin
 
@@ -85,6 +91,7 @@ begin
    uplinkClkEn_o <= uplinkClkEn_s;
 
    process(uplinkClk_s)
+
    begin
       if rising_edge(uplinkClk_s) then
          if uplinkCnt_s = 0 then
@@ -92,6 +99,21 @@ begin
          else
             uplinkClkEn_s <= '0';
          end if;
+         -- Simulation debug
+         if uplinkCnt_s = 0 then
+            simDbgUplink(63 downto 0)   <= uplink_mgtword_s;
+            simDbgDownlink(63 downto 0) <= downlink_mgtword_s;
+         elsif uplinkCnt_s = 1 then
+            simDbgUplink(127 downto 64)   <= uplink_mgtword_s;
+            simDbgDownlink(127 downto 64) <= downlink_mgtword_s;
+         elsif uplinkCnt_s = 2 then
+            simDbgUplink(191 downto 128)   <= uplink_mgtword_s;
+            simDbgDownlink(191 downto 128) <= downlink_mgtword_s;
+         else
+            simDbgUplink(255 downto 192)   <= uplink_mgtword_s;
+            simDbgDownlink(255 downto 192) <= downlink_mgtword_s;
+         end if;
+         -- Increment the counter
          uplinkCnt_s <= uplinkCnt_s + 1;
       end if;
    end process;
@@ -104,8 +126,7 @@ begin
          --=============--
          -- Clocks      --
          --=============--
-         MGT_REFCLK_i      => clk_mgtrefclk_i,
-         MGT_REFCLK_BUFG_i => clk_refclk_i,
+         MGT_REFCLK_i      => clk_refclk_i,
          MGT_FREEDRPCLK_i  => clk_mgtfreedrpclk_i,
          MGT_TXUSRCLK_o    => uplinkClk_s,
          MGT_RXUSRCLK_o    => downlinkClk_s,
@@ -117,7 +138,8 @@ begin
          --=============--
          -- Control     --
          --=============--
-         MGT_RXSlide_i     => mgt_rxslide_s,
+         MGT_RXSlide_i     => '0',
+         -- MGT_RXSlide_i     => mgt_rxslide_s,
          MGT_ENTXCALIBIN_i => '0',
          MGT_TXCALIB_i     => (others => '0'),
          --=============--
@@ -129,7 +151,7 @@ begin
          -- Data         --
          --==============--
          MGT_USRWORD_i     => uplink_mgtword_s,
-         MGT_USRWORD_o     => downlink_mgtword_s,
+         MGT_USRWORD_o     => downlink_mgtword_gt_s,
          --===============--
          -- Serial intf.  --
          --===============--
@@ -137,11 +159,24 @@ begin
          RXp_i             => mgt_rxp_i,
          TXn_o             => mgt_txn_o,
          TXp_o             => mgt_txp_o);
+         
+   U_slip : entity surf.Gearbox
+      generic map (
+         SLAVE_WIDTH_G  => 64,
+         MASTER_WIDTH_G => 64)
+      port map (
+         clk        => downlinkClk_s,
+         rst        => downlinkRst_i,
+         slip       => mgt_rxslide_s,
+         slaveData  => downlink_mgtword_gt_s,
+         masterData => downlink_mgtword_s);         
 
    U_lpgbtemul : entity work.lpgbtemul_top
       generic map(
          rxslide_pulse_duration => 2,
-         rxslide_pulse_delay    => 512)
+         rxslide_pulse_delay    => 128,
+         c_clockRatio           => 4,
+         c_mgtWordWidth         => 64)
       port map(
          -- DownLink
          downlinkClkEn_o             => downlinkClkEn_s,

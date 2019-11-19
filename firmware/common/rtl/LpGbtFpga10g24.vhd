@@ -18,6 +18,8 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
+library surf;
+
 use work.lpgbtfpga_package.all;
 
 library unisim;
@@ -49,7 +51,6 @@ entity LpGbtFpga10g24 is
       uplinkReady_o               : out std_logic;  --! Uplink ready status
       -- MGT
       clk_refclk_i                : in  std_logic;  --! Transceiver serial clock
-      clk_mgtrefclk_i             : in  std_logic;  --! Transceiver serial clock
       clk_mgtfreedrpclk_i         : in  std_logic;
       mgt_rxn_i                   : in  std_logic;
       mgt_rxp_i                   : in  std_logic;
@@ -63,19 +64,24 @@ end LpGbtFpga10g24;
 
 architecture mapping of LpGbtFpga10g24 is
 
-   signal downlink_mgtword_s : std_logic_vector(31 downto 0);
-   signal uplink_mgtword_s   : std_logic_vector(31 downto 0);
-   signal mgt_rxslide_s      : std_logic;
-   signal mgt_txrdy_s        : std_logic;
-   signal mgt_rxrdy_s        : std_logic;
+   signal downlink_mgtword_s  : std_logic_vector(63 downto 0);
+   signal uplink_mgtword_s    : std_logic_vector(63 downto 0);
+   signal uplink_mgtword_gt_s : std_logic_vector(63 downto 0);
+
+   signal simDbgUplink   : std_logic_vector(255 downto 0);
+   signal simDbgDownlink : std_logic_vector(255 downto 0);
+
+   signal mgt_rxslide_s : std_logic;
+   signal mgt_txrdy_s   : std_logic;
+   signal mgt_rxrdy_s   : std_logic;
 
    signal downlinkClk_s   : std_logic;
    signal downlinkClkEn_s : std_logic;
-   signal downlinkCnt_s   : std_logic_vector(2 downto 0) := (others => '0');
+   signal downlinkCnt_s   : std_logic_vector(1 downto 0) := (others => '0');
 
    signal uplinkClk_s   : std_logic;
    signal uplinkClkEn_s : std_logic;
-   signal uplinkCnt_s   : std_logic_vector(2 downto 0) := (others => '0');
+   signal uplinkCnt_s   : std_logic_vector(1 downto 0) := (others => '0');
 
 begin
 
@@ -90,6 +96,21 @@ begin
          else
             downlinkClkEn_s <= '0';
          end if;
+         -- Simulation debug
+         if downlinkCnt_s = 0 then
+            simDbgUplink(63 downto 0)   <= uplink_mgtword_s;
+            simDbgDownlink(63 downto 0) <= downlink_mgtword_s;
+         elsif downlinkCnt_s = 1 then
+            simDbgUplink(127 downto 64)   <= uplink_mgtword_s;
+            simDbgDownlink(127 downto 64) <= downlink_mgtword_s;
+         elsif downlinkCnt_s = 2 then
+            simDbgUplink(191 downto 128)   <= uplink_mgtword_s;
+            simDbgDownlink(191 downto 128) <= downlink_mgtword_s;
+         else
+            simDbgUplink(255 downto 192)   <= uplink_mgtword_s;
+            simDbgDownlink(255 downto 192) <= downlink_mgtword_s;
+         end if;
+         -- Increment the counter
          downlinkCnt_s <= downlinkCnt_s + 1;
       end if;
    end process;
@@ -98,8 +119,8 @@ begin
       generic map(
          -- Expert parameters
          c_multicyleDelay => 3,
-         c_clockRatio     => 8,
-         c_outputWidth    => 32)
+         c_clockRatio     => 4,
+         c_outputWidth    => 64)
       port map(
          -- Clocks
          clk_i               => downlinkClk_s,
@@ -123,8 +144,7 @@ begin
          --=============--
          -- Clocks      --
          --=============--
-         MGT_REFCLK_i      => clk_mgtrefclk_i,
-         MGT_REFCLK_BUFG_i => clk_refclk_i,
+         MGT_REFCLK_i      => clk_refclk_i,
          MGT_FREEDRPCLK_i  => clk_mgtfreedrpclk_i,
          MGT_TXUSRCLK_o    => downlinkClk_s,
          MGT_RXUSRCLK_o    => uplinkClk_s,
@@ -136,7 +156,8 @@ begin
          --=============--
          -- Control     --
          --=============--
-         MGT_RXSlide_i     => mgt_rxslide_s,
+         MGT_RXSlide_i     => '0',
+         -- MGT_RXSlide_i     => mgt_rxslide_s,
          MGT_ENTXCALIBIN_i => '0',
          MGT_TXCALIB_i     => (others => '0'),
          --=============--
@@ -148,7 +169,7 @@ begin
          -- Data         --
          --==============--
          MGT_USRWORD_i     => downlink_mgtword_s,
-         MGT_USRWORD_o     => uplink_mgtword_s,
+         MGT_USRWORD_o     => uplink_mgtword_gt_s,
          --===============--
          -- Serial intf.  --
          --===============--
@@ -156,6 +177,17 @@ begin
          RXp_i             => mgt_rxp_i,
          TXn_o             => mgt_txn_o,
          TXp_o             => mgt_txp_o);
+
+   U_slip : entity surf.Gearbox
+      generic map (
+         SLAVE_WIDTH_G  => 64,
+         MASTER_WIDTH_G => 64)
+      port map (
+         clk        => uplinkClk_s,
+         rst        => uplinkRst_i,
+         slip       => mgt_rxslide_s,
+         slaveData  => uplink_mgtword_gt_s,
+         masterData => uplink_mgtword_s);
 
    uplinkClk_o   <= uplinkClk_s;
    uplinkClkEn_o <= uplinkClkEn_s;
@@ -167,8 +199,8 @@ begin
          FEC                       => FEC12,
          -- Expert parameters
          c_multicyleDelay          => 3,
-         c_clockRatio              => 8,
-         c_mgtWordWidth            => 32,
+         c_clockRatio              => 4,
+         c_mgtWordWidth            => 64,
          c_allowedFalseHeader      => 5,
          c_allowedFalseHeaderOverN => 64,
          c_requiredTrueHeader      => 30,

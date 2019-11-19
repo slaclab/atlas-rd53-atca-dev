@@ -16,11 +16,12 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.AxiLitePkg.all;
-use work.EthMacPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.AxiLitePkg.all;
+use surf.EthMacPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -100,7 +101,7 @@ begin
    --------------
    -- ETH PHY/MAC
    --------------
-   U_10GigE : entity work.TenGigEthGthUltraScaleWrapper
+   U_10GigE : entity surf.TenGigEthGthUltraScaleWrapper
       generic map (
          TPD_G             => TPD_G,
          NUM_LANE_G        => 1,
@@ -142,7 +143,7 @@ begin
    ----------------------
    -- IPv4/ARP/UDP Engine
    ----------------------
-   U_UDP : entity work.UdpEngineWrapper
+   U_UDP : entity surf.UdpEngineWrapper
       generic map (
          -- Simulation Generics
          TPD_G          => TPD_G,
@@ -177,7 +178,7 @@ begin
    --------------
    -- RSSI Server
    --------------
-   U_RssiServer : entity work.RssiCoreWrapper
+   U_RssiServer : entity surf.RssiCoreWrapper
       generic map (
          TPD_G               => TPD_G,
          SERVER_G            => true,
@@ -214,7 +215,7 @@ begin
    ---------------
    -- SRPv3 Module
    ---------------
-   U_SRPv3 : entity work.SrpV3AxiLite
+   U_SRPv3 : entity surf.SrpV3AxiLite
       generic map (
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,

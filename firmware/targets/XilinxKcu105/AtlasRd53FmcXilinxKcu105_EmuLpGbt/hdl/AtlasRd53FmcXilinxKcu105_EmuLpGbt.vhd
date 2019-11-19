@@ -16,11 +16,14 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.I2cPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.I2cPkg.all;
+
+library atlas_rd53_fw_lib;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -102,9 +105,7 @@ architecture top_level of AtlasRd53FmcXilinxKcu105_EmuLpGbt is
    signal refRst300MHz  : sl;
    signal iDelayCtrlRdy : sl;
 
-   signal gtRefClk320div : sl;
-   signal gtRefClk320    : sl;
-   signal refClk320      : sl;
+   signal refClk320 : sl;
 
    signal phyReady : sl;
 
@@ -162,18 +163,8 @@ begin
          I     => gtRefClk320P,
          IB    => gtRefClk320N,
          CEB   => '0',
-         ODIV2 => gtRefClk320div,
-         O     => gtRefClk320);
-
-   U_BUFG_refClk320 : BUFG_GT
-      port map (
-         I       => gtRefClk320div,
-         CE      => '1',
-         CEMASK  => '1',
-         CLR     => '0',
-         CLRMASK => '1',
-         DIV     => "000",
-         O       => refClk320);
+         ODIV2 => open,
+         O     => refClk320);
 
    --------------------------------
    -- 160 MHz External Reference Clock
@@ -217,7 +208,7 @@ begin
          I => sysClk300,
          O => refClk300MHz);
 
-   U_SysclkRstSync : entity work.RstSync
+   U_SysclkRstSync : entity surf.RstSync
       port map (
          clk      => refClk300MHz,
          asyncRst => extRst,
@@ -262,7 +253,7 @@ begin
    --------------------
    -- AXI-Lite Crossbar
    --------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -283,7 +274,7 @@ begin
    -------------------
    -- FMC Port Mapping
    -------------------
-   U_FmcMapping : entity work.AtlasRd53FmcMapping
+   U_FmcMapping : entity atlas_rd53_fw_lib.AtlasRd53FmcMapping
       generic map (
          TPD_G        => TPD_G,
          XIL_DEVICE_G => XIL_DEVICE_C)
@@ -317,7 +308,7 @@ begin
    --------------------
    -- AxiVersion Module
    --------------------         
-   U_AxiVersion : entity work.AxiVersion
+   U_AxiVersion : entity surf.AxiVersion
       generic map (
          TPD_G        => TPD_G,
          CLK_PERIOD_G => (1.0/AXIL_CLK_FREQ_C),
@@ -334,7 +325,7 @@ begin
    --------------------
    -- AXI-Lite: PLL SPI
    --------------------
-   U_PLL : entity work.Si5345
+   U_PLL : entity surf.Si5345
       generic map (
          TPD_G              => TPD_G,
          MEMORY_INIT_FILE_G => "AtlasRd53FmcXilinxKcu105_EmuLpGbt.mem",
@@ -357,7 +348,7 @@ begin
    ---------------------------
    -- AXI-Lite: I2C Reg Access
    ---------------------------
-   U_PLL_RX_QUAL : entity work.AxiI2cRegMaster
+   U_PLL_RX_QUAL : entity surf.AxiI2cRegMaster
       generic map (
          TPD_G          => TPD_G,
          DEVICE_MAP_G   => PLL_GPIO_I2C_CONFIG_C,
@@ -380,7 +371,7 @@ begin
    -- Using AuroraRxLane for this is IDELAY alignment feature
    ----------------------------------------------------------
    GEN_LANE : for i in 15 downto 0 generate
-      U_Rx : entity work.AuroraRxLane
+      U_Rx : entity atlas_rd53_fw_lib.AuroraRxLane
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -428,7 +419,6 @@ begin
          rxLinkUp(3)     => rxLinkUp(4*3),
          -- SFP Interface
          refClk320       => refClk320,
-         gtRefClk320     => gtRefClk320,
          downlinkUp      => downlinkUp,
          uplinkUp        => uplinkUp,
          sfpTxP          => sfpTxP(1),
