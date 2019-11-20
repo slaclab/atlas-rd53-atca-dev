@@ -78,6 +78,9 @@ set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_FmcMap
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Bufg160/O]] -group [get_clocks -of_objects [get_pins {U_SmaTxClkout/U_GTH/inst/gen_gtwizard_gthe4_top.sma_tx_clkout_gtwizard_gthe4_inst/gen_gtwizard_gthe4.gen_channel_container[1].gen_enabled_channel.gthe4_channel_wrapper_inst/channel_inst/gthe4_channel_gen.gen_gthe4_channel_inst[0].GTHE4_CHANNEL_PRIM_INST/RXOUTCLK}]]
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins {U_SmaTxClkout/U_GTH/inst/gen_gtwizard_gthe4_top.sma_tx_clkout_gtwizard_gthe4_inst/gen_gtwizard_gthe4.gen_channel_container[1].gen_enabled_channel.gthe4_channel_wrapper_inst/channel_inst/gthe4_channel_gen.gen_gthe4_channel_inst[0].GTHE4_CHANNEL_PRIM_INST/RXOUTCLKPCS}]] -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Bufg160/O]]
 
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins {GEN_SFP[*].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/U_tx_wordclk/O}]] -group [get_clocks -of_objects [get_pins {GEN_SFP[*].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/U_rx_wordclk/O}]]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins {GEN_SFP[*].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/gtwiz_userclk_rx_inst/gen_gtwiz_userclk_rx_main.bufg_gt_usrclk2_inst/O}]] -group [get_clocks -of_objects [get_pins {GEN_SFP[*].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/gtwiz_userclk_tx_inst/gen_gtwiz_userclk_tx_main.bufg_gt_usrclk2_inst/O}]]
+
 set_property UNAVAILABLE_DURING_CALIBRATION TRUE [get_ports fmcHpc0LaP[20]]
 
 set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets U_FmcMapping/GEN_PLL_CLK[1].U_IBUFDS/O] 

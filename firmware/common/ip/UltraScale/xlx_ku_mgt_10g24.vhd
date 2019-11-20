@@ -28,8 +28,8 @@ entity xlx_ku_mgt_10g24 is
       --=============--
       -- Clocks      --
       --=============--
-      MGT_REFCLK_i      : in std_logic;
-      MGT_FREEDRPCLK_i  : in std_logic;
+      MGT_REFCLK_i     : in std_logic;
+      MGT_FREEDRPCLK_i : in std_logic;
 
       MGT_RXUSRCLK_o : out std_logic;
       MGT_TXUSRCLK_o : out std_logic;
@@ -59,8 +59,8 @@ entity xlx_ku_mgt_10g24 is
       --==============--
       -- Data         --
       --==============--
-      MGT_USRWORD_i    : in  std_logic_vector(63 downto 0);
-      MGT_USRWORD_o    : out std_logic_vector(63 downto 0);
+      MGT_USRWORD_i    : in  std_logic_vector(255 downto 0);
+      MGT_USRWORD_o    : out std_logic_vector(255 downto 0);
 
       --===============--
       -- Serial intf.  --
@@ -173,11 +173,15 @@ architecture structural of xlx_ku_mgt_10g24 is
    signal rx_reset_sig : std_logic := '0';
    signal tx_reset_sig : std_logic := '0';
 
-   signal MGT_USRWORD_s : std_logic_vector(63 downto 0) := (others => '0');
+   signal MGT_USRWORD_RX_s : std_logic_vector(63 downto 0) := (others => '0');
+   signal MGT_USRWORD_TX_s : std_logic_vector(63 downto 0) := (others => '0');
 
    -- Clock signals
    signal rx_wordclk_sig : std_logic := '0';
    signal tx_wordclk_sig : std_logic := '0';
+
+   signal rx_wordclk40_sig : std_logic := '0';
+   signal tx_wordclk40_sig : std_logic := '0';
 
    signal rx_wordclk_int_sig : std_logic := '0';
    signal tx_wordclk_int_sig : std_logic := '0';
@@ -202,8 +206,8 @@ begin  --========####   Architecture Body   ####========--
 
    MGT_RXREADY_o <= rx_reset_done and rxfsm_reset_done;
 
-   MGT_RXUSRCLK_o <= rx_wordclk_sig;
-   MGT_TXUSRCLK_o <= tx_wordclk_sig;
+   MGT_RXUSRCLK_o <= rx_wordclk40_sig;
+   MGT_TXUSRCLK_o <= tx_wordclk40_sig;
 
    rx_reset_sig <= MGT_RXRESET_i or not(tx_reset_done and MGT_TX_ALIGNED_s);
    tx_reset_sig <= MGT_TXRESET_i;
@@ -216,14 +220,14 @@ begin  --========####   Architecture Body   ####========--
          asyncRst => rxBuffBypassRst,
          syncRst  => gtwiz_buffbypass_rx_reset_in_s);
 
-   rxWordPipeline_proc : process(rx_reset_done, rx_wordclk_sig)
-   begin
-      if rx_reset_done = '0' then
-         MGT_USRWORD_o <= (others => '0');
-      elsif rising_edge(rx_wordclk_sig) then
-         MGT_USRWORD_o <= MGT_USRWORD_s;
-      end if;
-   end process;
+   -- rxWordPipeline_proc : process(rx_reset_done, rx_wordclk_sig)
+   -- begin
+   -- if rx_reset_done = '0' then
+   -- MGT_USRWORD_o <= (others => '0');
+   -- elsif rising_edge(rx_wordclk_sig) then
+   -- MGT_USRWORD_o <= MGT_USRWORD_s;
+   -- end if;
+   -- end process;
 
    gtwiz_userclk_tx_inst : xlx_ku_mgt_ip_10g24_example_gtwiz_userclk_tx
       port map(
@@ -233,6 +237,15 @@ begin  --========####   Architecture Body   ####========--
          gtwiz_userclk_tx_usrclk2_out => tx_wordclk_sig,
          gtwiz_userclk_tx_active_out  => gtwiz_userclk_tx_active_int);
 
+   U_tx_wordclk : BUFGCE_DIV
+      generic map (
+         BUFGCE_DIVIDE => 4)
+      port map (
+         I   => tx_wordclk_sig,
+         CE  => '1',
+         CLR => '0',
+         O   => tx_wordclk40_sig);
+
    gtwiz_userclk_rx_inst : xlx_ku_mgt_ip_10g24_example_gtwiz_userclk_rx
       port map(
          gtwiz_userclk_rx_srcclk_in   => rxoutclk_sig,
@@ -240,6 +253,56 @@ begin  --========####   Architecture Body   ####========--
          gtwiz_userclk_rx_usrclk_out  => rx_wordclk_int_sig,
          gtwiz_userclk_rx_usrclk2_out => rx_wordclk_sig,
          gtwiz_userclk_rx_active_out  => gtwiz_userclk_rx_active_int);
+
+   U_rx_wordclk : BUFGCE_DIV
+      generic map (
+         BUFGCE_DIVIDE => 4)
+      port map (
+         I   => rx_wordclk_sig,
+         CE  => '1',
+         CLR => '0',
+         O   => rx_wordclk40_sig);
+
+   U_Gearbox_TX : entity surf.AsyncGearbox
+      generic map (
+         SLAVE_WIDTH_G        => 256,
+         MASTER_WIDTH_G       => 64,
+         -- Pipelining generics
+         INPUT_PIPE_STAGES_G  => 0,
+         OUTPUT_PIPE_STAGES_G => 0,
+         -- Async FIFO generics
+         FIFO_MEMORY_TYPE_G   => "distributed",
+         FIFO_ADDR_WIDTH_G    => 5)
+      port map (
+         -- Slave Interface
+         slaveClk   => rx_wordclk40_sig,
+         slaveRst   => '0',
+         slaveData  => MGT_USRWORD_i,
+         -- Master Interface
+         masterClk  => rx_wordclk_sig,
+         masterRst  => '0',
+         masterData => MGT_USRWORD_TX_s);
+
+   U_Gearbox_RX : entity surf.AsyncGearbox
+      generic map (
+         SLAVE_WIDTH_G        => 64,
+         MASTER_WIDTH_G       => 256,
+         -- Pipelining generics
+         INPUT_PIPE_STAGES_G  => 0,
+         OUTPUT_PIPE_STAGES_G => 0,
+         -- Async FIFO generics
+         FIFO_MEMORY_TYPE_G   => "distributed",
+         FIFO_ADDR_WIDTH_G    => 5)
+      port map (
+         slip       => MGT_RXSlide_i,
+         -- Slave Interface
+         slaveClk   => rx_wordclk_sig,
+         slaveRst   => '0',
+         slaveData  => MGT_USRWORD_RX_s,
+         -- Master Interface
+         masterClk  => rx_wordclk40_sig,
+         masterRst  => '0',
+         masterData => MGT_USRWORD_o);
 
    xlx_ku_mgt_std_i : xlx_ku_mgt_ip_10g24
       port map (
@@ -271,8 +334,8 @@ begin  --========####   Architecture Body   ####========--
          gtwiz_reset_rx_cdr_stable_out         => open,
          gtwiz_reset_rx_done_out(0)            => rx_reset_done,
 
-         gtwiz_userdata_tx_in  => MGT_USRWORD_i,
-         gtwiz_userdata_rx_out => MGT_USRWORD_s,
+         gtwiz_userdata_tx_in  => MGT_USRWORD_TX_s,
+         gtwiz_userdata_rx_out => MGT_USRWORD_RX_s,
 
          drpclk_in(0) => MGT_FREEDRPCLK_i,
 
@@ -283,7 +346,8 @@ begin  --========####   Architecture Body   ####========--
 
          gtrefclk0_in(0) => MGT_REFCLK_i,
 
-         rxslide_in(0) => MGT_RXSlide_i,
+         -- rxslide_in(0) => MGT_RXSlide_i,
+         rxslide_in(0) => '0',
 
          rxpmaresetdone_out(0) => rxpmaresetdone,
          txpmaresetdone_out(0) => txpmaresetdone,

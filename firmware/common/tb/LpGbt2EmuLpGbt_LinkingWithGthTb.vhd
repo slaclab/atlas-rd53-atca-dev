@@ -26,6 +26,9 @@ end LpGbt2EmuLpGbt_LinkingWithGthTb;
 
 architecture testbed of LpGbt2EmuLpGbt_LinkingWithGthTb is
 
+   signal downlinkRaw : slv(35 downto 0)  := (others => '0');
+   signal uplinkRaw   : slv(233 downto 0) := (others => '0');
+
    signal downlinkCnt : Slv36Array(1 downto 0)  := (others => (others => '0'));
    signal uplinkCnt   : Slv234Array(1 downto 0) := (others => (others => '0'));
 
@@ -47,26 +50,41 @@ architecture testbed of LpGbt2EmuLpGbt_LinkingWithGthTb is
    signal gtLpToEmuP : sl := '0';
    signal gtLpToEmuN : sl := '1';
 
-   signal clkEnCnt : slv(2 downto 0) := (others => '0');
-   signal clkEn    : sl              := '0';
-
 begin
 
-   process(refClk320)
+   process(downlinkClk)
    begin
-      if rising_edge(refClk320) then
-         if clkEnCnt = 0 then
-            clkEn <= '1' after 1 ns;
+      if rising_edge(downlinkClk(0)) then
+         if downlinkClkEn(0) = '1' then
             if (downlinkReady = "11") then
                downlinkCnt(0) <= downlinkCnt(0) + 1 after 1 ns;
             end if;
+         end if;
+      end if;
+      if rising_edge(downlinkClk(1)) then
+         if downlinkClkEn(1) = '1' then
+            if (downlinkReady = "11") then
+               downlinkCnt(1) <= downlinkRaw after 1 ns;
+            end if;
+         end if;
+      end if;
+   end process;
+
+   process(uplinkClk)
+   begin
+      if rising_edge(uplinkClk(1)) then
+         if uplinkClkEn(1) = '1' then
             if (uplinkReady = "11") then
                uplinkCnt(1) <= uplinkCnt(1) + 1 after 1 ns;
             end if;
-         else
-            clkEn <= '0' after 1 ns;
          end if;
-         clkEnCnt <= clkEnCnt + 1 after 1 ns;
+      end if;
+      if rising_edge(uplinkClk(0)) then
+         if uplinkClkEn(0) = '1' then
+            if (uplinkReady = "11") then
+               uplinkCnt(0) <= uplinkRaw after 1 ns;
+            end if;
+         end if;
       end if;
    end process;
 
@@ -105,9 +123,9 @@ begin
          uplinkClk_o         => uplinkClk(0),
          uplinkClkEn_o       => uplinkClkEn(0),
          uplinkRst_i         => usrRst,
-         uplinkUserData_o    => uplinkCnt(0)(229 downto 0),
-         uplinkEcData_o      => uplinkCnt(0)(231 downto 230),
-         uplinkIcData_o      => uplinkCnt(0)(233 downto 232),
+         uplinkUserData_o    => uplinkRaw(229 downto 0),
+         uplinkEcData_o      => uplinkRaw(231 downto 230),
+         uplinkIcData_o      => uplinkRaw(233 downto 232),
          uplinkReady_o       => uplinkReady(0),
          -- MGT
          clk_refclk_i        => refClk320,
@@ -134,9 +152,9 @@ begin
          donwlinkClk_o       => downlinkClk(1),
          downlinkClkEn_o     => downlinkClkEn(1),
          downlinkRst_i       => usrRst,
-         downlinkUserData_o  => downlinkCnt(1)(31 downto 0),
-         downlinkEcData_o    => downlinkCnt(1)(33 downto 32),
-         downlinkIcData_o    => downlinkCnt(1)(35 downto 34),
+         downlinkUserData_o  => downlinkRaw(31 downto 0),
+         downlinkEcData_o    => downlinkRaw(33 downto 32),
+         downlinkIcData_o    => downlinkRaw(35 downto 34),
          downlinkReady_o     => downlinkReady(1),
          -- MGT
          clk_refclk_i        => refClk320,

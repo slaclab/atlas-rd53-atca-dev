@@ -97,7 +97,6 @@ begin
       end if;
    end process;
 
-   -- index <= MAX_CNT_C-clkEnCnt;
    index <= clkEnCnt;
 
    ---------------------------

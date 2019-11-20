@@ -64,6 +64,12 @@ set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_EMU_LP
 set_clock_groups -asynchronous -group [get_clocks sfpClk156P] -group [get_clocks -of_objects [get_pins U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/gtwiz_userclk_tx_inst/gen_gtwiz_userclk_tx_main.bufg_gt_usrclk2_inst/O]]
 set_clock_groups -asynchronous -group [get_clocks sfpClk156P] -group [get_clocks -of_objects [get_pins U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/gtwiz_userclk_rx_inst/gen_gtwiz_userclk_rx_main.bufg_gt_usrclk2_inst/O]]
 
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Bufg160/O]] -group [get_clocks -of_objects [get_pins U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/U_rx_wordclk/O]]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Bufg160/O]] -group [get_clocks -of_objects [get_pins U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/U_tx_wordclk/O]]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/U_rx_wordclk/O]] -group [get_clocks -of_objects [get_pins U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/U_tx_wordclk/O]]
+set_clock_groups -asynchronous -group [get_clocks sfpClk156P] -group [get_clocks -of_objects [get_pins U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/U_tx_wordclk/O]]
+set_clock_groups -asynchronous -group [get_clocks sfpClk156P] -group [get_clocks -of_objects [get_pins U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/U_rx_wordclk/O]]
+
 set_property CLOCK_DELAY_GROUP RD53_CLK_GRP [get_nets {U_FmcMapping/U_Selectio/clk160MHz[*]}] [get_nets {U_FmcMapping/U_Selectio/clk640MHz[*]}]
 
 set_property UNAVAILABLE_DURING_CALIBRATION TRUE [get_ports fmcHpcLaP[10]]

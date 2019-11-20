@@ -66,57 +66,27 @@ end EmuLpGbtFpga10g24;
 
 architecture mapping of EmuLpGbtFpga10g24 is
 
-   signal uplink_mgtword_s      : std_logic_vector(63 downto 0);
-   signal downlink_mgtword_s    : std_logic_vector(63 downto 0);
-   signal downlink_mgtword_gt_s : std_logic_vector(63 downto 0);
+   signal uplink_mgtword_s   : std_logic_vector(255 downto 0) := (others => '0');
+   signal downlink_mgtword_s : std_logic_vector(255 downto 0) := (others => '0');
 
-   signal simDbgUplink   : std_logic_vector(255 downto 0);
-   signal simDbgDownlink : std_logic_vector(255 downto 0);
+   signal mgt_rxslide_s : std_logic := '0';
+   signal mgt_txrdy_s   : std_logic := '0';
+   signal mgt_rxrdy_s   : std_logic := '0';
 
-   signal mgt_rxslide_s : std_logic;
-   signal mgt_txrdy_s   : std_logic;
-   signal mgt_rxrdy_s   : std_logic;
+   signal uplinkClk_s   : std_logic := '0';
+   signal uplinkClkEn_s : std_logic := '1';
 
-   signal uplinkClk_s   : std_logic;
-   signal uplinkClkEn_s : std_logic;
-   signal uplinkCnt_s   : std_logic_vector(1 downto 0) := (others => '0');
-
-   signal downlinkClk_s   : std_logic;
-   signal downlinkClkEn_s : std_logic;
-   signal downlinkCnt_s   : std_logic_vector(1 downto 0) := (others => '0');
+   signal downlinkClk_s   : std_logic := '0';
+   signal downlinkClkEn_s : std_logic := '1';
+   
+   signal uplinkRst_s   : std_logic := '1';
+   signal downlinkRst_s : std_logic := '1';
 
 begin
 
    uplinkClk_o   <= uplinkClk_s;
    uplinkClkEn_o <= uplinkClkEn_s;
-
-   process(uplinkClk_s)
-
-   begin
-      if rising_edge(uplinkClk_s) then
-         if uplinkCnt_s = 0 then
-            uplinkClkEn_s <= '1';
-         else
-            uplinkClkEn_s <= '0';
-         end if;
-         -- Simulation debug
-         if uplinkCnt_s = 0 then
-            simDbgUplink(63 downto 0)   <= uplink_mgtword_s;
-            simDbgDownlink(63 downto 0) <= downlink_mgtword_s;
-         elsif uplinkCnt_s = 1 then
-            simDbgUplink(127 downto 64)   <= uplink_mgtword_s;
-            simDbgDownlink(127 downto 64) <= downlink_mgtword_s;
-         elsif uplinkCnt_s = 2 then
-            simDbgUplink(191 downto 128)   <= uplink_mgtword_s;
-            simDbgDownlink(191 downto 128) <= downlink_mgtword_s;
-         else
-            simDbgUplink(255 downto 192)   <= uplink_mgtword_s;
-            simDbgDownlink(255 downto 192) <= downlink_mgtword_s;
-         end if;
-         -- Increment the counter
-         uplinkCnt_s <= uplinkCnt_s + 1;
-      end if;
-   end process;
+   uplinkClkEn_s <= mgt_txrdy_s;
 
    donwlinkClk_o   <= downlinkClk_s;
    downlinkClkEn_o <= downlinkClkEn_s;
@@ -138,8 +108,7 @@ begin
          --=============--
          -- Control     --
          --=============--
-         MGT_RXSlide_i     => '0',
-         -- MGT_RXSlide_i     => mgt_rxslide_s,
+         MGT_RXSlide_i     => mgt_rxslide_s,
          MGT_ENTXCALIBIN_i => '0',
          MGT_TXCALIB_i     => (others => '0'),
          --=============--
@@ -151,7 +120,7 @@ begin
          -- Data         --
          --==============--
          MGT_USRWORD_i     => uplink_mgtword_s,
-         MGT_USRWORD_o     => downlink_mgtword_gt_s,
+         MGT_USRWORD_o     => downlink_mgtword_s,
          --===============--
          -- Serial intf.  --
          --===============--
@@ -159,28 +128,17 @@ begin
          RXp_i             => mgt_rxp_i,
          TXn_o             => mgt_txn_o,
          TXp_o             => mgt_txp_o);
-         
-   U_slip : entity surf.Gearbox
-      generic map (
-         SLAVE_WIDTH_G  => 64,
-         MASTER_WIDTH_G => 64)
-      port map (
-         clk        => downlinkClk_s,
-         rst        => downlinkRst_i,
-         slip       => mgt_rxslide_s,
-         slaveData  => downlink_mgtword_gt_s,
-         masterData => downlink_mgtword_s);         
 
    U_lpgbtemul : entity work.lpgbtemul_top
       generic map(
          rxslide_pulse_duration => 2,
          rxslide_pulse_delay    => 128,
-         c_clockRatio           => 4,
-         c_mgtWordWidth         => 64)
+         c_clockRatio           => 1,
+         c_mgtWordWidth         => 256)
       port map(
          -- DownLink
          downlinkClkEn_o             => downlinkClkEn_s,
-         rst_downlink_i              => downlinkRst_i,
+         rst_downlink_i              => downlinkRst_s,
          downLinkDataGroup0          => downlinkUserData_o(15 downto 0),
          downLinkDataGroup1          => downlinkUserData_o(31 downto 16),
          downLinkDataEc              => downlinkEcData_o,
@@ -193,7 +151,7 @@ begin
          downlinkRdy_o               => downlinkReady_o,
          -- uplink data        
          uplinkClkEn_i               => uplinkClkEn_s,
-         rst_uplink_i                => uplinkRst_i,
+         rst_uplink_i                => uplinkRst_s,
          upLinkData0                 => uplinkUserData_i(31 downto 0),
          upLinkData1                 => uplinkUserData_i(63 downto 32),
          upLinkData2                 => uplinkUserData_i(95 downto 64),
@@ -204,7 +162,7 @@ begin
          upLinkDataIC                => uplinkIcData_i,
          upLinkDataEC                => uplinkEcData_i,
          upLinkScramblerBypass       => uplinkBypassScrambler_i,
-         upLinkScramblerReset        => uplinkRst_i,
+         upLinkScramblerReset        => uplinkRst_s,
          upLinkFecBypass             => uplinkBypassFECEncoder_i,
          upLinkInterleaverBypass     => uplinkBypassInterleaver_i,
          uplinkRdy_o                 => uplinkReady_o,
@@ -219,5 +177,17 @@ begin
          -- General Configuration
          fecMode                     => '1',   -- ‘1’ - FEC 12
          txDataRate                  => '1');  -- ‘1’ - 10.24 Gb/s
+
+   U_uplinkRst : entity surf.RstSync
+      port map(
+         clk      => uplinkClk_s,
+         asyncRst => uplinkRst_i,
+         syncRst  => uplinkRst_s);
+         
+   U_downlinkRst : entity surf.RstSync
+      port map(
+         clk      => downlinkClk_s,
+         asyncRst => downlinkRst_i,
+         syncRst  => downlinkRst_s);         
 
 end mapping;
