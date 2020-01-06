@@ -36,7 +36,6 @@ entity AtlasAtcaLinkAggRd53RtmMapping is
       dPortCmdP  : in    slv(23 downto 0);
       dPortCmdN  : in    slv(23 downto 0);
       -- I2C Interface
-      i2cSelect  : in    Slv6Array(3 downto 0);
       i2cScl     : inout slv(3 downto 0);
       i2cSda     : inout slv(3 downto 0);
       -- RTM Ports
@@ -53,15 +52,6 @@ begin
 
    GEN_DPM :
    for dpm in 3 downto 0 generate
-
-      rtmIo(dpm)(0) <= i2cSelect(dpm)(0);
-      rtmIo(dpm)(1) <= i2cSelect(dpm)(1);
-
-      rtmIo(dpm)(2) <= i2cSelect(dpm)(2);
-      rtmIo(dpm)(3) <= i2cSelect(dpm)(3);
-
-      rtmIo(dpm)(4) <= i2cSelect(dpm)(4);
-      rtmIo(dpm)(5) <= i2cSelect(dpm)(5);
 
       rtmIo(dpm)(6) <= i2cScl(dpm);
       rtmIo(dpm)(7) <= i2cSda(dpm);

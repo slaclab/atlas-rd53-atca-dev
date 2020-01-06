@@ -163,7 +163,6 @@ architecture top_level of AtlasAtcaLinkAggRd53Rtm_EmuLpGbt is
    signal dPortCmdP  : slv(23 downto 0);
    signal dPortCmdN  : slv(23 downto 0);
 
-   signal i2cSelect : Slv6Array(3 downto 0);
    signal i2cScl    : slv(3 downto 0);
    signal i2cSda    : slv(3 downto 0);
 
@@ -179,7 +178,6 @@ begin
          dPortCmdP  => dPortCmdP,
          dPortCmdN  => dPortCmdN,
          -- I2C Interface
-         i2cSelect  => i2cSelect,
          i2cScl     => i2cScl,
          i2cSda     => i2cSda,
          -- RTM Ports
@@ -224,7 +222,6 @@ begin
          dPortCmdP       => dPortCmdP,
          dPortCmdN       => dPortCmdN,
          -- I2C Interface
-         i2cSelect       => i2cSelect,
          i2cScl          => i2cScl,
          i2cSda          => i2cSda,
          --------------------- 

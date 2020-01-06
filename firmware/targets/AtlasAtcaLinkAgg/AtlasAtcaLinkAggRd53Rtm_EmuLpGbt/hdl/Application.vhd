@@ -67,7 +67,6 @@ entity Application is
       dPortCmdP       : out   slv(23 downto 0);
       dPortCmdN       : out   slv(23 downto 0);
       -- I2C Interface
-      i2cSelect       : out   Slv6Array(3 downto 0);
       i2cScl          : inout slv(3 downto 0);
       i2cSda          : inout slv(3 downto 0);
       --------------------- 
@@ -117,10 +116,30 @@ end Application;
 
 architecture mapping of Application is
 
-   constant NUM_AXIL_MASTERS_C : positive := 5;
+   constant I2C_CONFIG_C : I2cAxiLiteDevArray(0 to 2) := (
+      0              => MakeI2cAxiLiteDevType(
+         i2cAddress  => "0100000",      -- PCA9555
+         dataSize    => 8,              -- in units of bits
+         addrSize    => 8,              -- in units of bits
+         endianness  => '0',            -- Little endian                   
+         repeatStart => '1'),           -- Repeat Start  
+      1              => MakeI2cAxiLiteDevType(
+         i2cAddress  => "0100001",      -- PCA9555
+         dataSize    => 8,              -- in units of bits
+         addrSize    => 8,              -- in units of bits
+         endianness  => '0',            -- Little endian                   
+         repeatStart => '1'),           -- Repeat Start  
+      2              => MakeI2cAxiLiteDevType(
+         i2cAddress  => "0100010",      -- PCA9555
+         dataSize    => 8,              -- in units of bits
+         addrSize    => 8,              -- in units of bits
+         endianness  => '0',            -- Little endian
+         repeatStart => '1'));          -- Repeat Start           
+
+   constant NUM_AXIL_MASTERS_C : positive := 8;
 
    constant LP_GBT_INDEX_C : natural := 0;  -- [0:3]
-   constant I2C_INDEX_C    : natural := 4;
+   constant I2C_INDEX_C    : natural := 4;  -- [4:7]
 
    constant AXIL_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXIL_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXIL_MASTERS_C, APP_AXIL_BASE_ADDR_C, 28, 24);
 
@@ -159,6 +178,7 @@ architecture mapping of Application is
 begin
 
    NOT_SIM : if (SIMULATION_G = false) generate
+
       ----------------------------------------------------
       -- https://www.xilinx.com/support/answers/70060.html
       ----------------------------------------------------
@@ -175,6 +195,35 @@ begin
                gtTxP  => qsfpTxP(i),
                gtTxN  => qsfpTxN(i));
       end generate GEN_QSFP;
+
+
+      ----------------------
+      -- AXI-Lite: Power I2C
+      ----------------------
+      GEN_I2C :
+      for i in 3 downto 0 generate
+
+         U_PCA9555 : entity surf.AxiI2cRegMaster
+            generic map (
+               TPD_G          => TPD_G,
+               DEVICE_MAP_G   => I2C_CONFIG_C,
+               I2C_SCL_FREQ_G => 400.0E+3,  -- units of Hz
+               AXI_CLK_FREQ_G => AXIL_CLK_FREQ_C)
+            port map (
+               -- I2C Ports
+               scl            => i2cScl(i),
+               sda            => i2cSda(i),
+               -- AXI-Lite Register Interface
+               axiReadMaster  => axilReadMasters(i+I2C_INDEX_C),
+               axiReadSlave   => axilReadSlaves(i+I2C_INDEX_C),
+               axiWriteMaster => axilWriteMasters(i+I2C_INDEX_C),
+               axiWriteSlave  => axilWriteSlaves(i+I2C_INDEX_C),
+               -- Clocks and Resets
+               axiClk         => axilClk,
+               axiRst         => axilRst);
+
+      end generate GEN_I2C;
+
    end generate;
 
    ---------------------------------------------------------------------------------
