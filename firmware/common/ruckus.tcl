@@ -28,3 +28,12 @@ loadConstraints -path "$::DIR_PATH/ip/${fpgaType}/xlx_ku_mgt_ip_10g24.xdc"
 set_property PROCESSING_ORDER {EARLY}               [get_files {xlx_ku_mgt_ip_10g24.xdc}]
 set_property SCOPED_TO_REF    {xlx_ku_mgt_ip_10g24} [get_files {xlx_ku_mgt_ip_10g24.xdc}]
 set_property SCOPED_TO_CELLS  {inst}                [get_files {xlx_ku_mgt_ip_10g24.xdc}]
+
+loadSource -path "$::DIR_PATH/ip/${fpgaType}/xlx_ku_mgt_10g24_emu.vhd"
+loadSource -path "$::DIR_PATH/ip/${fpgaType}/xlx_ku_mgt_10g24_emu_qpll.vhd"
+loadIpCore -path "$::DIR_PATH/ip/${fpgaType}/xlx_ku_mgt_ip_10g24_emu.xci"
+
+loadConstraints -path "$::DIR_PATH/ip/${fpgaType}/xlx_ku_mgt_ip_10g24_emu.xdc"
+set_property PROCESSING_ORDER {EARLY}                   [get_files {xlx_ku_mgt_ip_10g24_emu.xdc}]
+set_property SCOPED_TO_REF    {xlx_ku_mgt_ip_10g24_emu} [get_files {xlx_ku_mgt_ip_10g24_emu.xdc}]
+set_property SCOPED_TO_CELLS  {inst}                    [get_files {xlx_ku_mgt_ip_10g24_emu.xdc}]

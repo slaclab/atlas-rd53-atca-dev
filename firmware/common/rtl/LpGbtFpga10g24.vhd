@@ -81,7 +81,11 @@ begin
 
    donwlinkClk_o   <= downlinkClk_s;
    downlinkClkEn_o <= downlinkClkEn_s;
-   downlinkClkEn_s <= mgt_txrdy_s;
+   U_downlinkClkEn : entity surf.Synchronizer
+      port map (
+         clk     => downlinkClk_s,
+         dataIn  => mgt_txrdy_s,
+         dataOut => downlinkClkEn_s);   
 
    downlink_inst : entity work.lpgbtfpga_Downlink
       generic map(

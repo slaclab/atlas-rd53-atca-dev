@@ -51,7 +51,12 @@ entity AtlasRd53EmuLpGbtLane is
       serDesData      : in  Slv8Array(NUM_ELINK_G-1 downto 0);
       rxLinkUp        : in  slv(NUM_ELINK_G-1 downto 0);
       -- SFP Interface
-      refClk320       : in  sl;  -- Using jitter clean FMC 320 MHz reference
+      refClk160       : in  sl;  -- Using jitter clean FMC 320 MHz reference
+      rxRecClk        : out sl;
+      qplllock        : in  slv(1 downto 0);
+      qplloutclk      : in  slv(1 downto 0);
+      qplloutrefclk   : in  slv(1 downto 0);
+      qpllRst         : out sl;
       downlinkUp      : out sl;
       uplinkUp        : out sl;
       sfpTxP          : out sl;
@@ -158,7 +163,7 @@ begin
    lpgbtFpga_top_inst : entity work.EmuLpGbtFpga10g24
       port map (
          -- Up link
-         uplinkClk_o         => uplinkClk,      -- 320 MHz
+         uplinkClk_o         => uplinkClk,      -- 40 MHz
          uplinkClkEn_o       => uplinkClkEn,    -- 40 MHz strobe
          uplinkRst_i         => uplinkRst,
          uplinkUserData_i    => uplinkUserData,
@@ -166,7 +171,7 @@ begin
          uplinkIcData_i      => uplinkIcData,
          uplinkReady_o       => uplinkReady,
          -- Down link
-         donwlinkClk_o       => donwlinkClk,    -- 320 MHz
+         donwlinkClk_o       => donwlinkClk,    -- 40 MHz
          downlinkClkEn_o     => downlinkClkEn,  -- 40 MHz strobe
          downlinkRst_i       => downlinkRst,
          downlinkUserData_o  => downlinkUserData,
@@ -174,7 +179,12 @@ begin
          downlinkIcData_o    => downlinkIcData,
          downlinkReady_o     => downlinkReady,
          -- MGT
-         clk_refclk_i        => refClk320,
+         rxRecClk            => rxRecClk,
+         qplllock            => qplllock,
+         qplloutclk          => qplloutclk,
+         qplloutrefclk       => qplloutrefclk,
+         qpllRst             => qpllRst,
+         clk_refclk_i        => refClk160,      -- CPLL using 160 MHz reference
          clk_mgtfreedrpclk_i => axilClk,
          mgt_rxn_i           => sfpRxN,
          mgt_rxp_i           => sfpRxP,

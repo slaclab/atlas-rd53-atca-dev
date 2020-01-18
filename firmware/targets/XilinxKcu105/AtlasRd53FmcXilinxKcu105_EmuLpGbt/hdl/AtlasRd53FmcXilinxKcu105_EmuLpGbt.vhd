@@ -3,6 +3,23 @@
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: 
+--    SFP[0] = 1GbE RUDP
+--    SFP[1] = emulation LP-GBT
+-------------------------------------------------------------------------------
+-- Recommend External Clock Reference:
+--
+-- 1) Using the on-board FMC 160 MHz reference clock on the ZCU102
+--   A) requires a FMC on the ZCU102
+--   B) PLL FW .mem file configured to use on-board 160 MHz reference
+-- 2) ZCU102 FMC generates the GTH 320 MHz reference clock used by the LpGBT 
+-- 3) The same 320 MHz clock used by the SMA_TX_P/N to send a 160 MHz clock (3.2Gb/s sending "1111111111_0000000000" pattern)
+-- 4) Connect the ZCU102 SMA_TX to the KCU105 SMA_CLK
+-- 5) Received SMA_CLK is send to KCU105 FMC 
+--    A)  PLL FW .mem file configured to use FPGA clock (instead of on-board 160 MHz reference)
+-- 6) KCU105 FMC generates the GTH 320 MHz reference clock used by the emulation LpGBT 
+--
+-------------------------------------------------------------------------------
+-- Note: This 160 MHz reference can be ASYNC from the source LP-GBT 160 MHz reference.
 -------------------------------------------------------------------------------
 -- This file is part of 'ATLAS RD53 FMC DEV'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -35,7 +52,7 @@ entity AtlasRd53FmcXilinxKcu105_EmuLpGbt is
    port (
       extRst       : in    sl;
       led          : out   slv(7 downto 0);
-      -- External Reference clock (required for synchronizing to remote LpGBT receiver) 
+      -- External 160 MHz Reference clock
       smaClkP      : in    sl;
       smaClkN      : in    sl;
       -- 300Mhz System Clock
@@ -105,15 +122,17 @@ architecture top_level of AtlasRd53FmcXilinxKcu105_EmuLpGbt is
    signal refRst300MHz  : sl;
    signal iDelayCtrlRdy : sl;
 
-   signal refClk320 : sl;
-
    signal phyReady : sl;
 
    signal clk160MHz : sl;
    signal rst160MHz : sl;
 
-   signal smaClk       : sl;
-   signal fpgaPllClkIn : sl;
+   signal refClk160     : sl;
+   signal rxRecClk      : sl;
+   signal qplllock      : slv(1 downto 0);
+   signal qplloutclk    : slv(1 downto 0);
+   signal qplloutrefclk : slv(1 downto 0);
+   signal qpllRst       : sl;
 
    signal pllCsL : sl;
    signal pllSck : sl;
@@ -152,21 +171,6 @@ begin
    led(0) <= rxLinkUp(4*0);
 
    --------------------------------
-   -- 320 MHz LpGBT Reference Clock
-   --------------------------------
-   U_IBUFDS_refClk320 : IBUFDS_GTE3
-      generic map (
-         REFCLK_EN_TX_PATH  => '0',
-         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
-         REFCLK_ICNTL_RX    => "00")
-      port map (
-         I     => gtRefClk320P,
-         IB    => gtRefClk320N,
-         CEB   => '0',
-         ODIV2 => open,
-         O     => refClk320);
-
-   --------------------------------
    -- 160 MHz External Reference Clock
    --------------------------------
    U_IBUFDS_refClk160 : IBUFDS_GTE3
@@ -178,18 +182,22 @@ begin
          I     => smaClkP,
          IB    => smaClkN,
          CEB   => '0',
-         ODIV2 => smaClk,
-         O     => open);
+         ODIV2 => open,
+         O     => refClk160);
 
-   U_BUFG_refClk160 : BUFG_GT
+   ------------------------
+   -- LP-GBT QPLL Reference
+   ------------------------
+   U_EmuLpGbtQpll : entity work.xlx_ku_mgt_10g24_emu_qpll
       port map (
-         I       => smaClk,
-         CE      => '1',
-         CEMASK  => '1',
-         CLR     => '0',
-         CLRMASK => '1',
-         DIV     => "000",
-         O       => fpgaPllClkIn);
+         -- MGT Clock Port (320 MHz)
+         gtClkP        => gtRefClk320P,
+         gtClkN        => gtRefClk320N,
+         -- Quad PLL Interface
+         qplllock      => qplllock,
+         qplloutclk    => qplloutclk,
+         qplloutrefclk => qplloutrefclk,
+         qpllRst       => qpllRst);
 
    -----------------------------
    -- 300 IDELAY Reference Clock
@@ -288,7 +296,7 @@ begin
          clk160MHz     => clk160MHz,
          rst160MHz     => rst160MHz,
          -- PLL Clocking Interface
-         fpgaPllClkIn  => fpgaPllClkIn,
+         fpgaPllClkIn  => rxRecClk, -- emulation LP-GBT recovered clock used as jitter cleaner reference
          -- PLL SPI Interface
          pllRst        => x"0",
          pllCsL        => pllCsL,
@@ -418,7 +426,12 @@ begin
          rxLinkUp(2)     => rxLinkUp(4*2),
          rxLinkUp(3)     => rxLinkUp(4*3),
          -- SFP Interface
-         refClk320       => refClk320,
+         refClk160       => refClk160,
+         rxRecClk        => rxRecClk,
+         qplllock        => qplllock,
+         qplloutclk      => qplloutclk,
+         qplloutrefclk   => qplloutrefclk,
+         qpllRst         => qpllRst,
          downlinkUp      => downlinkUp,
          uplinkUp        => uplinkUp,
          sfpTxP          => sfpTxP(1),

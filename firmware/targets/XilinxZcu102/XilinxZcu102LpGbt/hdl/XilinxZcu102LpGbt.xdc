@@ -84,3 +84,7 @@ set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins {GEN_SFP
 set_property UNAVAILABLE_DURING_CALIBRATION TRUE [get_ports fmcHpc0LaP[20]]
 
 set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets U_FmcMapping/GEN_PLL_CLK[1].U_IBUFDS/O] 
+
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins {GEN_SFP[*].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/U_tx_wordclk/O}]] -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Bufg160/O]]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_PLL/PllGen.U_Pll/CLKOUT0]] -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Bufg160/O]]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins {GEN_SFP[*].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/U_rx_wordclk/O}]] -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Bufg160/O]]

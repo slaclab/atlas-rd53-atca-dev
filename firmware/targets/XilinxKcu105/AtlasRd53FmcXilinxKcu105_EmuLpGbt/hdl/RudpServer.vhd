@@ -101,14 +101,19 @@ begin
    --------------
    -- ETH PHY/MAC
    --------------
-   U_10GigE : entity surf.TenGigEthGthUltraScaleWrapper
+   U_1GigE : entity surf.GigEthGthUltraScaleWrapper
       generic map (
-         TPD_G             => TPD_G,
-         NUM_LANE_G        => 1,
+         TPD_G              => TPD_G,
+         -- DMA/MAC Configurations
+         NUM_LANE_G         => 1,
          -- QUAD PLL Configurations
-         QPLL_REFCLK_SEL_G => "001",
+         USE_GTREFCLK_G     => false,
+         CLKIN_PERIOD_G     => 6.4,     -- 156.25 MHz
+         DIVCLK_DIVIDE_G    => 5,       -- 31.25 MHz = (156.25 MHz/5)
+         CLKFBOUT_MULT_F_G  => 32.0,    -- 1 GHz = (32 x 31.25 MHz)
+         CLKOUT0_DIVIDE_F_G => 8.0,     -- 125 MHz = (1.0 GHz/8)
          -- AXI Streaming Configurations
-         AXIS_CONFIG_G     => (others => EMAC_AXIS_CONFIG_C))
+         AXIS_CONFIG_G      => (others => EMAC_AXIS_CONFIG_C))
       port map (
          -- Local Configurations
          localMac(0)     => localMac,
@@ -121,12 +126,13 @@ begin
          dmaObSlaves(0)  => ibMacSlave,
          -- Misc. Signals
          extRst          => extRst,
-         coreClk         => dmaClk,
-         coreRst         => dmaRst,
          phyReady(0)     => phyReady,
-         -- MGT Clock Port (156.25 MHz or 312.5 MHz)
+         -- MGT Clock Port
          gtClkP          => sfpClk156P,
          gtClkN          => sfpClk156N,
+         -- Copy of internal MMCM reference clock and Reset
+         refClkOut       => dmaClk,
+         refRstOut       => dmaRst,
          -- MGT Ports
          gtTxP(0)        => sfpTxP,
          gtTxN(0)        => sfpTxN,

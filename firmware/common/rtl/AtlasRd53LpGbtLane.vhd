@@ -48,10 +48,14 @@ entity AtlasRd53LpGbtLane is
       dmaIbSlave      : in  AxiStreamSlaveType;
       dmaObMaster     : in  AxiStreamMasterType;
       dmaObSlave      : out AxiStreamSlaveType;
-      -- SFP Interface
+      -- Clocks and Resets
       refClk320       : in  sl;  -- Using jitter clean FMC 320 MHz reference
+      clk160MHz       : in  sl;
+      rst160MHz       : in  sl;
+      -- Status
       downlinkUp      : out sl;
       uplinkUp        : out sl;
+      -- SFP Interface
       sfpTxP          : out sl;
       sfpTxN          : out sl;
       sfpRxP          : in  sl;
@@ -130,8 +134,6 @@ architecture rtl of AtlasRd53LpGbtLane is
    signal header : Slv2Array(NUM_ELINK_C-1 downto 0);
    signal data   : Slv64Array(NUM_ELINK_C-1 downto 0);
 
-   signal clkEn160 : sl;
-
    signal batchSize    : Slv16Array(NUM_ELINK_C-1 downto 0);
    signal timerConfig  : Slv16Array(NUM_ELINK_C-1 downto 0);
    signal chBond       : slv(NUM_ELINK_C-1 downto 0);
@@ -140,6 +142,7 @@ architecture rtl of AtlasRd53LpGbtLane is
    signal doubleHdrDet : slv(NUM_ELINK_C-1 downto 0);
    signal singleHitDet : slv(NUM_ELINK_C-1 downto 0);
    signal doubleHitDet : slv(NUM_ELINK_C-1 downto 0);
+   signal cmdBusy      : slv(NUM_ELINK_C-1 downto 0);
    signal linkUp       : Slv4Array(NUM_ELINK_C-1 downto 0);
    signal hdrErrDet    : Slv4Array(NUM_ELINK_C-1 downto 0);
 
@@ -158,24 +161,6 @@ begin
          arst   => axilRst,
          clk    => donwlinkClk,
          rstOut => downlinkRst);
-
-   ------------------------
-   -- Generate the clkEn160
-   ------------------------
-   process(donwlinkClk)
-   begin
-      if rising_edge(donwlinkClk) then
-         if downlinkRst = '1' then
-            clkEn160 <= '0' after TPD_G;
-         else
-            if (clkEn160 = '0') or (downlinkClkEn = '1') then
-               clkEn160 <= '1' after TPD_G;
-            else
-               clkEn160 <= '0' after TPD_G;
-            end if;
-         end if;
-      end if;
-   end process;
 
    --------------------
    -- AXI-Lite Crossbar
@@ -209,8 +194,8 @@ begin
             TPD_G => TPD_G)
          port map (
             -- Monitoring Interface (clk160MHz domain)
-            clk160MHz       => donwlinkClk,
-            rst160MHz       => downlinkRst,
+            clk160MHz       => clk160MHz,
+            rst160MHz       => rst160MHz,
             autoReadReg     => (others => (others => '0')),
             dataDrop        => dataCtrl(i).overflow,
             configDrop      => '0',
@@ -223,6 +208,7 @@ begin
             dlyCfg          => (others => (others => '0')),
             hdrErrDet       => hdrErrDet(i),
             linkUp          => linkUp(i),
+            cmdBusy         => cmdBusy(i),
             bitSlip         => rxBitSlip(i),
             enable          => open,
             selectRate      => open,
@@ -288,25 +274,33 @@ begin
             sConfigMaster   => dmaObMasters(i),
             sConfigSlave    => dmaObSlaves(i),
             -- Timing Interface
-            clkEn160MHz     => clkEn160,
-            clk160MHz       => donwlinkClk,
-            rst160MHz       => downlinkRst,
+            clk160MHz       => clk160MHz,
+            rst160MHz       => rst160MHz,
             -- Command Serial Interface (clk160MHz domain)
+            cmdBusy         => cmdBusy(i),
             cmdOut          => cmd(i));
 
-      U_Gearbox_Cmd : entity surf.Gearbox
+      U_Gearbox_Cmd : entity surf.AsyncGearbox
          generic map (
-            TPD_G          => TPD_G,
-            SLAVE_WIDTH_G  => 1,
-            MASTER_WIDTH_G => 4)
+            TPD_G                => TPD_G,
+            SLAVE_WIDTH_G        => 1,
+            MASTER_WIDTH_G       => 4,
+            -- Pipelining generics
+            INPUT_PIPE_STAGES_G  => 0,
+            OUTPUT_PIPE_STAGES_G => 0,
+            -- Async FIFO generics
+            FIFO_MEMORY_TYPE_G   => "distributed",
+            FIFO_ADDR_WIDTH_G    => 5)
          port map (
-            clk          => donwlinkClk,
-            rst          => downlinkRst,
             -- Slave Interface
+            slaveClk     => clk160MHz,
+            slaveRst     => rst160MHz,
             slaveData(0) => cmd(i),
-            slaveValid   => clkEn160,
+            slaveValid   => '1',
             slaveReady   => open,
             -- Master Interface
+            masterClk    => donwlinkClk,
+            masterRst    => downlinkRst,
             masterData   => downlinkUserData((i*4)+3 downto i*4),
             masterValid  => open,
             masterReady  => downlinkClkEn);
@@ -319,7 +313,7 @@ begin
    lpgbtFpga_top_inst : entity work.LpGbtFpga10g24
       port map (
          -- Down link
-         donwlinkClk_o       => donwlinkClk,    -- 320 MHz
+         donwlinkClk_o       => donwlinkClk,    -- 40 MHz
          downlinkClkEn_o     => downlinkClkEn,  -- 40 MHz strobe
          downlinkRst_i       => downlinkRst,
          downlinkUserData_i  => downlinkUserData,
@@ -327,7 +321,7 @@ begin
          downlinkIcData_i    => downlinkIcData,
          downlinkReady_o     => downlinkReady,
          -- Up link
-         uplinkClk_o         => uplinkClk,      -- 320 MHz
+         uplinkClk_o         => uplinkClk,      -- 40 MHz
          uplinkClkEn_o       => uplinkClkEn,    -- 40 MHz strobe
          uplinkRst_i         => uplinkRst,
          uplinkUserData_o    => uplinkUserData,
@@ -359,20 +353,28 @@ begin
    GEN_DATA :
    for i in NUM_ELINK_C-1 downto 0 generate
 
-      U_Gearbox_1280Mbps : entity surf.Gearbox
+      U_Gearbox_1280Mbps : entity surf.AsyncGearbox
          generic map (
-            TPD_G          => TPD_G,
-            SLAVE_WIDTH_G  => 32,
-            MASTER_WIDTH_G => 66)
+            TPD_G                => TPD_G,
+            SLAVE_WIDTH_G        => 32,
+            MASTER_WIDTH_G       => 66,
+            -- Pipelining generics
+            INPUT_PIPE_STAGES_G  => 0,
+            OUTPUT_PIPE_STAGES_G => 0,
+            -- Async FIFO generics
+            FIFO_MEMORY_TYPE_G   => "distributed",
+            FIFO_ADDR_WIDTH_G    => 5)
          port map (
-            clk                     => uplinkClk,
-            rst                     => uplinkRst,
             slip                    => rxBitSlip(i)(0),
             -- Slave Interface
+            slaveClk                => uplinkClk,
+            slaveRst                => uplinkRst,
             slaveData(31 downto 0)  => uplinkUserData((i*32)+31 downto i*32),
             slaveValid              => uplinkClkEn,
             slaveReady              => open,
             -- Master Interface
+            masterClk               => clk160MHz,
+            masterRst               => rst160MHz,
             masterData(1 downto 0)  => rxHeader(i),
             masterData(65 downto 2) => rxData(i),
             masterValid             => rxValid(i)(0),

@@ -163,11 +163,16 @@ architecture mapping of Application is
    signal smaClk   : sl;
    signal smaClock : sl;
 
-   signal refClk320 : sl;
-
    signal iDelayCtrlRdy : sl;
    signal refClk300MHz  : sl;
    signal refRst300MHz  : sl;
+
+   signal refClk160     : sl;
+   signal rxRecClk      : slv(3 downto 0);
+   signal qplllock      : slv(1 downto 0);
+   signal qplloutclk    : slv(1 downto 0);
+   signal qplloutrefclk : slv(1 downto 0);
+   signal qpllRst       : slv(3 downto 0);
 
    attribute IODELAY_GROUP                 : string;
    attribute IODELAY_GROUP of U_IDELAYCTRL : label is "rd53_aurora";
@@ -195,7 +200,6 @@ begin
                gtTxP  => qsfpTxP(i),
                gtTxN  => qsfpTxN(i));
       end generate GEN_QSFP;
-
 
       ----------------------
       -- AXI-Lite: Power I2C
@@ -229,36 +233,43 @@ begin
    ---------------------------------------------------------------------------------
    -- External Reference clock (required for synchronizing to remote LpGBT receiver) 
    ---------------------------------------------------------------------------------
-   U_IBUFDS_smaClk : IBUFDS_GTE4
-      generic map (
-         REFCLK_EN_TX_PATH  => '0',
-         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
-         REFCLK_ICNTL_RX    => "00")
-      port map (
-         I     => smaClkP,
-         IB    => smaClkN,
-         CEB   => '0',
-         ODIV2 => smaClock,
-         O     => open);
-
-   U_BUFG_smaClk : BUFG_GT
-      port map (
-         I       => smaClock,
-         CE      => '1',
-         CEMASK  => '1',
-         CLR     => '0',
-         CLRMASK => '1',
-         DIV     => "000",
-         O       => smaClk);
-
    U_fpgaToPllClk : entity surf.ClkOutBufDiff
       generic map (
          TPD_G        => TPD_G,
          XIL_DEVICE_G => XIL_DEVICE_C)
       port map (
-         clkIn   => smaClk,
+         clkIn   => rxRecClk(0),  -- emulation LP-GBT recovered clock used as jitter cleaner reference
          clkOutP => fpgaToPllClkP,
          clkOutN => fpgaToPllClkN);
+
+   --------------------------------
+   -- 160 MHz External Reference Clock
+   --------------------------------
+   U_IBUFDS_refClk160 : IBUFDS_GTE3
+      generic map (
+         REFCLK_EN_TX_PATH  => '0',
+         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
+         REFCLK_ICNTL_RX    => "00")
+      port map (
+         I     => sfpRef160ClkP,
+         IB    => sfpRef160ClkN,
+         CEB   => '0',
+         ODIV2 => open,
+         O     => refClk160);
+
+   ------------------------
+   -- LP-GBT QPLL Reference
+   ------------------------
+   U_EmuLpGbtQpll : entity work.xlx_ku_mgt_10g24_emu_qpll
+      port map (
+         -- MGT Clock Port (320 MHz)
+         gtClkP        => sfpPllClkP,
+         gtClkN        => sfpPllClkN,
+         -- Quad PLL Interface
+         qplllock      => qplllock,
+         qplloutclk    => qplloutclk,
+         qplloutrefclk => qplloutrefclk,
+         qpllRst       => qpllRst(0));
 
    --------------------------
    -- 160 MHz Reference Clock
@@ -281,21 +292,6 @@ begin
          clk    => ref160Clk,
          rstIn  => ref156Rst,
          rstOut => ref160Rst);
-
-   --------------------------------
-   -- 320 MHz LpGBT Reference Clock
-   --------------------------------
-   U_IBUFDS_refClk320 : IBUFDS_GTE4
-      generic map (
-         REFCLK_EN_TX_PATH  => '0',
-         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
-         REFCLK_ICNTL_RX    => "00")
-      port map (
-         I     => sfpPllClkP,
-         IB    => sfpPllClkN,
-         CEB   => '0',
-         ODIV2 => open,
-         O     => refClk320);
 
    --------------------------
    -- Reference 300 MHz clock 
@@ -432,7 +428,12 @@ begin
             rxLinkUp(4)     => rxLinkUp(24*i+4*4),
             rxLinkUp(5)     => rxLinkUp(24*i+4*5),
             -- SFP Interface
-            refClk320       => refClk320,
+            refClk160       => refClk160,
+            rxRecClk        => rxRecClk(i),
+            qplllock        => qplllock,
+            qplloutclk      => qplloutclk,
+            qplloutrefclk   => qplloutrefclk,
+            qpllRst         => qpllRst(i),
             sfpTxP          => sfpTxP(i),
             sfpTxN          => sfpTxN(i),
             sfpRxP          => sfpRxP(i),

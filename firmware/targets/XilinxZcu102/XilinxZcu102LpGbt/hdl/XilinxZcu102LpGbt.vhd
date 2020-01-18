@@ -377,10 +377,14 @@ begin
             dmaIbSlave      => dmaIbSlaves(i),
             dmaObMaster     => dmaObMasters(i),
             dmaObSlave      => dmaObSlaves(i),
-            -- SFP Interface
+            -- Clocks and Resets
             refClk320       => refClk320,
+            clk160MHz       => clk160MHz,
+            rst160MHz       => rst160MHz,
+            -- Status
             downlinkUp      => downlinkUp(i),
             uplinkUp        => uplinkUp(i),
+            -- SFP Interface
             sfpTxP          => sfpTxP(i),
             sfpTxN          => sfpTxN(i),
             sfpRxP          => sfpRxP(i),
