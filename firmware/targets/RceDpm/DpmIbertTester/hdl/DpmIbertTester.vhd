@@ -67,21 +67,17 @@ end DpmIbertTester;
 
 architecture TOP_LEVEL of DpmIbertTester is
 
-   constant SERVER_SIZE_C : positive := 1;
-   constant SERVER_PORTS_C : PositiveArray(SERVER_SIZE_C-1 downto 0) := (
-      0 => 2542);                       -- Xilinx XVC 
-
    component ibert_7series_gtx_0
       port (
-    TXN_O : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
-    TXP_O : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
-    RXOUTCLK_O : OUT STD_LOGIC;
-    RXN_I : IN STD_LOGIC_VECTOR(11 DOWNTO 0);
-    RXP_I : IN STD_LOGIC_VECTOR(11 DOWNTO 0);
-    GTREFCLK0_I : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-    GTREFCLK1_I : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-    SYSCLK_I : IN STD_LOGIC
-  );
+         TXN_O       : out std_logic_vector(11 downto 0);
+         TXP_O       : out std_logic_vector(11 downto 0);
+         RXOUTCLK_O  : out std_logic;
+         RXN_I       : in  std_logic_vector(11 downto 0);
+         RXP_I       : in  std_logic_vector(11 downto 0);
+         GTREFCLK0_I : in  std_logic_vector(2 downto 0);
+         GTREFCLK1_I : in  std_logic_vector(2 downto 0);
+         SYSCLK_I    : in  std_logic
+         );
    end component;
 
    signal axilClk         : sl;
@@ -102,23 +98,8 @@ architecture TOP_LEVEL of DpmIbertTester is
    signal gtRefClock1 : sl;
    signal sysClk      : sl;
    signal sysClkBufg  : sl;
-   signal gtRefClk0   : slv(2 downto 0) := (others=>'0');
-   signal gtRefClk1   : slv(2 downto 0) := (others=>'0');
-
-   signal ethClk   : sl;
-   signal ethRst   : sl;
-   signal localMac : slv(47 downto 0);
-   signal localIp  : slv(31 downto 0);
-
-   signal ibMacMaster : AxiStreamMasterType;
-   signal ibMacSlave  : AxiStreamSlaveType;
-   signal obMacMaster : AxiStreamMasterType;
-   signal obMacSlave  : AxiStreamSlaveType;
-
-   signal obServerMasters : AxiStreamMasterArray(SERVER_SIZE_C-1 downto 0);
-   signal obServerSlaves  : AxiStreamSlaveArray(SERVER_SIZE_C-1 downto 0);
-   signal ibServerMasters : AxiStreamMasterArray(SERVER_SIZE_C-1 downto 0);
-   signal ibServerSlaves  : AxiStreamSlaveArray(SERVER_SIZE_C-1 downto 0);
+   signal gtRefClk0   : slv(2 downto 0) := (others => '0');
+   signal gtRefClk1   : slv(2 downto 0) := (others => '0');
 
 begin
 
@@ -149,13 +130,10 @@ begin
    --------------------------------------------------
    U_DpmCore : entity rce_gen3_fw_lib.DpmCore
       generic map (
-         TPD_G              => TPD_G,
-         RCE_DMA_MODE_G     => RCE_DMA_AXIS_C,
-         BUILD_INFO_G       => BUILD_INFO_G,
-         ETH_TYPE_G         => "1000BASE-KX",
-         UDP_SERVER_EN_G    => true,
-         UDP_SERVER_SIZE_G  => SERVER_SIZE_C,
-         UDP_SERVER_PORTS_G => SERVER_PORTS_C)
+         TPD_G          => TPD_G,
+         RCE_DMA_MODE_G => RCE_DMA_AXIS_C,
+         BUILD_INFO_G   => BUILD_INFO_G,
+         ETH_TYPE_G     => "ZYNQ-GEM")
       port map (
          -- IPMI I2C Ports
          i2cSda             => i2cSda,
@@ -183,16 +161,7 @@ begin
          dmaObMaster        => dmaObMaster,
          dmaObSlave         => dmaObSlave,
          dmaIbMaster        => dmaIbMaster,
-         dmaIbSlave         => dmaIbSlave,
-         -- User ETH interface (userEthClk domain)
-         userEthClk         => ethClk,
-         userEthClkRst      => ethRst,
-         userEthIpAddr      => localIp,
-         userEthMacAddr     => localMac,
-         userEthUdpIbMaster => ibMacMaster,
-         userEthUdpIbSlave  => ibMacSlave,
-         userEthUdpObMaster => obMacMaster,
-         userEthUdpObSlave  => obMacSlave);
+         dmaIbSlave         => dmaIbSlave);
 
    ---------------
    -- Loopback DMA
@@ -201,53 +170,6 @@ begin
    dmaRst      <= (others => axilRst);
    dmaIbMaster <= dmaObMaster;
    dmaObSlave  <= dmaIbSlave;
-
-   -----------
-   -- IPv4/UDP
-   -----------
-   U_UDP : entity surf.UdpEngineWrapper
-      generic map (
-         -- Simulation Generics
-         TPD_G          => TPD_G,
-         -- UDP Server Generics
-         SERVER_EN_G    => true,
-         SERVER_SIZE_G  => SERVER_SIZE_C,
-         SERVER_PORTS_G => SERVER_PORTS_C,
-         -- UDP Client Generics
-         CLIENT_EN_G    => false)
-      port map (
-         -- Local Configurations
-         localMac        => localMac,
-         localIp         => localIp,
-         -- Interface to Ethernet Media Access Controller (MAC)
-         obMacMaster     => obMacMaster,
-         obMacSlave      => obMacSlave,
-         ibMacMaster     => ibMacMaster,
-         ibMacSlave      => ibMacSlave,
-         -- Interface to UDP Server engine(s)
-         obServerMasters => obServerMasters,
-         obServerSlaves  => obServerSlaves,
-         ibServerMasters => ibServerMasters,
-         ibServerSlaves  => ibServerSlaves,
-         -- Clock and Reset
-         clk             => ethClk,
-         rst             => ethRst);
-
-   -----------------------
-   -- XVC UDP Debug Bridge
-   -----------------------
-   U_XVC_UDP_DEBUG_BRIDGE : entity surf.UdpDebugBridgeWrapper
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         -- Clock and Reset
-         clk            => ethClk,
-         rst            => ethRst,
-         -- UDP XVC Interface
-         obServerMaster => obServerMasters(0),
-         obServerSlave  => obServerSlaves(0),
-         ibServerMaster => ibServerMasters(0),
-         ibServerSlave  => ibServerSlaves(0));
 
    -----------------------
    -- GT REFCLK
@@ -267,26 +189,26 @@ begin
          CEB   => '0',
          ODIV2 => open,
          O     => gtRefClock1);
-         
-  gtRefClk0(0) <= gtRefClock0;
-  gtRefClk1(0) <= '0';
-  gtRefClk0(1) <= gtRefClock0;
-  gtRefClk1(1) <= gtRefClock1;
-  gtRefClk0(2) <= gtRefClock0;
-  gtRefClk1(2) <= '0';
+
+   gtRefClk0(0) <= gtRefClock0;
+   gtRefClk1(0) <= '0';
+   gtRefClk0(1) <= gtRefClock0;
+   gtRefClk1(1) <= gtRefClock1;
+   gtRefClk0(2) <= gtRefClock0;
+   gtRefClk1(2) <= '0';
 
    U_SYS_CLK : BUFG
       port map (
-         I     => sysClk,
-         O     => sysClkBufg);
+         I => sysClk,
+         O => sysClkBufg);
 
    -----------------------
    -- IBERT IP Core
    ----------------------- 
    U_IBERT : ibert_7series_gtx_0
       port map (
-        SYSCLK_I => sysClkBufg,
-        RXOUTCLK_O => open,
+         SYSCLK_I    => sysClkBufg,
+         RXOUTCLK_O  => open,
          TXN_O       => dpmToRtmHsM,
          TXP_O       => dpmToRtmHsP,
          RXN_I       => rtmToDpmHsM,

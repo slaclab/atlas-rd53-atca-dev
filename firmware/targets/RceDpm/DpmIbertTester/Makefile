@@ -1,6 +1,3 @@
-# Using XVC Debug bridge
-export USE_XVC_DEBUG = 1
-
 # Define target output
 target: bit
 

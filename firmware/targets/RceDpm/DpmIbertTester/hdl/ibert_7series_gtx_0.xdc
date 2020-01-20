@@ -30,108 +30,108 @@ set_property CLOCK_DEDICATED_ROUTE FALSE [get_pins u_ibert_core/inst/SYSCLK_DIVI
 create_clock -name J_CLK -period 30 [get_pins -of_objects [get_cells u_ibert_core/inst/bscan_inst/SERIES7_BSCAN.bscan_inst] -filter {name =~ *DRCK}]
 set_clock_groups -group [get_clocks J_CLK] -asynchronous
 
-# ##
-# ## Clock Constraints for MGT refclk
-# ##
-# create_clock -name REFCLK0_0 -period 4.0 [get_ports GTREFCLK0P_I[0]]
-# set_clock_groups -group [get_clocks -include_generated_clocks REFCLK0_0] -asynchronous
-# create_clock -name REFCLK0_1 -period 4.0 [get_ports GTREFCLK1P_I[0]]
-# set_clock_groups -group [get_clocks -include_generated_clocks REFCLK0_1] -asynchronous
+##
+## Clock Constraints for MGT refclk
+##
+create_clock -name REFCLK0_0 -period 4.0 [get_ports GTREFCLK0P_I[0]]
+set_clock_groups -group [get_clocks -include_generated_clocks REFCLK0_0] -asynchronous
+create_clock -name REFCLK0_1 -period 4.0 [get_ports GTREFCLK1P_I[0]]
+set_clock_groups -group [get_clocks -include_generated_clocks REFCLK0_1] -asynchronous
 
 ##
 ## TX/RX out clock constraints
 ##
 # GT X0Y4
-create_clock -name Q1_RXCLK0 -period 20.48 [get_pins {u_ibert_core/inst/QUAD[0].u_q/CH[0].u_ch/u_gtxe2_channel/RXOUTCLK}]
+create_clock -name Q1_RXCLK0 -period 25.6 [get_pins {u_ibert_core/inst/QUAD[0].u_q/CH[0].u_ch/u_gtxe2_channel/RXOUTCLK}]
 set_clock_groups -group [get_clocks Q1_RXCLK0] -asynchronous
-create_clock -name  Q1_TX0 -period 20.48 [get_pins {u_ibert_core/inst/QUAD[0].u_q/CH[0].u_ch/u_gtxe2_channel/TXOUTCLK}]
+create_clock -name  Q1_TX0 -period 25.6 [get_pins {u_ibert_core/inst/QUAD[0].u_q/CH[0].u_ch/u_gtxe2_channel/TXOUTCLK}]
 set_clock_groups -group [get_clocks Q1_TX0] -asynchronous
 # GT X0Y5
-create_clock -name Q1_RXCLK1 -period 20.48 [get_pins {u_ibert_core/inst/QUAD[0].u_q/CH[1].u_ch/u_gtxe2_channel/RXOUTCLK}]
+create_clock -name Q1_RXCLK1 -period 25.6 [get_pins {u_ibert_core/inst/QUAD[0].u_q/CH[1].u_ch/u_gtxe2_channel/RXOUTCLK}]
 set_clock_groups -group [get_clocks Q1_RXCLK1] -asynchronous
 # GT X0Y6
-create_clock -name Q1_RXCLK2 -period 20.48 [get_pins {u_ibert_core/inst/QUAD[0].u_q/CH[2].u_ch/u_gtxe2_channel/RXOUTCLK}]
+create_clock -name Q1_RXCLK2 -period 25.6 [get_pins {u_ibert_core/inst/QUAD[0].u_q/CH[2].u_ch/u_gtxe2_channel/RXOUTCLK}]
 set_clock_groups -group [get_clocks Q1_RXCLK2] -asynchronous
 # GT X0Y7
-create_clock -name Q1_RXCLK3 -period 20.48 [get_pins {u_ibert_core/inst/QUAD[0].u_q/CH[3].u_ch/u_gtxe2_channel/RXOUTCLK}]
+create_clock -name Q1_RXCLK3 -period 25.6 [get_pins {u_ibert_core/inst/QUAD[0].u_q/CH[3].u_ch/u_gtxe2_channel/RXOUTCLK}]
 set_clock_groups -group [get_clocks Q1_RXCLK3] -asynchronous
 # GT X0Y8
-create_clock -name Q2_RXCLK0 -period 20.48 [get_pins {u_ibert_core/inst/QUAD[1].u_q/CH[0].u_ch/u_gtxe2_channel/RXOUTCLK}]
+create_clock -name Q2_RXCLK0 -period 25.6 [get_pins {u_ibert_core/inst/QUAD[1].u_q/CH[0].u_ch/u_gtxe2_channel/RXOUTCLK}]
 set_clock_groups -group [get_clocks Q2_RXCLK0] -asynchronous
-create_clock -name  Q2_TX0 -period 20.48 [get_pins {u_ibert_core/inst/QUAD[1].u_q/CH[0].u_ch/u_gtxe2_channel/TXOUTCLK}]
+create_clock -name  Q2_TX0 -period 25.6 [get_pins {u_ibert_core/inst/QUAD[1].u_q/CH[0].u_ch/u_gtxe2_channel/TXOUTCLK}]
 set_clock_groups -group [get_clocks Q2_TX0] -asynchronous
 # GT X0Y9
-create_clock -name Q2_RXCLK1 -period 20.48 [get_pins {u_ibert_core/inst/QUAD[1].u_q/CH[1].u_ch/u_gtxe2_channel/RXOUTCLK}]
+create_clock -name Q2_RXCLK1 -period 25.6 [get_pins {u_ibert_core/inst/QUAD[1].u_q/CH[1].u_ch/u_gtxe2_channel/RXOUTCLK}]
 set_clock_groups -group [get_clocks Q2_RXCLK1] -asynchronous
 # GT X0Y10
-create_clock -name Q2_RXCLK2 -period 20.48 [get_pins {u_ibert_core/inst/QUAD[1].u_q/CH[2].u_ch/u_gtxe2_channel/RXOUTCLK}]
+create_clock -name Q2_RXCLK2 -period 25.6 [get_pins {u_ibert_core/inst/QUAD[1].u_q/CH[2].u_ch/u_gtxe2_channel/RXOUTCLK}]
 set_clock_groups -group [get_clocks Q2_RXCLK2] -asynchronous
 # GT X0Y11
-create_clock -name Q2_RXCLK3 -period 20.48 [get_pins {u_ibert_core/inst/QUAD[1].u_q/CH[3].u_ch/u_gtxe2_channel/RXOUTCLK}]
+create_clock -name Q2_RXCLK3 -period 25.6 [get_pins {u_ibert_core/inst/QUAD[1].u_q/CH[3].u_ch/u_gtxe2_channel/RXOUTCLK}]
 set_clock_groups -group [get_clocks Q2_RXCLK3] -asynchronous
 # GT X0Y12
-create_clock -name Q3_RXCLK0 -period 20.48 [get_pins {u_ibert_core/inst/QUAD[2].u_q/CH[0].u_ch/u_gtxe2_channel/RXOUTCLK}]
+create_clock -name Q3_RXCLK0 -period 25.6 [get_pins {u_ibert_core/inst/QUAD[2].u_q/CH[0].u_ch/u_gtxe2_channel/RXOUTCLK}]
 set_clock_groups -group [get_clocks Q3_RXCLK0] -asynchronous
-create_clock -name  Q3_TX0 -period 20.48 [get_pins {u_ibert_core/inst/QUAD[2].u_q/CH[0].u_ch/u_gtxe2_channel/TXOUTCLK}]
+create_clock -name  Q3_TX0 -period 25.6 [get_pins {u_ibert_core/inst/QUAD[2].u_q/CH[0].u_ch/u_gtxe2_channel/TXOUTCLK}]
 set_clock_groups -group [get_clocks Q3_TX0] -asynchronous
 # GT X0Y13
-create_clock -name Q3_RXCLK1 -period 20.48 [get_pins {u_ibert_core/inst/QUAD[2].u_q/CH[1].u_ch/u_gtxe2_channel/RXOUTCLK}]
+create_clock -name Q3_RXCLK1 -period 25.6 [get_pins {u_ibert_core/inst/QUAD[2].u_q/CH[1].u_ch/u_gtxe2_channel/RXOUTCLK}]
 set_clock_groups -group [get_clocks Q3_RXCLK1] -asynchronous
 # GT X0Y14
-create_clock -name Q3_RXCLK2 -period 20.48 [get_pins {u_ibert_core/inst/QUAD[2].u_q/CH[2].u_ch/u_gtxe2_channel/RXOUTCLK}]
+create_clock -name Q3_RXCLK2 -period 25.6 [get_pins {u_ibert_core/inst/QUAD[2].u_q/CH[2].u_ch/u_gtxe2_channel/RXOUTCLK}]
 set_clock_groups -group [get_clocks Q3_RXCLK2] -asynchronous
 # GT X0Y15
-create_clock -name Q3_RXCLK3 -period 20.48 [get_pins {u_ibert_core/inst/QUAD[2].u_q/CH[3].u_ch/u_gtxe2_channel/RXOUTCLK}]
+create_clock -name Q3_RXCLK3 -period 25.6 [get_pins {u_ibert_core/inst/QUAD[2].u_q/CH[3].u_ch/u_gtxe2_channel/RXOUTCLK}]
 set_clock_groups -group [get_clocks Q3_RXCLK3] -asynchronous
 
 ##
 ## System clock pin locs and timing constraints
 ##
 
-# ##
-# ## GTXE2 Channel and Common Loc constraints
-# ##
-# set_property LOC GTXE2_CHANNEL_X0Y4 [get_cells u_ibert_core/inst/QUAD[0].u_q/CH[0].u_ch/u_gtxe2_channel]
-# set_property LOC GTXE2_CHANNEL_X0Y5 [get_cells u_ibert_core/inst/QUAD[0].u_q/CH[1].u_ch/u_gtxe2_channel]
-# set_property LOC GTXE2_CHANNEL_X0Y6 [get_cells u_ibert_core/inst/QUAD[0].u_q/CH[2].u_ch/u_gtxe2_channel]
-# set_property LOC GTXE2_CHANNEL_X0Y7 [get_cells u_ibert_core/inst/QUAD[0].u_q/CH[3].u_ch/u_gtxe2_channel]
-# set_property LOC GTXE2_COMMON_X0Y1 [get_cells u_ibert_core/inst/QUAD[0].u_q/u_common/u_gtxe2_common]
-# set_property LOC GTXE2_CHANNEL_X0Y8 [get_cells u_ibert_core/inst/QUAD[1].u_q/CH[0].u_ch/u_gtxe2_channel]
-# set_property LOC GTXE2_CHANNEL_X0Y9 [get_cells u_ibert_core/inst/QUAD[1].u_q/CH[1].u_ch/u_gtxe2_channel]
-# set_property LOC GTXE2_CHANNEL_X0Y10 [get_cells u_ibert_core/inst/QUAD[1].u_q/CH[2].u_ch/u_gtxe2_channel]
-# set_property LOC GTXE2_CHANNEL_X0Y11 [get_cells u_ibert_core/inst/QUAD[1].u_q/CH[3].u_ch/u_gtxe2_channel]
-# set_property LOC GTXE2_COMMON_X0Y2 [get_cells u_ibert_core/inst/QUAD[1].u_q/u_common/u_gtxe2_common]
-# set_property LOC GTXE2_CHANNEL_X0Y12 [get_cells u_ibert_core/inst/QUAD[2].u_q/CH[0].u_ch/u_gtxe2_channel]
-# set_property LOC GTXE2_CHANNEL_X0Y13 [get_cells u_ibert_core/inst/QUAD[2].u_q/CH[1].u_ch/u_gtxe2_channel]
-# set_property LOC GTXE2_CHANNEL_X0Y14 [get_cells u_ibert_core/inst/QUAD[2].u_q/CH[2].u_ch/u_gtxe2_channel]
-# set_property LOC GTXE2_CHANNEL_X0Y15 [get_cells u_ibert_core/inst/QUAD[2].u_q/CH[3].u_ch/u_gtxe2_channel]
-# set_property LOC GTXE2_COMMON_X0Y3 [get_cells u_ibert_core/inst/QUAD[2].u_q/u_common/u_gtxe2_common]
+##
+## GTXE2 Channel and Common Loc constraints
+##
+set_property LOC GTXE2_CHANNEL_X0Y4 [get_cells u_ibert_core/inst/QUAD[0].u_q/CH[0].u_ch/u_gtxe2_channel]
+set_property LOC GTXE2_CHANNEL_X0Y5 [get_cells u_ibert_core/inst/QUAD[0].u_q/CH[1].u_ch/u_gtxe2_channel]
+set_property LOC GTXE2_CHANNEL_X0Y6 [get_cells u_ibert_core/inst/QUAD[0].u_q/CH[2].u_ch/u_gtxe2_channel]
+set_property LOC GTXE2_CHANNEL_X0Y7 [get_cells u_ibert_core/inst/QUAD[0].u_q/CH[3].u_ch/u_gtxe2_channel]
+set_property LOC GTXE2_COMMON_X0Y1 [get_cells u_ibert_core/inst/QUAD[0].u_q/u_common/u_gtxe2_common]
+set_property LOC GTXE2_CHANNEL_X0Y8 [get_cells u_ibert_core/inst/QUAD[1].u_q/CH[0].u_ch/u_gtxe2_channel]
+set_property LOC GTXE2_CHANNEL_X0Y9 [get_cells u_ibert_core/inst/QUAD[1].u_q/CH[1].u_ch/u_gtxe2_channel]
+set_property LOC GTXE2_CHANNEL_X0Y10 [get_cells u_ibert_core/inst/QUAD[1].u_q/CH[2].u_ch/u_gtxe2_channel]
+set_property LOC GTXE2_CHANNEL_X0Y11 [get_cells u_ibert_core/inst/QUAD[1].u_q/CH[3].u_ch/u_gtxe2_channel]
+set_property LOC GTXE2_COMMON_X0Y2 [get_cells u_ibert_core/inst/QUAD[1].u_q/u_common/u_gtxe2_common]
+set_property LOC GTXE2_CHANNEL_X0Y12 [get_cells u_ibert_core/inst/QUAD[2].u_q/CH[0].u_ch/u_gtxe2_channel]
+set_property LOC GTXE2_CHANNEL_X0Y13 [get_cells u_ibert_core/inst/QUAD[2].u_q/CH[1].u_ch/u_gtxe2_channel]
+set_property LOC GTXE2_CHANNEL_X0Y14 [get_cells u_ibert_core/inst/QUAD[2].u_q/CH[2].u_ch/u_gtxe2_channel]
+set_property LOC GTXE2_CHANNEL_X0Y15 [get_cells u_ibert_core/inst/QUAD[2].u_q/CH[3].u_ch/u_gtxe2_channel]
+set_property LOC GTXE2_COMMON_X0Y3 [get_cells u_ibert_core/inst/QUAD[2].u_q/u_common/u_gtxe2_common]
 
-# ##
-# ## BUFH Loc constraints for TX/RX userclks
-# ##
-# set_property LOC BUFHCE_X1Y12 [get_cells u_ibert_core/inst/QUAD[0].u_q/u_common/u_clocking/local_txusr.NON_K7.u_txusr]
-# set_property LOC BUFHCE_X1Y13 [get_cells u_ibert_core/inst/QUAD[0].u_q/u_common/u_clocking/rx_ind.NON_K7.u_rxusr0]
-# set_property LOC BUFHCE_X1Y14 [get_cells u_ibert_core/inst/QUAD[0].u_q/u_common/u_clocking/rx_ind.NON_K7.u_rxusr1]
-# set_property LOC BUFHCE_X1Y15 [get_cells u_ibert_core/inst/QUAD[0].u_q/u_common/u_clocking/rx_ind.NON_K7.u_rxusr2]
-# set_property LOC BUFHCE_X1Y16 [get_cells u_ibert_core/inst/QUAD[0].u_q/u_common/u_clocking/rx_ind.NON_K7.u_rxusr3]
-# set_property LOC BUFHCE_X1Y24 [get_cells u_ibert_core/inst/QUAD[1].u_q/u_common/u_clocking/local_txusr.NON_K7.u_txusr]
-# set_property LOC BUFHCE_X1Y25 [get_cells u_ibert_core/inst/QUAD[1].u_q/u_common/u_clocking/rx_ind.NON_K7.u_rxusr0]
-# set_property LOC BUFHCE_X1Y26 [get_cells u_ibert_core/inst/QUAD[1].u_q/u_common/u_clocking/rx_ind.NON_K7.u_rxusr1]
-# set_property LOC BUFHCE_X1Y27 [get_cells u_ibert_core/inst/QUAD[1].u_q/u_common/u_clocking/rx_ind.NON_K7.u_rxusr2]
-# set_property LOC BUFHCE_X1Y28 [get_cells u_ibert_core/inst/QUAD[1].u_q/u_common/u_clocking/rx_ind.NON_K7.u_rxusr3]
-# set_property LOC BUFHCE_X1Y36 [get_cells u_ibert_core/inst/QUAD[2].u_q/u_common/u_clocking/local_txusr.NON_K7.u_txusr]
-# set_property LOC BUFHCE_X1Y37 [get_cells u_ibert_core/inst/QUAD[2].u_q/u_common/u_clocking/rx_ind.NON_K7.u_rxusr0]
-# set_property LOC BUFHCE_X1Y38 [get_cells u_ibert_core/inst/QUAD[2].u_q/u_common/u_clocking/rx_ind.NON_K7.u_rxusr1]
-# set_property LOC BUFHCE_X1Y39 [get_cells u_ibert_core/inst/QUAD[2].u_q/u_common/u_clocking/rx_ind.NON_K7.u_rxusr2]
-# set_property LOC BUFHCE_X1Y40 [get_cells u_ibert_core/inst/QUAD[2].u_q/u_common/u_clocking/rx_ind.NON_K7.u_rxusr3]
+##
+## BUFH Loc constraints for TX/RX userclks
+##
+set_property LOC BUFHCE_X1Y12 [get_cells u_ibert_core/inst/QUAD[0].u_q/u_common/u_clocking/local_txusr.NON_K7.u_txusr]
+set_property LOC BUFHCE_X1Y13 [get_cells u_ibert_core/inst/QUAD[0].u_q/u_common/u_clocking/rx_ind.NON_K7.u_rxusr0]
+set_property LOC BUFHCE_X1Y14 [get_cells u_ibert_core/inst/QUAD[0].u_q/u_common/u_clocking/rx_ind.NON_K7.u_rxusr1]
+set_property LOC BUFHCE_X1Y15 [get_cells u_ibert_core/inst/QUAD[0].u_q/u_common/u_clocking/rx_ind.NON_K7.u_rxusr2]
+set_property LOC BUFHCE_X1Y16 [get_cells u_ibert_core/inst/QUAD[0].u_q/u_common/u_clocking/rx_ind.NON_K7.u_rxusr3]
+set_property LOC BUFHCE_X1Y24 [get_cells u_ibert_core/inst/QUAD[1].u_q/u_common/u_clocking/local_txusr.NON_K7.u_txusr]
+set_property LOC BUFHCE_X1Y25 [get_cells u_ibert_core/inst/QUAD[1].u_q/u_common/u_clocking/rx_ind.NON_K7.u_rxusr0]
+set_property LOC BUFHCE_X1Y26 [get_cells u_ibert_core/inst/QUAD[1].u_q/u_common/u_clocking/rx_ind.NON_K7.u_rxusr1]
+set_property LOC BUFHCE_X1Y27 [get_cells u_ibert_core/inst/QUAD[1].u_q/u_common/u_clocking/rx_ind.NON_K7.u_rxusr2]
+set_property LOC BUFHCE_X1Y28 [get_cells u_ibert_core/inst/QUAD[1].u_q/u_common/u_clocking/rx_ind.NON_K7.u_rxusr3]
+set_property LOC BUFHCE_X1Y36 [get_cells u_ibert_core/inst/QUAD[2].u_q/u_common/u_clocking/local_txusr.NON_K7.u_txusr]
+set_property LOC BUFHCE_X1Y37 [get_cells u_ibert_core/inst/QUAD[2].u_q/u_common/u_clocking/rx_ind.NON_K7.u_rxusr0]
+set_property LOC BUFHCE_X1Y38 [get_cells u_ibert_core/inst/QUAD[2].u_q/u_common/u_clocking/rx_ind.NON_K7.u_rxusr1]
+set_property LOC BUFHCE_X1Y39 [get_cells u_ibert_core/inst/QUAD[2].u_q/u_common/u_clocking/rx_ind.NON_K7.u_rxusr2]
+set_property LOC BUFHCE_X1Y40 [get_cells u_ibert_core/inst/QUAD[2].u_q/u_common/u_clocking/rx_ind.NON_K7.u_rxusr3]
 
 
-# ##
-# ## MGT reference clock BUFFERS location constraints
-# ##
-# set_property LOC IBUFDS_GTE2_X0Y4 [get_cells u_buf_q2_clk0]
-# set_property LOC IBUFDS_GTE2_X0Y5 [get_cells u_buf_q2_clk1]
+##
+## MGT reference clock BUFFERS location constraints
+##
+set_property LOC IBUFDS_GTE2_X0Y4 [get_cells u_buf_q2_clk0]
+set_property LOC IBUFDS_GTE2_X0Y5 [get_cells u_buf_q2_clk1]
 
 ##
 ## Asynchronous constraints for Userclks and systemclock clock groups
@@ -277,11 +277,11 @@ set_property CLK_COR_SEQ_2_USE "FALSE" [get_cells u_ibert_core/inst/QUAD[0].u_q/
 
  ##-----------Channel PLL----------------------
 set_property CPLL_CFG 24'hBC07DC [get_cells u_ibert_core/inst/QUAD[0].u_q/CH[*].u_ch/u_gtxe2_channel]
-set_property CPLL_FBDIV 5 [get_cells u_ibert_core/inst/QUAD[0].u_q/CH[*].u_ch/u_gtxe2_channel]
+set_property CPLL_FBDIV 2 [get_cells u_ibert_core/inst/QUAD[0].u_q/CH[*].u_ch/u_gtxe2_channel]
 set_property CPLL_FBDIV_45 5 [get_cells u_ibert_core/inst/QUAD[0].u_q/CH[*].u_ch/u_gtxe2_channel]
 set_property CPLL_INIT_CFG 24'h00001E [get_cells u_ibert_core/inst/QUAD[0].u_q/CH[*].u_ch/u_gtxe2_channel]
 set_property CPLL_LOCK_CFG 16'h01C0 [get_cells u_ibert_core/inst/QUAD[0].u_q/CH[*].u_ch/u_gtxe2_channel]
-set_property CPLL_REFCLK_DIV 2 [get_cells u_ibert_core/inst/QUAD[0].u_q/CH[*].u_ch/u_gtxe2_channel]
+set_property CPLL_REFCLK_DIV 1 [get_cells u_ibert_core/inst/QUAD[0].u_q/CH[*].u_ch/u_gtxe2_channel]
 set_property RXOUT_DIV 4 [get_cells u_ibert_core/inst/QUAD[0].u_q/CH[*].u_ch/u_gtxe2_channel]
 set_property TXOUT_DIV 4 [get_cells u_ibert_core/inst/QUAD[0].u_q/CH[*].u_ch/u_gtxe2_channel]
 
@@ -456,7 +456,7 @@ set_property UCODEER_CLR 1'b0 [get_cells u_ibert_core/inst/QUAD[0].u_q/CH[*].u_c
 ##
 set_property BIAS_CFG 64'h0000040000001000 [get_cells u_ibert_core/inst/QUAD[0].u_q/u_common/u_gtxe2_common]
 set_property COMMON_CFG 32'h00000000 [get_cells u_ibert_core/inst/QUAD[0].u_q/u_common/u_gtxe2_common]
-set_property QPLL_CFG 27'h06801C1 [get_cells u_ibert_core/inst/QUAD[0].u_q/u_common/u_gtxe2_common]
+set_property QPLL_CFG 27'h0680181 [get_cells u_ibert_core/inst/QUAD[0].u_q/u_common/u_gtxe2_common]
 set_property QPLL_CLKOUT_CFG 4'b0000 [get_cells u_ibert_core/inst/QUAD[0].u_q/u_common/u_gtxe2_common]
 set_property QPLL_COARSE_FREQ_OVRD 6'b010000 [get_cells u_ibert_core/inst/QUAD[0].u_q/u_common/u_gtxe2_common]
 set_property QPLL_COARSE_FREQ_OVRD_EN 1'b0 [get_cells u_ibert_core/inst/QUAD[0].u_q/u_common/u_gtxe2_common]
@@ -467,7 +467,7 @@ set_property QPLL_FBDIV_MONITOR_EN 1'b1 [get_cells u_ibert_core/inst/QUAD[0].u_q
 set_property QPLL_INIT_CFG 24'h000028 [get_cells u_ibert_core/inst/QUAD[0].u_q/u_common/u_gtxe2_common]
 set_property QPLL_LOCK_CFG 16'h21E8 [get_cells u_ibert_core/inst/QUAD[0].u_q/u_common/u_gtxe2_common]
 set_property QPLL_LPF 4'b1111 [get_cells u_ibert_core/inst/QUAD[0].u_q/u_common/u_gtxe2_common]
-set_property QPLL_REFCLK_DIV 4 [get_cells u_ibert_core/inst/QUAD[0].u_q/u_common/u_gtxe2_common]
+set_property QPLL_REFCLK_DIV 1 [get_cells u_ibert_core/inst/QUAD[0].u_q/u_common/u_gtxe2_common]
 ##
 ## Attribute Values for QUAD[2] - Channel
 ##
@@ -524,11 +524,11 @@ set_property CLK_COR_SEQ_2_USE "FALSE" [get_cells u_ibert_core/inst/QUAD[1].u_q/
 
  ##-----------Channel PLL----------------------
 set_property CPLL_CFG 24'hBC07DC [get_cells u_ibert_core/inst/QUAD[1].u_q/CH[*].u_ch/u_gtxe2_channel]
-set_property CPLL_FBDIV 5 [get_cells u_ibert_core/inst/QUAD[1].u_q/CH[*].u_ch/u_gtxe2_channel]
+set_property CPLL_FBDIV 2 [get_cells u_ibert_core/inst/QUAD[1].u_q/CH[*].u_ch/u_gtxe2_channel]
 set_property CPLL_FBDIV_45 5 [get_cells u_ibert_core/inst/QUAD[1].u_q/CH[*].u_ch/u_gtxe2_channel]
 set_property CPLL_INIT_CFG 24'h00001E [get_cells u_ibert_core/inst/QUAD[1].u_q/CH[*].u_ch/u_gtxe2_channel]
 set_property CPLL_LOCK_CFG 16'h01C0 [get_cells u_ibert_core/inst/QUAD[1].u_q/CH[*].u_ch/u_gtxe2_channel]
-set_property CPLL_REFCLK_DIV 2 [get_cells u_ibert_core/inst/QUAD[1].u_q/CH[*].u_ch/u_gtxe2_channel]
+set_property CPLL_REFCLK_DIV 1 [get_cells u_ibert_core/inst/QUAD[1].u_q/CH[*].u_ch/u_gtxe2_channel]
 set_property RXOUT_DIV 4 [get_cells u_ibert_core/inst/QUAD[1].u_q/CH[*].u_ch/u_gtxe2_channel]
 set_property TXOUT_DIV 4 [get_cells u_ibert_core/inst/QUAD[1].u_q/CH[*].u_ch/u_gtxe2_channel]
 
@@ -703,7 +703,7 @@ set_property UCODEER_CLR 1'b0 [get_cells u_ibert_core/inst/QUAD[1].u_q/CH[*].u_c
 ##
 set_property BIAS_CFG 64'h0000040000001000 [get_cells u_ibert_core/inst/QUAD[1].u_q/u_common/u_gtxe2_common]
 set_property COMMON_CFG 32'h00000000 [get_cells u_ibert_core/inst/QUAD[1].u_q/u_common/u_gtxe2_common]
-set_property QPLL_CFG 27'h06801C1 [get_cells u_ibert_core/inst/QUAD[1].u_q/u_common/u_gtxe2_common]
+set_property QPLL_CFG 27'h0680181 [get_cells u_ibert_core/inst/QUAD[1].u_q/u_common/u_gtxe2_common]
 set_property QPLL_CLKOUT_CFG 4'b0000 [get_cells u_ibert_core/inst/QUAD[1].u_q/u_common/u_gtxe2_common]
 set_property QPLL_COARSE_FREQ_OVRD 6'b010000 [get_cells u_ibert_core/inst/QUAD[1].u_q/u_common/u_gtxe2_common]
 set_property QPLL_COARSE_FREQ_OVRD_EN 1'b0 [get_cells u_ibert_core/inst/QUAD[1].u_q/u_common/u_gtxe2_common]
@@ -714,7 +714,7 @@ set_property QPLL_FBDIV_MONITOR_EN 1'b1 [get_cells u_ibert_core/inst/QUAD[1].u_q
 set_property QPLL_INIT_CFG 24'h000028 [get_cells u_ibert_core/inst/QUAD[1].u_q/u_common/u_gtxe2_common]
 set_property QPLL_LOCK_CFG 16'h21E8 [get_cells u_ibert_core/inst/QUAD[1].u_q/u_common/u_gtxe2_common]
 set_property QPLL_LPF 4'b1111 [get_cells u_ibert_core/inst/QUAD[1].u_q/u_common/u_gtxe2_common]
-set_property QPLL_REFCLK_DIV 4 [get_cells u_ibert_core/inst/QUAD[1].u_q/u_common/u_gtxe2_common]
+set_property QPLL_REFCLK_DIV 1 [get_cells u_ibert_core/inst/QUAD[1].u_q/u_common/u_gtxe2_common]
 ##
 ## Attribute Values for QUAD[3] - Channel
 ##
@@ -771,11 +771,11 @@ set_property CLK_COR_SEQ_2_USE "FALSE" [get_cells u_ibert_core/inst/QUAD[2].u_q/
 
  ##-----------Channel PLL----------------------
 set_property CPLL_CFG 24'hBC07DC [get_cells u_ibert_core/inst/QUAD[2].u_q/CH[*].u_ch/u_gtxe2_channel]
-set_property CPLL_FBDIV 5 [get_cells u_ibert_core/inst/QUAD[2].u_q/CH[*].u_ch/u_gtxe2_channel]
+set_property CPLL_FBDIV 2 [get_cells u_ibert_core/inst/QUAD[2].u_q/CH[*].u_ch/u_gtxe2_channel]
 set_property CPLL_FBDIV_45 5 [get_cells u_ibert_core/inst/QUAD[2].u_q/CH[*].u_ch/u_gtxe2_channel]
 set_property CPLL_INIT_CFG 24'h00001E [get_cells u_ibert_core/inst/QUAD[2].u_q/CH[*].u_ch/u_gtxe2_channel]
 set_property CPLL_LOCK_CFG 16'h01C0 [get_cells u_ibert_core/inst/QUAD[2].u_q/CH[*].u_ch/u_gtxe2_channel]
-set_property CPLL_REFCLK_DIV 2 [get_cells u_ibert_core/inst/QUAD[2].u_q/CH[*].u_ch/u_gtxe2_channel]
+set_property CPLL_REFCLK_DIV 1 [get_cells u_ibert_core/inst/QUAD[2].u_q/CH[*].u_ch/u_gtxe2_channel]
 set_property RXOUT_DIV 4 [get_cells u_ibert_core/inst/QUAD[2].u_q/CH[*].u_ch/u_gtxe2_channel]
 set_property TXOUT_DIV 4 [get_cells u_ibert_core/inst/QUAD[2].u_q/CH[*].u_ch/u_gtxe2_channel]
 
@@ -950,7 +950,7 @@ set_property UCODEER_CLR 1'b0 [get_cells u_ibert_core/inst/QUAD[2].u_q/CH[*].u_c
 ##
 set_property BIAS_CFG 64'h0000040000001000 [get_cells u_ibert_core/inst/QUAD[2].u_q/u_common/u_gtxe2_common]
 set_property COMMON_CFG 32'h00000000 [get_cells u_ibert_core/inst/QUAD[2].u_q/u_common/u_gtxe2_common]
-set_property QPLL_CFG 27'h06801C1 [get_cells u_ibert_core/inst/QUAD[2].u_q/u_common/u_gtxe2_common]
+set_property QPLL_CFG 27'h0680181 [get_cells u_ibert_core/inst/QUAD[2].u_q/u_common/u_gtxe2_common]
 set_property QPLL_CLKOUT_CFG 4'b0000 [get_cells u_ibert_core/inst/QUAD[2].u_q/u_common/u_gtxe2_common]
 set_property QPLL_COARSE_FREQ_OVRD 6'b010000 [get_cells u_ibert_core/inst/QUAD[2].u_q/u_common/u_gtxe2_common]
 set_property QPLL_COARSE_FREQ_OVRD_EN 1'b0 [get_cells u_ibert_core/inst/QUAD[2].u_q/u_common/u_gtxe2_common]
@@ -961,5 +961,5 @@ set_property QPLL_FBDIV_MONITOR_EN 1'b1 [get_cells u_ibert_core/inst/QUAD[2].u_q
 set_property QPLL_INIT_CFG 24'h000028 [get_cells u_ibert_core/inst/QUAD[2].u_q/u_common/u_gtxe2_common]
 set_property QPLL_LOCK_CFG 16'h21E8 [get_cells u_ibert_core/inst/QUAD[2].u_q/u_common/u_gtxe2_common]
 set_property QPLL_LPF 4'b1111 [get_cells u_ibert_core/inst/QUAD[2].u_q/u_common/u_gtxe2_common]
-set_property QPLL_REFCLK_DIV 4 [get_cells u_ibert_core/inst/QUAD[2].u_q/u_common/u_gtxe2_common]
+set_property QPLL_REFCLK_DIV 1 [get_cells u_ibert_core/inst/QUAD[2].u_q/u_common/u_gtxe2_common]
 
