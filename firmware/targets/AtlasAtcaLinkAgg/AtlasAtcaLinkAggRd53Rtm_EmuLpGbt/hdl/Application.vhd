@@ -168,6 +168,7 @@ architecture mapping of Application is
    signal refRst300MHz  : sl;
 
    signal refClk160     : sl;
+   signal drpClk        : sl;
    signal rxRecClk      : slv(3 downto 0);
    signal qplllock      : slv(1 downto 0);
    signal qplloutclk    : slv(1 downto 0);
@@ -245,7 +246,7 @@ begin
    --------------------------------
    -- 160 MHz External Reference Clock
    --------------------------------
-   U_IBUFDS_refClk160 : IBUFDS_GTE3
+   U_IBUFDS_refClk160 : IBUFDS_GTE4
       generic map (
          REFCLK_EN_TX_PATH  => '0',
          REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
@@ -292,6 +293,15 @@ begin
          clk    => ref160Clk,
          rstIn  => ref156Rst,
          rstOut => ref160Rst);
+         
+  U_drp_clk : BUFGCE_DIV
+     generic map (
+        BUFGCE_DIVIDE => 4)
+     port map (
+        I   => axilClk,       -- 156.25 MHz 
+        CE  => '1',
+        CLR => '0',
+        O   => drpClk);    -- 39.0625 MHz         
 
    --------------------------
    -- Reference 300 MHz clock 
@@ -430,6 +440,7 @@ begin
             -- SFP Interface
             refClk160       => refClk160,
             rxRecClk        => rxRecClk(i),
+            drpClk          => drpClk,
             qplllock        => qplllock,
             qplloutclk      => qplloutclk,
             qplloutrefclk   => qplloutrefclk,

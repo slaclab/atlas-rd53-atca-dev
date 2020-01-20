@@ -21,6 +21,9 @@ use ieee.std_logic_arith.all;
 library surf;
 use surf.StdRtlPkg.all;
 
+library unisim;
+use unisim.vcomponents.all;
+
 entity LpGbt2EmuLpGbt_LinkingWithGthTb is
 end LpGbt2EmuLpGbt_LinkingWithGthTb;
 
@@ -47,6 +50,7 @@ architecture testbed of LpGbt2EmuLpGbt_LinkingWithGthTb is
    signal refClk160N : sl := '1';
 
    signal axilClk : sl := '0';
+   signal drpClk  : sl := '0';
    signal usrRst  : sl := '1';
 
    signal gtEmuToLpP : sl := '0';
@@ -184,7 +188,7 @@ begin
          qplloutrefclk       => qplloutrefclk,
          qpllRst             => qpllRst,
          clk_refclk_i        => refClk160P, -- CPLL using 160 MHz reference
-         clk_mgtfreedrpclk_i => axilClk,
+         clk_mgtfreedrpclk_i => drpClk,
          mgt_rxn_i           => gtLpToEmuN,
          mgt_rxp_i           => gtLpToEmuP,
          mgt_txn_o           => gtEmuToLpN,
@@ -200,5 +204,14 @@ begin
          qplloutclk    => qplloutclk,
          qplloutrefclk => qplloutrefclk,
          qpllRst       => qpllRst);
+
+  U_drp_clk : BUFGCE_DIV
+     generic map (
+        BUFGCE_DIVIDE => 4)
+     port map (
+        I   => axilClk,       -- 156.25 MHz 
+        CE  => '1',
+        CLR => '0',
+        O   => drpClk);    -- 39.0625 MHz
 
 end testbed;

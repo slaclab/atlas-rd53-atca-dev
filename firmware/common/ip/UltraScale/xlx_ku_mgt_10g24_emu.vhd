@@ -186,8 +186,9 @@ architecture structural of xlx_ku_mgt_10g24_emu is
    signal rx_reset_sig : std_logic := '0';
    signal tx_reset_sig : std_logic := '0';
 
-   signal MGT_USRWORD_RX_s : std_logic_vector(63 downto 0) := (others => '0');
-   signal MGT_USRWORD_TX_s : std_logic_vector(63 downto 0) := (others => '0');
+   signal MGT_USRWORD_os_s : std_logic_vector(255 downto 0) := (others => '0');
+   signal MGT_USRWORD_RX_s : std_logic_vector(63 downto 0)  := (others => '0');
+   signal MGT_USRWORD_TX_s : std_logic_vector(63 downto 0)  := (others => '0');
 
    -- Clock signals
    signal rx_wordclk_sig : std_logic := '0';
@@ -301,31 +302,23 @@ begin  --========####   Architecture Body   ####========--
          masterRst  => '0',
          masterData => MGT_USRWORD_TX_s);
 
-   -- U_Gearbox_RX : entity surf.AsyncGearbox
-   -- generic map (
-   -- SLAVE_WIDTH_G        => 64,
-   -- MASTER_WIDTH_G       => 256,
-   -- -- Pipelining generics
-   -- INPUT_PIPE_STAGES_G  => 0,
-   -- OUTPUT_PIPE_STAGES_G => 0,
-   -- -- Async FIFO generics
-   -- FIFO_MEMORY_TYPE_G   => "distributed",
-   -- FIFO_ADDR_WIDTH_G    => 5)
-   -- port map (
-   -- slip       => MGT_RXSlide_i,
-   -- -- Slave Interface
-   -- slaveClk   => rx_wordclk_sig,
-   -- slaveRst   => '0',
-   -- slaveData  => MGT_USRWORD_RX_s,
-   -- -- Master Interface
-   -- masterClk  => rx_wordclk40_sig,
-   -- masterRst  => '0',
-   -- masterData => MGT_USRWORD_o);
-
    EMULATE_OVERSAMPLING :
    for i in 63 downto 0 generate
-      MGT_USRWORD_o((4*i)+3 downto (4*i)) <= (others => MGT_USRWORD_RX_s(i));
+      MGT_USRWORD_os_s((4*i)+3 downto (4*i)) <= (others => MGT_USRWORD_RX_s(i));
    end generate EMULATE_OVERSAMPLING;
+
+   U_Gearbox_RX : entity surf.Gearbox
+      generic map (
+         SLAVE_WIDTH_G  => 256,
+         MASTER_WIDTH_G => 256)
+      port map (
+         slip       => MGT_RXSlide_i,
+         clk        => rx_wordclk_sig,
+         rst        => '0',
+         -- Slave Interface
+         slaveData  => MGT_USRWORD_os_s,
+         -- Master Interface
+         masterData => MGT_USRWORD_o);
 
    xlx_ku_mgt_std_i : xlx_ku_mgt_ip_10g24_emu
       port map (
@@ -377,8 +370,8 @@ begin  --========####   Architecture Body   ####========--
 
          gtrefclk0_in(0) => MGT_REFCLK_i,
 
-         rxslide_in(0) => MGT_RXSlide_i,
-         -- rxslide_in(0) => '0',
+         -- rxslide_in(0) => MGT_RXSlide_i,
+         rxslide_in(0) => '0',
 
          rxpmaresetdone_out(0) => rxpmaresetdone,
          txpmaresetdone_out(0) => txpmaresetdone,
@@ -403,14 +396,15 @@ begin  --========####   Architecture Body   ####========--
 
    MGT_TX_ALIGNED_s <= tx_reset_done;
 
-   U_drp_clk : BUFGCE_DIV
-      generic map (
-         BUFGCE_DIVIDE => 4)
-      port map (
-         I   => MGT_FREEDRPCLK_i,       -- 156.25 MHz 
-         CE  => '1',
-         CLR => '0',
-         O   => MGT_FREEDRPCLK_sig);    -- 39.0625 MHz
+   MGT_FREEDRPCLK_sig <= MGT_FREEDRPCLK_i;
+--   U_drp_clk : BUFGCE_DIV
+--      generic map (
+--         BUFGCE_DIVIDE => 4)
+--      port map (
+--         I   => MGT_FREEDRPCLK_i,       -- 156.25 MHz 
+--         CE  => '1',
+--         CLR => '0',
+--         O   => MGT_FREEDRPCLK_sig);    -- 39.0625 MHz
 
 end structural;
 --=================================================================================================--

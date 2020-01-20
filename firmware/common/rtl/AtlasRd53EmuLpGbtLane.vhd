@@ -52,6 +52,7 @@ entity AtlasRd53EmuLpGbtLane is
       rxLinkUp        : in  slv(NUM_ELINK_G-1 downto 0);
       -- SFP Interface
       refClk160       : in  sl;  -- Using jitter clean FMC 320 MHz reference
+      drpClk          : in sl;
       rxRecClk        : out sl;
       qplllock        : in  slv(1 downto 0);
       qplloutclk      : in  slv(1 downto 0);
@@ -185,7 +186,7 @@ begin
          qplloutrefclk       => qplloutrefclk,
          qpllRst             => qpllRst,
          clk_refclk_i        => refClk160,      -- CPLL using 160 MHz reference
-         clk_mgtfreedrpclk_i => axilClk,
+         clk_mgtfreedrpclk_i => drpClk,
          mgt_rxn_i           => sfpRxN,
          mgt_rxp_i           => sfpRxP,
          mgt_txn_o           => sfpTxN,

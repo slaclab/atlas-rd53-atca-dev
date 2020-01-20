@@ -129,6 +129,7 @@ architecture top_level of AtlasRd53FmcXilinxKcu105_EmuLpGbt is
 
    signal refClk160     : sl;
    signal rxRecClk      : sl;
+   signal drpClk        : sl;
    signal qplllock      : slv(1 downto 0);
    signal qplloutclk    : slv(1 downto 0);
    signal qplloutrefclk : slv(1 downto 0);
@@ -427,6 +428,7 @@ begin
          rxLinkUp(3)     => rxLinkUp(4*3),
          -- SFP Interface
          refClk160       => refClk160,
+         drpClk          => drpClk,
          rxRecClk        => rxRecClk,
          qplllock        => qplllock,
          qplloutclk      => qplloutclk,
@@ -438,5 +440,14 @@ begin
          sfpTxN          => sfpTxN(1),
          sfpRxP          => sfpRxP(1),
          sfpRxN          => sfpRxN(1));
+
+  U_drp_clk : BUFGCE_DIV
+     generic map (
+        BUFGCE_DIVIDE => 4)
+     port map (
+        I   => axilClk,       -- 156.25 MHz 
+        CE  => '1',
+        CLR => '0',
+        O   => drpClk);    -- 39.0625 MHz
 
 end top_level;
