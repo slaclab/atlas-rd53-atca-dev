@@ -239,7 +239,7 @@ begin
          TPD_G           => TPD_G,
          CLK_FREQUENCY_G => AXIL_CLK_FREQ_C,
          IP_ADDR_G       => x"0A02A8C0",  -- Set the default IP address before DHCP: 192.168.2.10 = x"0A02A8C0"
-         DHCP_G          => false,
+         DHCP_G          => true,       -- DHCP enabled
          JUMBO_G         => false)
       port map (
          extRst          => extRst,
@@ -297,7 +297,7 @@ begin
          clk160MHz     => clk160MHz,
          rst160MHz     => rst160MHz,
          -- PLL Clocking Interface
-         fpgaPllClkIn  => rxRecClk, -- emulation LP-GBT recovered clock used as jitter cleaner reference
+         fpgaPllClkIn  => rxRecClk,  -- emulation LP-GBT recovered clock used as jitter cleaner reference
          -- PLL SPI Interface
          pllRst        => x"0",
          pllCsL        => pllCsL,
@@ -441,13 +441,13 @@ begin
          sfpRxP          => sfpRxP(1),
          sfpRxN          => sfpRxN(1));
 
-  U_drp_clk : BUFGCE_DIV
-     generic map (
-        BUFGCE_DIVIDE => 4)
-     port map (
-        I   => axilClk,       -- 156.25 MHz 
-        CE  => '1',
-        CLR => '0',
-        O   => drpClk);    -- 39.0625 MHz
+   U_drp_clk : BUFGCE_DIV
+      generic map (
+         BUFGCE_DIVIDE => 4)
+      port map (
+         I   => axilClk,                -- 156.25 MHz 
+         CE  => '1',
+         CLR => '0',
+         O   => drpClk);                -- 39.0625 MHz
 
 end top_level;
