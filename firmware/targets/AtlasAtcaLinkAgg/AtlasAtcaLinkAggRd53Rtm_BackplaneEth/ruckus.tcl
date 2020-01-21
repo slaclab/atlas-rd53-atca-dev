@@ -5,7 +5,7 @@ source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 loadRuckusTcl $::env(TOP_DIR)/submodules/surf
 loadRuckusTcl $::env(TOP_DIR)/submodules/atlas-atca-link-agg-fw-lib
 loadRuckusTcl $::env(TOP_DIR)/submodules/atlas-rd53-fw-lib
-loadRuckusTcl $::env(TOP_DIR)/common
+loadSource -dir $::env(TOP_DIR)/common/rtl
 
 # Load local source Code and constraints
 loadSource      -dir "$::DIR_PATH/hdl"

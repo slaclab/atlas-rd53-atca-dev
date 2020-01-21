@@ -17,3 +17,7 @@ set_property top {LpGbt2EmuLpGbt_LinkingWithoutGthTb} [get_filesets sim_1]
 
 # Adding the common Si5345 configuration
 add_files -norecurse "$::DIR_PATH/pll-config/AtlasAtcaLinkAggRd53Rtm_EmuLpGbt.mem"
+
+# Remove out of scope .XDC files
+remove_files [get_files xlx_ku_mgt_ip_10g24_example_top.xdc]
+remove_files [get_files xlx_ku_mgt_ip_10g24.xdc]

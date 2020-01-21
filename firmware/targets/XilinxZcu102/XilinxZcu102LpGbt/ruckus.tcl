@@ -15,3 +15,7 @@ loadIpCore      -dir "$::DIR_PATH/ip"
 
 # Load the simulation testbed
 set_property top {LpGbt2EmuLpGbt_LinkingWithGthTb} [get_filesets sim_1]
+
+# Remove out of scope .XDC files
+remove_files [get_files xlx_ku_mgt_ip_10g24_emu_example_top.xdc]
+remove_files [get_files xlx_ku_mgt_ip_10g24_emu.xdc]

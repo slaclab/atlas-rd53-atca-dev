@@ -17,3 +17,7 @@ add_files -norecurse "$::DIR_PATH/pll-config/AtlasRd53FmcXilinxKcu105_EmuLpGbt.m
 
 # Load the simulation testbed
 set_property top {LpGbt2EmuLpGbt_LinkingWithGthTb} [get_filesets sim_1]
+
+# Remove out of scope .XDC files
+remove_files [get_files xlx_ku_mgt_ip_10g24_example_top.xdc]
+remove_files [get_files xlx_ku_mgt_ip_10g24.xdc]
