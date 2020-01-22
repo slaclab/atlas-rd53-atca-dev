@@ -32,6 +32,8 @@ build.info
 
 # Vivado Build
 build*
+.Xil*
+*.str
 
 # Only .bit.gz and .mcs.gz should be committed to git
 *.bit
