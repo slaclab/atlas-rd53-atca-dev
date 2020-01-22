@@ -49,9 +49,9 @@ architecture testbed of LpGbt2EmuLpGbt_LinkingWithGthTb is
    signal refClk160P : sl := '0';
    signal refClk160N : sl := '1';
 
-   signal axilClk : sl := '0';
-   signal drpClk  : sl := '0';
-   signal usrRst  : sl := '1';
+   signal axilClk : sl              := '0';
+   signal drpClk  : sl              := '0';
+   signal usrRst  : slv(1 downto 0) := (others => '1');
 
    signal gtEmuToLpP : sl := '0';
    signal gtEmuToLpN : sl := '1';
@@ -114,16 +114,17 @@ begin
       port map (
          clkP => refClk320P,
          clkN => refClk320N,
-         rst  => usrRst);
+         rst  => usrRst(0));
 
    U_refClk160 : entity surf.ClkRst
       generic map (
          CLK_PERIOD_G      => 6.25 ns,  -- 160 MHz
          RST_START_DELAY_G => 0 ns,
-         RST_HOLD_TIME_G   => 10 us)
+         RST_HOLD_TIME_G   => 100 us)
       port map (
          clkP => refClk160P,
-         clkN => refClk160N);
+         clkN => refClk160N,
+         rst  => usrRst(1));
 
    U_axilClk : entity surf.ClkRst
       generic map (
@@ -139,7 +140,7 @@ begin
          -- Down link
          donwlinkClk_o       => downlinkClk(0),
          downlinkClkEn_o     => downlinkClkEn(0),
-         downlinkRst_i       => usrRst,
+         downlinkRst_i       => usrRst(0),
          downlinkUserData_i  => downlinkCnt(0)(31 downto 0),
          downlinkEcData_i    => downlinkCnt(0)(33 downto 32),
          downlinkIcData_i    => downlinkCnt(0)(35 downto 34),
@@ -147,13 +148,13 @@ begin
          -- Up link
          uplinkClk_o         => uplinkClk(0),
          uplinkClkEn_o       => uplinkClkEn(0),
-         uplinkRst_i         => usrRst,
+         uplinkRst_i         => usrRst(0),
          uplinkUserData_o    => uplinkRaw(229 downto 0),
          uplinkEcData_o      => uplinkRaw(231 downto 230),
          uplinkIcData_o      => uplinkRaw(233 downto 232),
          uplinkReady_o       => uplinkReady(0),
          -- MGT
-         clk_refclk_i        => refClk320P, -- CPLL using 320 MHz reference
+         clk_refclk_i        => refClk320P,  -- CPLL using 320 MHz reference
          clk_mgtfreedrpclk_i => axilClk,
          mgt_rxn_i           => gtEmuToLpN,
          mgt_rxp_i           => gtEmuToLpP,
@@ -168,7 +169,7 @@ begin
          -- Up link
          uplinkClk_o         => uplinkClk(1),
          uplinkClkEn_o       => uplinkClkEn(1),
-         uplinkRst_i         => usrRst,
+         uplinkRst_i         => usrRst(1),
          uplinkUserData_i    => uplinkCnt(1)(229 downto 0),
          uplinkEcData_i      => uplinkCnt(1)(231 downto 230),
          uplinkIcData_i      => uplinkCnt(1)(233 downto 232),
@@ -176,7 +177,7 @@ begin
          -- Down link
          donwlinkClk_o       => downlinkClk(1),
          downlinkClkEn_o     => downlinkClkEn(1),
-         downlinkRst_i       => usrRst,
+         downlinkRst_i       => usrRst(1),
          downlinkUserData_o  => downlinkRaw(31 downto 0),
          downlinkEcData_o    => downlinkRaw(33 downto 32),
          downlinkIcData_o    => downlinkRaw(35 downto 34),
@@ -187,7 +188,7 @@ begin
          qplloutclk          => qplloutclk,
          qplloutrefclk       => qplloutrefclk,
          qpllRst             => qpllRst,
-         clk_refclk_i        => refClk160P, -- CPLL using 160 MHz reference
+         clk_refclk_i        => refClk160P,  -- CPLL using 160 MHz reference
          clk_mgtfreedrpclk_i => drpClk,
          mgt_rxn_i           => gtLpToEmuN,
          mgt_rxp_i           => gtLpToEmuP,
@@ -205,13 +206,13 @@ begin
          qplloutrefclk => qplloutrefclk,
          qpllRst       => qpllRst);
 
-  U_drp_clk : BUFGCE_DIV
-     generic map (
-        BUFGCE_DIVIDE => 4)
-     port map (
-        I   => axilClk,       -- 156.25 MHz 
-        CE  => '1',
-        CLR => '0',
-        O   => drpClk);    -- 39.0625 MHz
+   U_drp_clk : BUFGCE_DIV
+      generic map (
+         BUFGCE_DIVIDE => 4)
+      port map (
+         I   => axilClk,                -- 156.25 MHz 
+         CE  => '1',
+         CLR => '0',
+         O   => drpClk);                -- 39.0625 MHz
 
 end testbed;

@@ -160,8 +160,7 @@ architecture mapping of Application is
    signal clk160MHz : sl;
    signal rst160MHz : sl;
 
-   signal smaClk   : sl;
-   signal smaClock : sl;
+   signal smaClk : sl;
 
    signal iDelayCtrlRdy : sl;
    signal refClk300MHz  : sl;
@@ -182,6 +181,21 @@ architecture mapping of Application is
    attribute KEEP_HIERARCHY of U_IDELAYCTRL : label is "TRUE";
 
 begin
+
+   -------------------------
+   -- Terminate Unused Ports
+   -------------------------
+   U_smaClk : IBUFDS_GTE4
+      generic map (
+         REFCLK_EN_TX_PATH  => '0',
+         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
+         REFCLK_ICNTL_RX    => "00")
+      port map (
+         I     => smaClkP,
+         IB    => smaClkN,
+         CEB   => '0',
+         ODIV2 => smaClk,
+         O     => open);
 
    NOT_SIM : if (SIMULATION_G = false) generate
 
@@ -291,17 +305,17 @@ begin
          TPD_G => TPD_G)
       port map (
          clk    => ref160Clk,
-         rstIn  => ref156Rst,
+         rstIn  => axilRst,
          rstOut => ref160Rst);
-         
-  U_drp_clk : BUFGCE_DIV
-     generic map (
-        BUFGCE_DIVIDE => 4)
-     port map (
-        I   => axilClk,       -- 156.25 MHz 
-        CE  => '1',
-        CLR => '0',
-        O   => drpClk);    -- 39.0625 MHz         
+
+   U_drp_clk : BUFGCE_DIV
+      generic map (
+         BUFGCE_DIVIDE => 4)
+      port map (
+         I   => axilClk,                -- 156.25 MHz 
+         CE  => '1',
+         CLR => '0',
+         O   => drpClk);                -- 39.0625 MHz         
 
    --------------------------
    -- Reference 300 MHz clock 

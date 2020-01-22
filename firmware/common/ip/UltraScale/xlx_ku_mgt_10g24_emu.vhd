@@ -89,7 +89,6 @@ architecture structural of xlx_ku_mgt_10g24_emu is
 
    component xlx_ku_mgt_ip_10g24_emu
       port (
-         -- gtwiz_userclk_tx_reset_in          : in  std_logic_vector(0 downto 0);
          gtwiz_userclk_tx_active_in         : in  std_logic_vector(0 downto 0);
          gtwiz_userclk_rx_active_in         : in  std_logic_vector(0 downto 0);
          gtwiz_buffbypass_rx_reset_in       : in  std_logic_vector(0 downto 0);
@@ -108,7 +107,7 @@ architecture structural of xlx_ku_mgt_10g24_emu is
          gtwiz_reset_rx_done_out            : out std_logic_vector(0 downto 0);
          gtwiz_reset_qpll0reset_out         : out std_logic_vector(0 downto 0);
          gtwiz_userdata_tx_in               : in  std_logic_vector(63 downto 0);
-         gtwiz_userdata_rx_out              : out std_logic_vector(63 downto 0);
+         gtwiz_userdata_rx_out              : out std_logic_vector(31 downto 0);
          drpaddr_in                         : in  std_logic_vector(8 downto 0);
          drpclk_in                          : in  std_logic_vector(0 downto 0);
          drpdi_in                           : in  std_logic_vector(15 downto 0);
@@ -161,7 +160,7 @@ architecture structural of xlx_ku_mgt_10g24_emu is
       generic (
          P_CONTENTS                     : natural := 0;
          P_FREQ_RATIO_SOURCE_TO_USRCLK  : natural := 1;
-         P_FREQ_RATIO_USRCLK_TO_USRCLK2 : natural := 2);
+         P_FREQ_RATIO_USRCLK_TO_USRCLK2 : natural := 1);
       port (
          gtwiz_userclk_rx_srcclk_in   : in  std_logic;
          gtwiz_userclk_rx_reset_in    : in  std_logic;
@@ -186,8 +185,8 @@ architecture structural of xlx_ku_mgt_10g24_emu is
    signal rx_reset_sig : std_logic := '0';
    signal tx_reset_sig : std_logic := '0';
 
-   signal MGT_USRWORD_os_s : std_logic_vector(255 downto 0) := (others => '0');
-   signal MGT_USRWORD_RX_s : std_logic_vector(63 downto 0)  := (others => '0');
+   signal MGT_USRWORD_os_s : std_logic_vector(127 downto 0) := (others => '0');
+   signal MGT_USRWORD_RX_s : std_logic_vector(31 downto 0)  := (others => '0');
    signal MGT_USRWORD_TX_s : std_logic_vector(63 downto 0)  := (others => '0');
 
    -- Clock signals
@@ -236,14 +235,14 @@ begin  --========####   Architecture Body   ####========--
          asyncRst => rxBuffBypassRst,
          syncRst  => gtwiz_buffbypass_rx_reset_in_s);
 
-   -- rxWordPipeline_proc : process(rx_reset_done, rx_wordclk_sig)
-   -- begin
-   -- if rx_reset_done = '0' then
-   -- MGT_USRWORD_o <= (others => '0');
-   -- elsif rising_edge(rx_wordclk_sig) then
-   -- MGT_USRWORD_o <= MGT_USRWORD_s;
-   -- end if;
-   -- end process;
+--   rxWordPipeline_proc : process(rx_reset_done, rx_wordclk_sig)
+--   begin
+--      if rx_reset_done = '0' then
+--         MGT_USRWORD_o <= (others => '0');
+--      elsif rising_edge(rx_wordclk_sig) then
+--         MGT_USRWORD_o <= MGT_USRWORD_s;
+--      end if;
+--   end process;
 
    gtwiz_userclk_tx_inst : xlx_ku_mgt_ip_10g24_emu_example_gtwiz_userclk_tx
       port map(
@@ -253,14 +252,16 @@ begin  --========####   Architecture Body   ####========--
          gtwiz_userclk_tx_usrclk2_out => tx_wordclk_sig,
          gtwiz_userclk_tx_active_out  => gtwiz_userclk_tx_active_int);
 
-   U_tx_wordclk : BUFGCE_DIV
-      generic map (
-         BUFGCE_DIVIDE => 4)
-      port map (
-         I   => tx_wordclk_sig,
-         CE  => '1',
-         CLR => '0',
-         O   => tx_wordclk40_sig);
+--   U_tx_wordclk : BUFGCE_DIV
+--      generic map (
+--         BUFGCE_DIVIDE => 4)
+--      port map (
+--         I   => tx_wordclk_sig,
+--         CE  => '1',
+--         CLR => '0',
+--         O   => tx_wordclk40_sig);
+
+   tx_wordclk40_sig <= rx_wordclk40_sig;
 
    gtwiz_userclk_rx_inst : xlx_ku_mgt_ip_10g24_emu_example_gtwiz_userclk_rx
       port map(
@@ -270,17 +271,16 @@ begin  --========####   Architecture Body   ####========--
          gtwiz_userclk_rx_usrclk2_out => rx_wordclk_sig,
          gtwiz_userclk_rx_active_out  => gtwiz_userclk_rx_active_int);
 
-   -- U_rx_wordclk : BUFGCE_DIV
-   -- generic map (
-   -- BUFGCE_DIVIDE => 4)
-   -- port map (
-   -- I   => rx_wordclk_sig,
-   -- CE  => '1',
-   -- CLR => '0',
-   -- O   => rx_wordclk40_sig);
+   U_rx_wordclk : BUFGCE_DIV
+      generic map (
+         BUFGCE_DIVIDE => 2)
+      port map (
+         I   => rx_wordclk_sig,
+         CE  => '1',
+         CLR => '0',
+         O   => rx_wordclk40_sig);
 
-   rx_wordclk40_sig <= rx_wordclk_sig;
-   MGT_RX_REC_CLK_o <= rx_wordclk_sig;
+   MGT_RX_REC_CLK_o <= rx_wordclk40_sig;
 
    U_Gearbox_TX : entity surf.AsyncGearbox
       generic map (
@@ -295,7 +295,7 @@ begin  --========####   Architecture Body   ####========--
       port map (
          -- Slave Interface
          slaveClk   => tx_wordclk40_sig,
-         slaveRst   => '0',
+         slaveRst   => gtwiz_buffbypass_rx_reset_in_s,
          slaveData  => MGT_USRWORD_i,
          -- Master Interface
          masterClk  => tx_wordclk_sig,
@@ -303,21 +303,29 @@ begin  --========####   Architecture Body   ####========--
          masterData => MGT_USRWORD_TX_s);
 
    EMULATE_OVERSAMPLING :
-   for i in 63 downto 0 generate
+   for i in 31 downto 0 generate
       MGT_USRWORD_os_s((4*i)+3 downto (4*i)) <= (others => MGT_USRWORD_RX_s(i));
    end generate EMULATE_OVERSAMPLING;
 
-   U_Gearbox_RX : entity surf.Gearbox
+   U_Gearbox_RX : entity surf.AsyncGearbox
       generic map (
-         SLAVE_WIDTH_G  => 256,
-         MASTER_WIDTH_G => 256)
+         SLAVE_WIDTH_G        => 128,
+         MASTER_WIDTH_G       => 256,
+         -- Pipelining generics
+         INPUT_PIPE_STAGES_G  => 0,
+         OUTPUT_PIPE_STAGES_G => 0,
+         -- Async FIFO generics
+         FIFO_MEMORY_TYPE_G   => "distributed",
+         FIFO_ADDR_WIDTH_G    => 5)
       port map (
          slip       => MGT_RXSlide_i,
-         clk        => rx_wordclk_sig,
-         rst        => '0',
          -- Slave Interface
+         slaveClk   => rx_wordclk_sig,
+         slaveRst   => '0',
          slaveData  => MGT_USRWORD_os_s,
          -- Master Interface
+         masterClk  => rx_wordclk40_sig,
+         masterRst  => gtwiz_buffbypass_rx_reset_in_s,
          masterData => MGT_USRWORD_o);
 
    xlx_ku_mgt_std_i : xlx_ku_mgt_ip_10g24_emu

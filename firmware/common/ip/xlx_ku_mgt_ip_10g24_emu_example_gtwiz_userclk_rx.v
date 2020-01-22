@@ -61,7 +61,7 @@ module xlx_ku_mgt_ip_10g24_emu_example_gtwiz_userclk_rx #(
 
   parameter integer P_CONTENTS                     = 0,
   parameter integer P_FREQ_RATIO_SOURCE_TO_USRCLK  = 1,
-  parameter integer P_FREQ_RATIO_USRCLK_TO_USRCLK2 = 2
+  parameter integer P_FREQ_RATIO_USRCLK_TO_USRCLK2 = 1
 
 )(
 
