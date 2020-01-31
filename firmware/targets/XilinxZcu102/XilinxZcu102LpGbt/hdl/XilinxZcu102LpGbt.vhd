@@ -139,6 +139,16 @@ architecture TOP_LEVEL of XilinxZcu102LpGbt is
    attribute KEEP_HIERARCHY                 : string;
    attribute KEEP_HIERARCHY of U_IDELAYCTRL : label is "TRUE";
 
+   attribute dont_touch                  : string;
+   attribute dont_touch of extRst        : signal is "TRUE";
+   attribute dont_touch of axilRst       : signal is "TRUE";
+   attribute dont_touch of coreRst       : signal is "TRUE";
+   attribute dont_touch of rst160MHz     : signal is "TRUE";
+   attribute dont_touch of downlinkUp    : signal is "TRUE";
+   attribute dont_touch of uplinkUp      : signal is "TRUE";
+   attribute dont_touch of iDelayCtrlRdy : signal is "TRUE";
+   attribute dont_touch of refRst300MHz  : signal is "TRUE";
+
 begin
 
    led(7 downto 4) <= downlinkUp;
