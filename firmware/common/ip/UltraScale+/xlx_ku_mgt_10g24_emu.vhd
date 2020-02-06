@@ -52,22 +52,17 @@ entity xlx_ku_mgt_10g24_emu is
       --=============--
       MGT_RXSlide_i : in std_logic;
 
-      MGT_ENTXCALIBIN_i : in std_logic;
-      MGT_TXCALIB_i     : in std_logic_vector(6 downto 0);
-
       --=============--
       -- Status      --
       --=============--
       MGT_TXREADY_o : out std_logic;
       MGT_RXREADY_o : out std_logic;
 
-      MGT_TX_ALIGNED_o : out std_logic;
-      MGT_TX_PIPHASE_o : out std_logic_vector(6 downto 0);
       --==============--
       -- Data         --
       --==============--
-      MGT_USRWORD_i    : in  std_logic_vector(255 downto 0);
-      MGT_USRWORD_o    : out std_logic_vector(255 downto 0);
+      MGT_USRWORD_i : in  std_logic_vector(255 downto 0);
+      MGT_USRWORD_o : out std_logic_vector(255 downto 0);
 
       --===============--
       -- Serial intf.  --
@@ -80,12 +75,7 @@ entity xlx_ku_mgt_10g24_emu is
       );
 end xlx_ku_mgt_10g24_emu;
 
---! @brief MGT - Transceiver
---! @details The MGT module implements all the logic required to send the GBT frame on high speed
---! links: resets modules for the transceiver, Tx PLL and alignement logic to align the received word with the 
---! GBT frame header.
 architecture structural of xlx_ku_mgt_10g24_emu is
-   --================================ Signal Declarations ================================--
 
    component xlx_ku_mgt_ip_10g24_emu
       port (
@@ -188,9 +178,10 @@ architecture structural of xlx_ku_mgt_10g24_emu is
    signal rx_reset_sig : std_logic := '0';
    signal tx_reset_sig : std_logic := '0';
 
-   signal MGT_USRWORD_os_s : std_logic_vector(127 downto 0) := (others => '0');
+   signal MGT_USRWORD_os_s : std_logic_vector(63 downto 0)  := (others => '0');
    signal MGT_USRWORD_RX_s : std_logic_vector(31 downto 0)  := (others => '0');
    signal MGT_USRWORD_TX_s : std_logic_vector(63 downto 0)  := (others => '0');
+   signal MGT_USRWORD_s    : std_logic_vector(255 downto 0) := (others => '0');
 
    -- Clock signals
    signal rx_wordclk_sig : std_logic := '0';
@@ -205,32 +196,50 @@ architecture structural of xlx_ku_mgt_10g24_emu is
    signal rxoutclk_sig : std_logic := '0';
    signal txoutclk_sig : std_logic := '0';
 
-   -- Tx phase aligner signals
-   signal MGT_TX_ALIGNED_s : std_logic := '0';
+   signal MGT_RXREADY_s : std_logic := '0';
 
-   signal MGT_FREEDRPCLK_sig : std_logic := '0';
+   signal rx_reset_done_all : std_logic := '0';
+   signal txValid           : std_logic := '0';
+   signal rxValid           : std_logic := '0';
 
---=================================================================================================--
-begin  --========####   Architecture Body   ####========-- 
---=================================================================================================--
+begin
 
-   --==================================== User Logic =====================================--
-
-   --=============--
-   -- Assignments --
-   --=============--              
-   MGT_TXREADY_o    <= tx_reset_done and MGT_TX_ALIGNED_s;
-   MGT_TX_ALIGNED_o <= MGT_TX_ALIGNED_s;
-
-   MGT_RXREADY_o <= rx_reset_done and rxfsm_reset_done;
-
-   MGT_RXUSRCLK_o <= rx_wordclk40_sig;
+   ----------
+   -- Outputs
+   ----------       
    MGT_TXUSRCLK_o <= tx_wordclk40_sig;
+   U_TXREADY : entity surf.RstSync
+      generic map(
+         IN_POLARITY_G  => '0',
+         OUT_POLARITY_G => '0')
+      port map(
+         clk      => tx_wordclk40_sig,
+         asyncRst => tx_reset_done,
+         syncRst  => MGT_TXREADY_o);
 
-   rx_reset_sig <= MGT_RXRESET_i or not(tx_reset_done and MGT_TX_ALIGNED_s);
+   MGT_RX_REC_CLK_o <= rx_wordclk40_sig;
+   MGT_RXUSRCLK_o   <= rx_wordclk40_sig;
+   MGT_RXREADY_o    <= MGT_RXREADY_s;
+   U_RXREADY : entity surf.RstSync
+      generic map(
+         IN_POLARITY_G  => '0',
+         OUT_POLARITY_G => '0')
+      port map(
+         clk      => rx_wordclk40_sig,
+         asyncRst => rx_reset_done_all,
+         syncRst  => MGT_RXREADY_s);
+
+   MGT_USRWORD_o <= MGT_USRWORD_s when(MGT_RXREADY_s = '1') else (others => '0');
+
+   ---------
+   -- Resets
+   ---------
+   rx_reset_sig <= MGT_RXRESET_i;
    tx_reset_sig <= MGT_TXRESET_i;
 
-   rxBuffBypassRst <= not(gtwiz_userclk_rx_active_int) or (not(tx_reset_done) and not(MGT_TX_ALIGNED_s));
+   rx_reset_done_all <= rx_reset_done and rxfsm_reset_done;
+
+   rxBuffBypassRst <= not(gtwiz_userclk_rx_active_int);
 
    resetDoneSynch_rx : entity surf.RstSync
       port map(
@@ -238,15 +247,9 @@ begin  --========####   Architecture Body   ####========--
          asyncRst => rxBuffBypassRst,
          syncRst  => gtwiz_buffbypass_rx_reset_in_s);
 
---   rxWordPipeline_proc : process(rx_reset_done, rx_wordclk_sig)
---   begin
---      if rx_reset_done = '0' then
---         MGT_USRWORD_o <= (others => '0');
---      elsif rising_edge(rx_wordclk_sig) then
---         MGT_USRWORD_o <= MGT_USRWORD_s;
---      end if;
---   end process;
-
+   ---------
+   -- Clocks
+   ---------
    gtwiz_userclk_tx_inst : xlx_ku_mgt_ip_10g24_emu_example_gtwiz_userclk_tx
       port map(
          gtwiz_userclk_tx_srcclk_in   => txoutclk_sig,
@@ -254,17 +257,6 @@ begin  --========####   Architecture Body   ####========--
          gtwiz_userclk_tx_usrclk_out  => tx_wordclk_int_sig,
          gtwiz_userclk_tx_usrclk2_out => tx_wordclk_sig,
          gtwiz_userclk_tx_active_out  => gtwiz_userclk_tx_active_int);
-
---   U_tx_wordclk : BUFGCE_DIV
---      generic map (
---         BUFGCE_DIVIDE => 4)
---      port map (
---         I   => tx_wordclk_sig,
---         CE  => '1',
---         CLR => '0',
---         O   => tx_wordclk40_sig);
-
-   tx_wordclk40_sig <= rx_wordclk40_sig;
 
    gtwiz_userclk_rx_inst : xlx_ku_mgt_ip_10g24_emu_example_gtwiz_userclk_rx
       port map(
@@ -283,8 +275,11 @@ begin  --========####   Architecture Body   ####========--
          CLR => '0',
          O   => rx_wordclk40_sig);
 
-   MGT_RX_REC_CLK_o <= rx_wordclk40_sig;
+   tx_wordclk40_sig <= rx_wordclk40_sig;
 
+   ------------------
+   -- Gearbox Modules
+   ------------------
    U_Gearbox_TX : entity surf.AsyncGearbox
       generic map (
          SLAVE_WIDTH_G        => 256,
@@ -298,39 +293,52 @@ begin  --========####   Architecture Body   ####========--
       port map (
          -- Slave Interface
          slaveClk   => tx_wordclk40_sig,
-         slaveRst   => gtwiz_buffbypass_rx_reset_in_s,
+         slaveRst   => '0',
          slaveData  => MGT_USRWORD_i,
+         slaveValid => txValid,
          -- Master Interface
          masterClk  => tx_wordclk_sig,
          masterRst  => '0',
          masterData => MGT_USRWORD_TX_s);
 
-   EMULATE_OVERSAMPLING :
-   for i in 31 downto 0 generate
-      MGT_USRWORD_os_s((4*i)+3 downto (4*i)) <= (others => MGT_USRWORD_RX_s(i));
-   end generate EMULATE_OVERSAMPLING;
+   U_txValid : entity surf.Synchronizer
+      port map(
+         clk     => tx_wordclk40_sig,
+         dataIn  => tx_reset_done,
+         dataOut => txValid);
 
    U_Gearbox_RX : entity surf.AsyncGearbox
       generic map (
-         SLAVE_WIDTH_G        => 128,
-         MASTER_WIDTH_G       => 256,
-         -- Pipelining generics
-         INPUT_PIPE_STAGES_G  => 0,
-         OUTPUT_PIPE_STAGES_G => 0,
-         -- Async FIFO generics
-         FIFO_MEMORY_TYPE_G   => "distributed",
-         FIFO_ADDR_WIDTH_G    => 5)
+         SLAVE_WIDTH_G  => 32,
+         MASTER_WIDTH_G => 64)
       port map (
          slip       => MGT_RXSlide_i,
          -- Slave Interface
          slaveClk   => rx_wordclk_sig,
          slaveRst   => '0',
-         slaveData  => MGT_USRWORD_os_s,
+         slaveData  => MGT_USRWORD_RX_s,
+         slaveValid => rxValid,
          -- Master Interface
          masterClk  => rx_wordclk40_sig,
-         masterRst  => gtwiz_buffbypass_rx_reset_in_s,
-         masterData => MGT_USRWORD_o);
+         masterRst  => '0',
+         masterData => MGT_USRWORD_os_s);
 
+   U_rxValid : entity surf.Synchronizer
+      port map(
+         clk     => rx_wordclk_sig,
+         dataIn  => rx_reset_done_all,
+         dataOut => rxValid);
+
+   process(MGT_USRWORD_os_s)
+   begin
+      for i in 63 downto 0 loop
+         MGT_USRWORD_s((4*i)+3 downto (4*i)) <= (others => MGT_USRWORD_os_s(i));
+      end loop;
+   end process;
+
+   -------------
+   -- GTH Module
+   -------------
    xlx_ku_mgt_std_i : xlx_ku_mgt_ip_10g24_emu
       port map (
 
@@ -358,7 +366,7 @@ begin  --========####   Architecture Body   ####========--
          gtwiz_buffbypass_rx_done_out(0)      => rxfsm_reset_done,
          gtwiz_buffbypass_rx_error_out        => open,
 
-         gtwiz_reset_clk_freerun_in(0) => MGT_FREEDRPCLK_sig,
+         gtwiz_reset_clk_freerun_in(0) => MGT_FREEDRPCLK_i,  -- 156.25 MHz/4 = 39.0625 MHz
 
          gtwiz_reset_all_in(0)                 => MGT_RXRESET_i,
          gtwiz_reset_tx_pll_and_datapath_in(0) => tx_reset_sig,
@@ -373,7 +381,7 @@ begin  --========####   Architecture Body   ####========--
          gtwiz_userdata_tx_in  => MGT_USRWORD_TX_s,
          gtwiz_userdata_rx_out => MGT_USRWORD_RX_s,
 
-         drpclk_in(0) => MGT_FREEDRPCLK_sig,
+         drpclk_in(0) => MGT_FREEDRPCLK_i,  -- 156.25 MHz/4 = 39.0625 MHz
 
          gthrxn_in(0)  => RXn_i,
          gthrxp_in(0)  => RXp_i,
@@ -382,8 +390,7 @@ begin  --========####   Architecture Body   ####========--
 
          gtrefclk0_in(0) => MGT_REFCLK_i,
 
-         -- rxslide_in(0) => MGT_RXSlide_i,
-         rxslide_in(0) => '0',
+         rxslide_in(0) => '0',          -- Using ASYNC GEARBOX instead
 
          rxpmaresetdone_out(0) => rxpmaresetdone,
          txpmaresetdone_out(0) => txpmaresetdone,
@@ -406,19 +413,4 @@ begin  --========####   Architecture Body   ####========--
          -- Tx buffer status
          txbufstatus_out => open);
 
-   MGT_TX_ALIGNED_s <= tx_reset_done;
-
-   MGT_FREEDRPCLK_sig <= MGT_FREEDRPCLK_i;
---   U_drp_clk : BUFGCE_DIV
---      generic map (
---         BUFGCE_DIVIDE => 4)
---      port map (
---         I   => MGT_FREEDRPCLK_i,       -- 156.25 MHz 
---         CE  => '1',
---         CLR => '0',
---         O   => MGT_FREEDRPCLK_sig);    -- 39.0625 MHz
-
 end structural;
---=================================================================================================--
---#################################################################################################--
---=================================================================================================--

@@ -49,17 +49,24 @@ class RudpRoot(pr.Root):
         
         # Add Jitter cleaner PLL device
         self.add(silabs.Si5345(      
-            name        = 'Pll', 
-            description = 'firmware/submodules/surf/python/surf/devices/silabs/_Si5345.py', 
+            name        = 'Pll[0]', 
+            description = 'firmware/submodules/surf/python/surf/devices/silabs/_Si5345.py: FMC_HPC', 
             offset      = (1*0x0001_0000), 
             memBase     = self._srp,
         ))          
+        
+        self.add(silabs.Si5345(      
+            name        = 'Pll[1]', 
+            description = 'firmware/submodules/surf/python/surf/devices/silabs/_Si5345.py: FMC_LPC', 
+            offset      = (2*0x0001_0000), 
+            memBase     = self._srp,
+        ))                  
         
         # Add I2C GPIO device
         self.add(nxp.Pca9506(      
             name        = 'Gpio', 
             description = 'firmware/submodules/surf/python/surf/devices/nxp/_Pca9506.py', 
-            offset      = (2*0x0001_0000 + 0*0x0000_0400), 
+            offset      = (3*0x0001_0000 + 0*0x0000_0400), 
             memBase     = self._srp,
         ))          
         
@@ -67,6 +74,6 @@ class RudpRoot(pr.Root):
         self.add(ti.Lmk61e2(      
             name        = 'Lmk', 
             description = 'firmware/submodules/surf/python/surf/devices/ti/_Lmk61e2.py', 
-            offset      = (2*0x0001_0000 + 1*0x0000_0400), 
+            offset      = (4*0x0001_0000 + 1*0x0000_0400), 
             memBase     = self._srp,
         ))           

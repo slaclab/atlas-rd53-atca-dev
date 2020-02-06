@@ -36,13 +36,16 @@ set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 DQS_BIAS TRUE EQUALI
 set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 DQS_BIAS TRUE EQUALIZATION EQ_LEVEL0 } [get_ports { fmcHpc0LaP[23] fmcHpc0LaN[23] }]; # DATA[3][2] BANK67:(L16/K16)
 set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 DQS_BIAS TRUE EQUALIZATION EQ_LEVEL0 } [get_ports { fmcHpc0LaP[24] fmcHpc0LaN[24] }]; # DATA[3][3] BANK67:(L12/K12)
 
+set_property -dict { IOSTANDARD LVDS DIFF_TERM TRUE } [get_ports { fmcHpc0LaP[26] fmcHpc0LaN[26] }]; # TLU_INT
+set_property -dict { IOSTANDARD LVDS DIFF_TERM TRUE } [get_ports { fmcHpc0LaP[27] fmcHpc0LaN[27] }]; # TLU_RST
+
+set_property -dict { IOSTANDARD LVDS } [get_ports { fmcHpc0LaP[28] fmcHpc0LaN[28] }]; # TLU_BSY
+set_property -dict { IOSTANDARD LVDS } [get_ports { fmcHpc0LaP[29] fmcHpc0LaN[29] }]; # TLU_TRG_CLK
+
 ##############################################################################
 
 set_property PACKAGE_PIN G8 [get_ports { gtRefClk320P }]
 set_property PACKAGE_PIN G7 [get_ports { gtRefClk320N }]
-
-set_property PACKAGE_PIN L27 [get_ports { userClk156P }]
-set_property PACKAGE_PIN L28 [get_ports { userClk156N }]
 
 ##############################################################################
 
@@ -51,12 +54,9 @@ set_property PACKAGE_PIN L28 [get_ports { userClk156N }]
 ####################
 
 create_clock -name gtRefClk320P -period 3.118 [get_ports {gtRefClk320P} ]
-create_clock -name userClk156P  -period 6.400 [get_ports {userClk156P} ]
 
 create_clock -name fmcHpc0LaP0 -period 6.237 [get_ports {fmcHpc0LaP[0]}]
 create_clock -name fmcHpc0LaP1 -period 6.237 [get_ports {fmcHpc0LaP[1]}]
-
-create_generated_clock -name clk300MHz [get_pins {U_MMCM/MmcmGen.U_Mmcm/CLKOUT0}]
 
 create_generated_clock -name clk640MHz [get_pins {U_FmcMapping/U_Selectio/GEN_REAL.U_PLL/CLKOUT0}]
 create_generated_clock -name clk160MHz [get_pins {U_FmcMapping/U_Selectio/U_Bufg160/O}]
@@ -68,7 +68,6 @@ set_clock_groups -asynchronous -group [get_clocks {clk125}] -group [get_clocks -
 
 set_clock_groups -asynchronous \
    -group [get_clocks -include_generated_clocks {gtRefClk320P}] \
-   -group [get_clocks -include_generated_clocks {userClk156P}] \
    -group [get_clocks {clk200}] \  
    -group [get_clocks {clk125}]
 
@@ -88,3 +87,13 @@ set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets U_FmcMapping/GEN_PLL_CLK[1].U
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins {GEN_SFP[*].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/U_tx_wordclk/O}]] -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Bufg160/O]]
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_PLL/PllGen.U_Pll/CLKOUT0]] -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Bufg160/O]]
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins {GEN_SFP[*].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/U_rx_wordclk/O}]] -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Bufg160/O]]
+
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Bufg160/O]] -group [get_clocks gtRefClk320P]
+
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_PLL/PllGen.U_Pll/CLKOUT0]] -group [get_clocks -of_objects [get_pins {GEN_SFP[*].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/U_tx_wordclk/O}]]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_PLL/PllGen.U_Pll/CLKOUT0]] -group [get_clocks -of_objects [get_pins {GEN_SFP[*].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/U_rx_wordclk/O}]]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_PLL/PllGen.U_Pll/CLKOUT0]] -group [get_clocks -of_objects [get_pins U_Core/U_RceG3Top/U_RceG3Clocks/U_MMCM/MmcmGen.U_Mmcm/CLKOUT3]]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_PLL/PllGen.U_Pll/CLKOUT0]] -group [get_clocks -of_objects [get_pins U_Core/U_RceG3Top/U_RceG3Clocks/U_MMCM/MmcmGen.U_Mmcm/CLKOUT0]]
+
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins {GEN_SFP[*].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/U_tx_wordclk/O}]] -group [get_clocks -of_objects [get_pins {GEN_SFP[*].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/gtwiz_userclk_tx_inst/gen_gtwiz_userclk_tx_main.bufg_gt_usrclk2_inst/O}]]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins {GEN_SFP[*].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/U_rx_wordclk/O}]] -group [get_clocks -of_objects [get_pins {GEN_SFP[*].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/gtwiz_userclk_rx_inst/gen_gtwiz_userclk_rx_main.bufg_gt_usrclk2_inst/O}]]

@@ -71,21 +71,19 @@ architecture mapping of LpGbtFpga10g24 is
    signal mgt_txrdy_s   : std_logic := '0';
    signal mgt_rxrdy_s   : std_logic := '0';
 
+   signal downlinkReady_s : std_logic := '0';
    signal downlinkClk_s   : std_logic := '0';
    signal downlinkClkEn_s : std_logic := '1';
 
+   signal uplinkReady_s : std_logic := '0';
    signal uplinkClk_s   : std_logic := '0';
    signal uplinkClkEn_s : std_logic := '1';
 
 begin
 
    donwlinkClk_o   <= downlinkClk_s;
-   downlinkClkEn_o <= downlinkClkEn_s;
-   U_downlinkClkEn : entity surf.Synchronizer
-      port map (
-         clk     => downlinkClk_s,
-         dataIn  => mgt_txrdy_s,
-         dataOut => downlinkClkEn_s);   
+   downlinkClkEn_o <= mgt_txrdy_s;
+   downlinkReady_o <= mgt_txrdy_s and downlinkReady_s;
 
    downlink_inst : entity work.lpgbtfpga_Downlink
       generic map(
@@ -109,48 +107,47 @@ begin
          encoderBypass_i     => downLinkBypassFECEncoder_i,
          scramblerBypass_i   => downLinkBypassScrambler_i,
          -- Status
-         rdy_o               => downlinkReady_o);
+         rdy_o               => downlinkReady_s);
 
    mgt_inst : entity work.xlx_ku_mgt_10g24
       port map(
          --=============--
          -- Clocks      --
          --=============--
-         MGT_REFCLK_i      => clk_refclk_i,
-         MGT_FREEDRPCLK_i  => clk_mgtfreedrpclk_i,
-         MGT_TXUSRCLK_o    => downlinkClk_s,
-         MGT_RXUSRCLK_o    => uplinkClk_s,
+         MGT_REFCLK_i     => clk_refclk_i,
+         MGT_FREEDRPCLK_i => clk_mgtfreedrpclk_i,
+         MGT_TXUSRCLK_o   => downlinkClk_s,
+         MGT_RXUSRCLK_o   => uplinkClk_s,
          --=============--
          -- Resets      --
          --=============--
-         MGT_TXRESET_i     => downlinkRst_i,
-         MGT_RXRESET_i     => uplinkRst_i,
+         MGT_TXRESET_i    => downlinkRst_i,
+         MGT_RXRESET_i    => uplinkRst_i,
          --=============--
          -- Control     --
          --=============--
-         MGT_RXSlide_i     => mgt_rxslide_s,
-         MGT_ENTXCALIBIN_i => '0',
-         MGT_TXCALIB_i     => (others => '0'),
+         MGT_RXSlide_i    => mgt_rxslide_s,
          --=============--
          -- Status      --
          --=============--
-         MGT_TXREADY_o     => mgt_txrdy_s,
-         MGT_RXREADY_o     => mgt_rxrdy_s,
+         MGT_TXREADY_o    => mgt_txrdy_s,
+         MGT_RXREADY_o    => mgt_rxrdy_s,
          --==============--
          -- Data         --
          --==============--
-         MGT_USRWORD_i     => downlink_mgtword_s,
-         MGT_USRWORD_o     => uplink_mgtword_s,
+         MGT_USRWORD_i    => downlink_mgtword_s,
+         MGT_USRWORD_o    => uplink_mgtword_s,
          --===============--
          -- Serial intf.  --
          --===============--
-         RXn_i             => mgt_rxn_i,
-         RXp_i             => mgt_rxp_i,
-         TXn_o             => mgt_txn_o,
-         TXp_o             => mgt_txp_o);
+         RXn_i            => mgt_rxn_i,
+         RXp_i            => mgt_rxp_i,
+         TXn_o            => mgt_txn_o,
+         TXp_o            => mgt_txp_o);
 
    uplinkClk_o   <= uplinkClk_s;
-   uplinkClkEn_o <= uplinkClkEn_s;
+   uplinkClkEn_o <= mgt_rxrdy_s and uplinkReady_s and uplinkClkEn_s;
+   uplinkReady_o <= mgt_rxrdy_s and uplinkReady_s;
 
    uplink_inst : entity work.lpgbtfpga_Uplink
       generic map(
@@ -188,6 +185,6 @@ begin
          dataCorrected_o      => open,
          IcCorrected_o        => open,
          EcCorrected_o        => open,
-         rdy_o                => uplinkReady_o);
+         rdy_o                => uplinkReady_s);
 
 end mapping;

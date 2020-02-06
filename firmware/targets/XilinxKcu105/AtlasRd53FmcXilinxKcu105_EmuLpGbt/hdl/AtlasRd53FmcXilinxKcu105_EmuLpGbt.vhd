@@ -52,13 +52,12 @@ entity AtlasRd53FmcXilinxKcu105_EmuLpGbt is
    port (
       extRst       : in    sl;
       led          : out   slv(7 downto 0);
-      -- External 160 MHz Reference clock
-      smaClkP      : in    sl;
-      smaClkN      : in    sl;
       -- 300Mhz System Clock
       sysClk300P   : in    sl;
       sysClk300N   : in    sl;
       -- FMC Interface
+      gtRefClk160P : in    sl;
+      gtRefClk160N : in    sl;
       gtRefClk320P : in    sl;
       gtRefClk320N : in    sl;
       fmcHpcLaP    : inout slv(33 downto 0);
@@ -94,12 +93,12 @@ architecture top_level of AtlasRd53FmcXilinxKcu105_EmuLpGbt is
 
    constant AXIL_CLK_FREQ_C : real := 156.25E+6;  -- Units of Hz
 
-   constant NUM_AXIL_MASTERS_C : positive := 4;
+   constant NUM_AXIL_MASTERS_C : positive := 5;
 
    constant VERSION_INDEX_C : natural := 0;
-   constant PLL_INDEX_C     : natural := 1;
-   constant I2C_INDEX_C     : natural := 2;
-   constant LP_GBT_INDEX_C  : natural := 3;
+   constant PLL_INDEX_C     : natural := 1; -- [1:2]
+   constant I2C_INDEX_C     : natural := 3; 
+   constant LP_GBT_INDEX_C  : natural := 4;
 
    constant AXIL_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXIL_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXIL_MASTERS_C, x"0000_0000", 20, 16);
 
@@ -180,8 +179,8 @@ begin
          REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
          REFCLK_ICNTL_RX    => "00")
       port map (
-         I     => smaClkP,
-         IB    => smaClkN,
+         I     => gtRefClk160P,
+         IB    => gtRefClk160N,
          CEB   => '0',
          ODIV2 => open,
          O     => refClk160);
@@ -334,7 +333,7 @@ begin
    --------------------
    -- AXI-Lite: PLL SPI
    --------------------
-   U_PLL : entity surf.Si5345
+   U_PLL0 : entity surf.Si5345
       generic map (
          TPD_G              => TPD_G,
          MEMORY_INIT_FILE_G => "AtlasRd53FmcXilinxKcu105_EmuLpGbt.mem",
@@ -344,15 +343,35 @@ begin
          -- AXI-Lite Register Interface
          axiClk         => axilClk,
          axiRst         => axilRst,
-         axiReadMaster  => axilReadMasters(PLL_INDEX_C),
-         axiReadSlave   => axilReadSlaves(PLL_INDEX_C),
-         axiWriteMaster => axilWriteMasters(PLL_INDEX_C),
-         axiWriteSlave  => axilWriteSlaves(PLL_INDEX_C),
+         axiReadMaster  => axilReadMasters(PLL_INDEX_C+0),
+         axiReadSlave   => axilReadSlaves(PLL_INDEX_C+0),
+         axiWriteMaster => axilWriteMasters(PLL_INDEX_C+0),
+         axiWriteSlave  => axilWriteSlaves(PLL_INDEX_C+0),
          -- SPI Ports
          coreSclk       => pllSck,
          coreSDin       => pllSdo,
          coreSDout      => pllSdi,
          coreCsb        => pllCsL);
+         
+   U_PLL1 : entity surf.Si5345
+      generic map (
+         TPD_G              => TPD_G,
+         MEMORY_INIT_FILE_G => "AtlasRd53FmcXilinxKcu105_lpcRefClk.mem",
+         CLK_PERIOD_G       => (1/AXIL_CLK_FREQ_C),
+         SPI_SCLK_PERIOD_G  => (1/10.0E+6))  -- 1/(10 MHz SCLK)
+      port map (
+         -- AXI-Lite Register Interface
+         axiClk         => axilClk,
+         axiRst         => axilRst,
+         axiReadMaster  => axilReadMasters(PLL_INDEX_C+1),
+         axiReadSlave   => axilReadSlaves(PLL_INDEX_C+1),
+         axiWriteMaster => axilWriteMasters(PLL_INDEX_C+1),
+         axiWriteSlave  => axilWriteSlaves(PLL_INDEX_C+1),
+         -- SPI Ports
+         coreSclk       => fmcLpcLaP(3),
+         coreSDin       => fmcLpcLaN(4),
+         coreSDout      => fmcLpcLaN(3),
+         coreCsb        => fmcLpcLaP(4));         
 
    ---------------------------
    -- AXI-Lite: I2C Reg Access

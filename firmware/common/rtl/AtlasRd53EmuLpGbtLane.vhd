@@ -97,6 +97,7 @@ architecture rtl of AtlasRd53EmuLpGbtLane is
    signal uplinkClkEn    : sl;
 
    signal reset160MHz : sl;
+   signal pwrUpRst    : sl;
 
 begin
 
@@ -166,7 +167,7 @@ begin
          -- Up link
          uplinkClk_o         => uplinkClk,      -- 40 MHz
          uplinkClkEn_o       => uplinkClkEn,    -- 40 MHz strobe
-         uplinkRst_i         => uplinkRst,
+         uplinkRst_i         => pwrUpRst,       -- ASYNC RST
          uplinkUserData_i    => uplinkUserData,
          uplinkEcData_i      => uplinkEcData,
          uplinkIcData_i      => uplinkIcData,
@@ -174,7 +175,7 @@ begin
          -- Down link
          donwlinkClk_o       => donwlinkClk,    -- 40 MHz
          downlinkClkEn_o     => downlinkClkEn,  -- 40 MHz strobe
-         downlinkRst_i       => downlinkRst,
+         downlinkRst_i       => pwrUpRst,       -- ASYNC RST
          downlinkUserData_o  => downlinkUserData,
          downlinkEcData_o    => downlinkEcData,
          downlinkIcData_o    => downlinkIcData,
@@ -192,6 +193,14 @@ begin
          mgt_txn_o           => sfpTxN,
          mgt_txp_o           => sfpTxP);
 
+   U_pwrUpRst : entity surf.PwrUpRst
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         arst   => axilRst,
+         clk    => axilClk,
+         rstOut => pwrUpRst);
+         
    ---------------------------
    -- Generate the downlinkRst
    ---------------------------

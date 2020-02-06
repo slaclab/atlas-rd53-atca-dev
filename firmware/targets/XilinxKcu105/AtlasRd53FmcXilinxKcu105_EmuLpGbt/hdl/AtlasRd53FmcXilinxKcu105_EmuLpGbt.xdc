@@ -47,11 +47,14 @@ set_property -dict { IOSTANDARD LVDS } [get_ports { fmcHpcLaP[29] fmcHpcLaN[29] 
 set_property PACKAGE_PIN K6 [get_ports { gtRefClk320P }]
 set_property PACKAGE_PIN K5 [get_ports { gtRefClk320N }]
 
+set_property PACKAGE_PIN T6 [get_ports { gtRefClk160P }]
+set_property PACKAGE_PIN T5 [get_ports { gtRefClk160N }]
+
 ####################
 # Timing Constraints
 ####################
 
-create_clock -name smaClkP      -period 6.237 [get_ports {smaClkP}]
+create_clock -name gtRefClk160P -period 6.237 [get_ports {gtRefClk160P}]
 create_clock -name fmcHpcLaP0   -period 6.237 [get_ports {fmcHpcLaP[0]}]
 create_clock -name fmcHpcLaP1   -period 6.237 [get_ports {fmcHpcLaP[1]}]
 create_clock -name gtRefClk320P -period 3.118 [get_ports {gtRefClk320P}]
@@ -74,3 +77,10 @@ set_property CLOCK_DELAY_GROUP RD53_CLK_GRP [get_nets {U_FmcMapping/U_Selectio/c
 
 set_property UNAVAILABLE_DURING_CALIBRATION TRUE [get_ports fmcHpcLaP[10]]
 set_property UNAVAILABLE_DURING_CALIBRATION TRUE [get_ports fmcHpcLaP[20]]
+
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Bufg160/O]] -group [get_clocks sfpClk156P]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins {U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/xlx_ku_mgt_std_i/inst/gen_gtwizard_gthe3_top.xlx_ku_mgt_ip_10g24_emu_gtwizard_gthe3_inst/gen_gtwizard_gthe3.gen_channel_container[0].gen_enabled_channel.gthe3_channel_wrapper_inst/channel_inst/gthe3_channel_gen.gen_gthe3_channel_inst[0].GTHE3_CHANNEL_PRIM_INST/RXOUTCLK}]] -group [get_clocks sfpClk156P]
+set_clock_groups -asynchronous -group [get_clocks sysClk300P] -group [get_clocks sfpClk156P]
+
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_drp_clk/O]] -group [get_clocks -of_objects [get_pins U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/U_rx_wordclk/O]]
+set_clock_groups -asynchronous -group [get_clocks sysClk300P] -group [get_clocks -of_objects [get_pins U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/U_rx_wordclk/O]]

@@ -45,17 +45,12 @@ entity xlx_ku_mgt_10g24 is
       --=============--
       MGT_RXSlide_i : in std_logic;
 
-      MGT_ENTXCALIBIN_i : in std_logic;
-      MGT_TXCALIB_i     : in std_logic_vector(6 downto 0);
-
       --=============--
       -- Status      --
       --=============--
       MGT_TXREADY_o : out std_logic;
       MGT_RXREADY_o : out std_logic;
 
-      MGT_TX_ALIGNED_o : out std_logic;
-      MGT_TX_PIPHASE_o : out std_logic_vector(6 downto 0);
       --==============--
       -- Data         --
       --==============--
@@ -73,12 +68,7 @@ entity xlx_ku_mgt_10g24 is
       );
 end xlx_ku_mgt_10g24;
 
---! @brief MGT - Transceiver
---! @details The MGT module implements all the logic required to send the GBT frame on high speed
---! links: resets modules for the transceiver, Tx PLL and alignement logic to align the received word with the 
---! GBT frame header.
 architecture structural of xlx_ku_mgt_10g24 is
-   --================================ Signal Declarations ================================--
 
    component xlx_ku_mgt_ip_10g24
       port (
@@ -173,8 +163,9 @@ architecture structural of xlx_ku_mgt_10g24 is
    signal rx_reset_sig : std_logic := '0';
    signal tx_reset_sig : std_logic := '0';
 
-   signal MGT_USRWORD_RX_s : std_logic_vector(63 downto 0) := (others => '0');
-   signal MGT_USRWORD_TX_s : std_logic_vector(63 downto 0) := (others => '0');
+   signal MGT_USRWORD_RX_s : std_logic_vector(63 downto 0)  := (others => '0');
+   signal MGT_USRWORD_TX_s : std_logic_vector(63 downto 0)  := (others => '0');
+   signal MGT_USRWORD_s    : std_logic_vector(255 downto 0) := (others => '0');
 
    -- Clock signals
    signal rx_wordclk_sig : std_logic := '0';
@@ -189,30 +180,49 @@ architecture structural of xlx_ku_mgt_10g24 is
    signal rxoutclk_sig : std_logic := '0';
    signal txoutclk_sig : std_logic := '0';
 
-   -- Tx phase aligner signals
-   signal MGT_TX_ALIGNED_s : std_logic := '0';
+   signal MGT_RXREADY_s : std_logic := '0';
 
---=================================================================================================--
-begin  --========####   Architecture Body   ####========-- 
---=================================================================================================--
+   signal rx_reset_done_all : std_logic := '0';
+   signal txValid           : std_logic := '0';
+   signal rxValid           : std_logic := '0';
 
-   --==================================== User Logic =====================================--
+begin
 
-   --=============--
-   -- Assignments --
-   --=============--              
-   MGT_TXREADY_o    <= tx_reset_done and MGT_TX_ALIGNED_s;
-   MGT_TX_ALIGNED_o <= MGT_TX_ALIGNED_s;
-
-   MGT_RXREADY_o <= rx_reset_done and rxfsm_reset_done;
+   ----------
+   -- Outputs
+   ----------
+   MGT_TXUSRCLK_o <= tx_wordclk40_sig;
+   U_TXREADY : entity surf.RstSync
+      generic map(
+         IN_POLARITY_G  => '0',
+         OUT_POLARITY_G => '0')
+      port map(
+         clk      => tx_wordclk40_sig,
+         asyncRst => tx_reset_done,
+         syncRst  => MGT_TXREADY_o);
 
    MGT_RXUSRCLK_o <= rx_wordclk40_sig;
-   MGT_TXUSRCLK_o <= tx_wordclk40_sig;
+   MGT_RXREADY_o  <= MGT_RXREADY_s;
+   U_RXREADY : entity surf.RstSync
+      generic map(
+         IN_POLARITY_G  => '0',
+         OUT_POLARITY_G => '0')
+      port map(
+         clk      => rx_wordclk40_sig,
+         asyncRst => rx_reset_done_all,
+         syncRst  => MGT_RXREADY_s);
 
-   rx_reset_sig <= MGT_RXRESET_i or not(tx_reset_done and MGT_TX_ALIGNED_s);
+   MGT_USRWORD_o <= MGT_USRWORD_s when(MGT_RXREADY_s = '1') else (others => '0');
+
+   ---------
+   -- Resets
+   ---------
+   rx_reset_sig <= MGT_RXRESET_i or not(tx_reset_done);
    tx_reset_sig <= MGT_TXRESET_i;
 
-   rxBuffBypassRst <= not(gtwiz_userclk_rx_active_int) or (not(tx_reset_done) and not(MGT_TX_ALIGNED_s));
+   rx_reset_done_all <= rx_reset_done and rxfsm_reset_done;
+
+   rxBuffBypassRst <= not(gtwiz_userclk_rx_active_int) or not(tx_reset_done);
 
    resetDoneSynch_rx : entity surf.RstSync
       port map(
@@ -220,15 +230,9 @@ begin  --========####   Architecture Body   ####========--
          asyncRst => rxBuffBypassRst,
          syncRst  => gtwiz_buffbypass_rx_reset_in_s);
 
-   -- rxWordPipeline_proc : process(rx_reset_done, rx_wordclk_sig)
-   -- begin
-   -- if rx_reset_done = '0' then
-   -- MGT_USRWORD_o <= (others => '0');
-   -- elsif rising_edge(rx_wordclk_sig) then
-   -- MGT_USRWORD_o <= MGT_USRWORD_s;
-   -- end if;
-   -- end process;
-
+   ---------
+   -- Clocks
+   ---------
    gtwiz_userclk_tx_inst : xlx_ku_mgt_ip_10g24_example_gtwiz_userclk_tx
       port map(
          gtwiz_userclk_tx_srcclk_in   => txoutclk_sig,
@@ -263,47 +267,55 @@ begin  --========####   Architecture Body   ####========--
          CLR => '0',
          O   => rx_wordclk40_sig);
 
+   ------------------
+   -- Gearbox Modules
+   ------------------
    U_Gearbox_TX : entity surf.AsyncGearbox
       generic map (
-         SLAVE_WIDTH_G        => 256,
-         MASTER_WIDTH_G       => 64,
-         -- Pipelining generics
-         INPUT_PIPE_STAGES_G  => 0,
-         OUTPUT_PIPE_STAGES_G => 0,
-         -- Async FIFO generics
-         FIFO_MEMORY_TYPE_G   => "distributed",
-         FIFO_ADDR_WIDTH_G    => 5)
+         SLAVE_WIDTH_G  => 256,
+         MASTER_WIDTH_G => 64)
       port map (
          -- Slave Interface
-         slaveClk   => rx_wordclk40_sig,
+         slaveClk   => tx_wordclk40_sig,
          slaveRst   => '0',
          slaveData  => MGT_USRWORD_i,
+         slaveValid => txValid,
          -- Master Interface
-         masterClk  => rx_wordclk_sig,
+         masterClk  => tx_wordclk_sig,
          masterRst  => '0',
          masterData => MGT_USRWORD_TX_s);
 
+   U_txValid : entity surf.Synchronizer
+      port map(
+         clk     => tx_wordclk40_sig,
+         dataIn  => tx_reset_done,
+         dataOut => txValid);
+
    U_Gearbox_RX : entity surf.AsyncGearbox
       generic map (
-         SLAVE_WIDTH_G        => 64,
-         MASTER_WIDTH_G       => 256,
-         -- Pipelining generics
-         INPUT_PIPE_STAGES_G  => 0,
-         OUTPUT_PIPE_STAGES_G => 0,
-         -- Async FIFO generics
-         FIFO_MEMORY_TYPE_G   => "distributed",
-         FIFO_ADDR_WIDTH_G    => 5)
+         SLAVE_WIDTH_G  => 64,
+         MASTER_WIDTH_G => 256)
       port map (
          slip       => MGT_RXSlide_i,
          -- Slave Interface
          slaveClk   => rx_wordclk_sig,
          slaveRst   => '0',
          slaveData  => MGT_USRWORD_RX_s,
+         slaveValid => rxValid,
          -- Master Interface
          masterClk  => rx_wordclk40_sig,
          masterRst  => '0',
-         masterData => MGT_USRWORD_o);
+         masterData => MGT_USRWORD_s);
 
+   U_rxValid : entity surf.Synchronizer
+      port map(
+         clk     => rx_wordclk_sig,
+         dataIn  => rx_reset_done_all,
+         dataOut => rxValid);
+
+   -------------
+   -- GTH Module
+   -------------
    xlx_ku_mgt_std_i : xlx_ku_mgt_ip_10g24
       port map (
          rxusrclk_in(0)  => rx_wordclk_int_sig,
@@ -346,8 +358,7 @@ begin  --========####   Architecture Body   ####========--
 
          gtrefclk0_in(0) => MGT_REFCLK_i,
 
-         -- rxslide_in(0) => MGT_RXSlide_i,
-         rxslide_in(0) => '0',
+         rxslide_in(0) => '0',          -- Using ASYNC GEARBOX instead
 
          rxpmaresetdone_out(0) => rxpmaresetdone,
          txpmaresetdone_out(0) => txpmaresetdone,
@@ -370,9 +381,4 @@ begin  --========####   Architecture Body   ####========--
          -- Tx buffer status
          txbufstatus_out => open);
 
-   MGT_TX_ALIGNED_s <= tx_reset_done;
-
 end structural;
---=================================================================================================--
---#################################################################################################--
---=================================================================================================--

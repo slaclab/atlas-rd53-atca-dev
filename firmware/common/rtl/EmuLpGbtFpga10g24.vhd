@@ -90,59 +90,51 @@ architecture mapping of EmuLpGbtFpga10g24 is
 begin
 
    uplinkClk_o   <= uplinkClk_s;
-   uplinkClkEn_o <= uplinkClkEn_s;
-
-   U_uplinkClkEn : entity surf.Synchronizer
-      port map (
-         clk     => uplinkClk_s,
-         dataIn  => mgt_txrdy_s,
-         dataOut => uplinkClkEn_s);
+   uplinkClkEn_o <= mgt_txrdy_s and uplinkClkEn_s;
 
    donwlinkClk_o   <= downlinkClk_s;
-   downlinkClkEn_o <= downlinkClkEn_s;
+   downlinkClkEn_o <= mgt_rxrdy_s and downlinkClkEn_s;
 
    mgt_inst : entity work.xlx_ku_mgt_10g24_emu
       port map(
          --=============--
          -- Clocks      --
          --=============--
-         QPLL_LOCK_i       => qplllock,
-         QPLL_CLK_i        => qplloutclk,
-         QPLL_REFCLK_i     => qplloutrefclk,
-         QPLL_RST_o        => qpllRst,
-         MGT_RX_REC_CLK_o  => rxRecClk,
-         MGT_REFCLK_i      => clk_refclk_i,
-         MGT_FREEDRPCLK_i  => clk_mgtfreedrpclk_i,
-         MGT_TXUSRCLK_o    => uplinkClk_s,
-         MGT_RXUSRCLK_o    => downlinkClk_s,
+         QPLL_LOCK_i      => qplllock,
+         QPLL_CLK_i       => qplloutclk,
+         QPLL_REFCLK_i    => qplloutrefclk,
+         QPLL_RST_o       => qpllRst,
+         MGT_RX_REC_CLK_o => rxRecClk,
+         MGT_REFCLK_i     => clk_refclk_i,
+         MGT_FREEDRPCLK_i => clk_mgtfreedrpclk_i,
+         MGT_TXUSRCLK_o   => uplinkClk_s,
+         MGT_RXUSRCLK_o   => downlinkClk_s,
          --=============--
          -- Resets      --
          --=============--
-         MGT_TXRESET_i     => downlinkRst_i,
-         MGT_RXRESET_i     => uplinkRst_i,
+         MGT_TXRESET_i    => downlinkRst_i,
+         MGT_RXRESET_i    => uplinkRst_i,
          --=============--
          -- Control     --
          --=============--
-         MGT_RXSlide_i     => mgt_rxslide_s,
-         MGT_ENTXCALIBIN_i => '0',
-         MGT_TXCALIB_i     => (others => '0'),
+         MGT_RXSlide_i    => mgt_rxslide_s,
          --=============--
          -- Status      --
          --=============--
-         MGT_TXREADY_o     => mgt_txrdy_s,
-         MGT_RXREADY_o     => mgt_rxrdy_s,
+         MGT_TXREADY_o    => mgt_txrdy_s,
+         MGT_RXREADY_o    => mgt_rxrdy_s,
          --==============--
          -- Data         --
          --==============--
-         MGT_USRWORD_i     => uplink_mgtword_s,
-         MGT_USRWORD_o     => downlink_mgtword_s,
+         MGT_USRWORD_i    => uplink_mgtword_s,
+         MGT_USRWORD_o    => downlink_mgtword_s,
          --===============--
          -- Serial intf.  --
          --===============--
-         RXn_i             => mgt_rxn_i,
-         RXp_i             => mgt_rxp_i,
-         TXn_o             => mgt_txn_o,
-         TXp_o             => mgt_txp_o);
+         RXn_i            => mgt_rxn_i,
+         RXp_i            => mgt_rxp_i,
+         TXn_o            => mgt_txn_o,
+         TXp_o            => mgt_txp_o);
 
    U_lpgbtemul : entity work.lpgbtemul_top
       generic map(

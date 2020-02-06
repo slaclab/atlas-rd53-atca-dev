@@ -46,8 +46,6 @@ entity XilinxZcu102LpGbt is
       -- Clocks
       gtRefClk320P : in    sl;          -- FMC_HPC0_GBTCLK0_M2C_C_P
       gtRefClk320N : in    sl;          -- FMC_HPC0_GBTCLK0_M2C_C_N
-      userClk156P  : in    sl;          -- USER_MGT_SI570_CLOCK1_C_P
-      userClk156N  : in    sl;          -- USER_MGT_SI570_CLOCK1_C_N
       -- FMC Interface
       fmcHpc0LaP   : inout slv(33 downto 0);
       fmcHpc0LaN   : inout slv(33 downto 0);
@@ -62,6 +60,8 @@ entity XilinxZcu102LpGbt is
 end XilinxZcu102LpGbt;
 
 architecture TOP_LEVEL of XilinxZcu102LpGbt is
+
+   constant NUM_LP_GBT_LANES_C : positive range 1 to 4 := 1;
 
    constant PLL_GPIO_I2C_CONFIG_C : I2cAxiLiteDevArray(0 to 1) := (
       0              => MakeI2cAxiLiteDevType(
@@ -86,69 +86,59 @@ architecture TOP_LEVEL of XilinxZcu102LpGbt is
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXIL_MASTERS_C-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXIL_MASTERS_C-1 downto 0)  := (others => AXI_LITE_READ_SLAVE_EMPTY_OK_C);
 
-   signal axilClk         : sl;
-   signal axilRst         : sl;
+   signal axilClk         : sl                    := '0';
+   signal axilRst         : sl                    := '0';
    signal axilReadMaster  : AxiLiteReadMasterType;
-   signal axilReadSlave   : AxiLiteReadSlaveType;
+   signal axilReadSlave   : AxiLiteReadSlaveType  := AXI_LITE_READ_SLAVE_EMPTY_OK_C;
    signal axilWriteMaster : AxiLiteWriteMasterType;
-   signal axilWriteSlave  : AxiLiteWriteSlaveType;
+   signal axilWriteSlave  : AxiLiteWriteSlaveType := AXI_LITE_WRITE_SLAVE_EMPTY_OK_C;
 
-   signal coreClk         : sl;
-   signal coreRst         : sl;
+   signal coreClk         : sl                    := '0';
+   signal coreRst         : sl                    := '0';
    signal coreReadMaster  : AxiLiteReadMasterType;
-   signal coreReadSlave   : AxiLiteReadSlaveType;
+   signal coreReadSlave   : AxiLiteReadSlaveType  := AXI_LITE_READ_SLAVE_EMPTY_OK_C;
    signal coreWriteMaster : AxiLiteWriteMasterType;
-   signal coreWriteSlave  : AxiLiteWriteSlaveType;
+   signal coreWriteSlave  : AxiLiteWriteSlaveType := AXI_LITE_WRITE_SLAVE_EMPTY_OK_C;
 
-   signal dmaClk       : slv(3 downto 0);
-   signal dmaRst       : slv(3 downto 0);
-   signal dmaIbMasters : AxiStreamMasterArray(3 downto 0);
-   signal dmaIbSlaves  : AxiStreamSlaveArray(3 downto 0);
-   signal dmaObMasters : AxiStreamMasterArray(3 downto 0);
-   signal dmaObSlaves  : AxiStreamSlaveArray(3 downto 0);
+   signal dmaClk       : slv(3 downto 0)                  := (others => '0');
+   signal dmaRst       : slv(3 downto 0)                  := (others => '0');
+   signal dmaIbMasters : AxiStreamMasterArray(3 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
+   signal dmaIbSlaves  : AxiStreamSlaveArray(3 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
+   signal dmaObMasters : AxiStreamMasterArray(3 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
+   signal dmaObSlaves  : AxiStreamSlaveArray(3 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
 
-   signal refClk320      : sl;
-   signal userClk156     : sl;
-   signal userClk156Bufg : sl;
+   signal refClk320     : sl := '0';
+   signal refClk320Div2 : sl := '0';
+   signal refClk320Bufg : sl := '0';
 
-   signal clk160MHz : sl;
-   signal rst160MHz : sl;
-   signal pllClkOut : sl;
+   signal clk160MHz : sl := '0';
+   signal rst160MHz : sl := '0';
+   signal pllClkOut : sl := '0';
+   signal extReset  : sl := '0';
 
-   signal pllCsL : sl;
-   signal pllSck : sl;
-   signal pllSdi : sl;
-   signal pllSdo : sl;
+   signal pllCsL : sl := '0';
+   signal pllSck : sl := '0';
+   signal pllSdi : sl := '0';
+   signal pllSdo : sl := '0';
 
-   signal i2cScl : sl;
-   signal i2cSda : sl;
+   signal pllbooting : sl              := '0';
+   signal pllRst     : slv(3 downto 0) := (others => '0');
 
-   signal dPortCmdP : slv(3 downto 0);
-   signal dPortCmdN : slv(3 downto 0);
+   signal i2cScl : sl := 'Z';
+   signal i2cSda : sl := 'Z';
 
-   signal downlinkUp : slv(3 downto 0);
-   signal uplinkUp   : slv(3 downto 0);
+   signal dPortCmdP : slv(3 downto 0) := (others => '0');
+   signal dPortCmdN : slv(3 downto 0) := (others => '1');
 
-   signal iDelayCtrlRdy : sl;
-   signal refClk300MHz  : sl;
-   signal refRst300MHz  : sl;
+   signal downlinkUp : slv(3 downto 0) := (others => '0');
+   signal uplinkUp   : slv(3 downto 0) := (others => '0');
 
-   attribute IODELAY_GROUP                 : string;
-   attribute IODELAY_GROUP of U_IDELAYCTRL : label is "rd53_aurora";
-
-   attribute KEEP_HIERARCHY                 : string;
-   attribute KEEP_HIERARCHY of U_IDELAYCTRL : label is "TRUE";
-
-   attribute dont_touch                  : string;
-   attribute dont_touch of extRst        : signal is "TRUE";
-   attribute dont_touch of axilRst       : signal is "TRUE";
-   attribute dont_touch of coreRst       : signal is "TRUE";
-   attribute dont_touch of rst160MHz     : signal is "TRUE";
-   attribute dont_touch of downlinkUp    : signal is "TRUE";
-   attribute dont_touch of uplinkUp      : signal is "TRUE";
-   attribute dont_touch of iDelayCtrlRdy : signal is "TRUE";
-   attribute dont_touch of refRst300MHz  : signal is "TRUE";
-
+-- attribute dont_touch                   : string;
+-- attribute dont_touch of axilRst        : signal is "TRUE";
+-- attribute dont_touch of coreRst        : signal is "TRUE";
+-- attribute dont_touch of rst160MHz      : signal is "TRUE";
+-- attribute dont_touch of downlinkUp     : signal is "TRUE";
+-- attribute dont_touch of uplinkUp       : signal is "TRUE";
 begin
 
    led(7 downto 4) <= downlinkUp;
@@ -228,28 +218,6 @@ begin
    --------------------------------
    -- 156.25 MHz DMA/AXI-Lite Clock
    --------------------------------
-   U_IBUFDS_userClk156 : IBUFDS_GTE4
-      generic map (
-         REFCLK_EN_TX_PATH  => '0',
-         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
-         REFCLK_ICNTL_RX    => "00")
-      port map (
-         I     => userClk156P,
-         IB    => userClk156N,
-         CEB   => '0',
-         ODIV2 => userClk156,
-         O     => open);
-
-   U_BUFG_userClk156 : BUFG_GT
-      port map (
-         I       => userClk156,
-         CE      => '1',
-         CEMASK  => '1',
-         CLR     => '0',
-         CLRMASK => '1',
-         DIV     => "000",
-         O       => userClk156Bufg);
-
    U_PLL : entity surf.ClockManagerUltraScale
       generic map(
          TPD_G            => TPD_G,
@@ -257,45 +225,22 @@ begin
          INPUT_BUFG_G     => false,
          FB_BUFG_G        => true,
          NUM_CLOCKS_G     => 1,
-         CLKIN_PERIOD_G   => 6.4,
-         CLKFBOUT_MULT_G  => 8,
-         CLKOUT0_DIVIDE_G => 8)
+         CLKIN_PERIOD_G   => 8.0,       -- 125 MHz
+         CLKFBOUT_MULT_G  => 10,        -- 1250 MHz
+         CLKOUT0_DIVIDE_G => 8)         -- 156.25 MHz
       port map(
-         clkIn     => userClk156Bufg,
-         rstIn     => coreRst,
+         clkIn     => coreClk,
+         rstIn     => extReset,
          clkOut(0) => axilClk,
          rstOut(0) => axilRst);
 
-   --------------------------
-   -- Reference 300 MHz clock 
-   --------------------------
-   U_MMCM : entity surf.ClockManagerUltraScale
-      generic map(
-         TPD_G              => TPD_G,
-         TYPE_G             => "MMCM",
-         INPUT_BUFG_G       => false,
-         FB_BUFG_G          => true,
-         RST_IN_POLARITY_G  => '1',
-         NUM_CLOCKS_G       => 1,
-         -- MMCM attributes
-         BANDWIDTH_G        => "OPTIMIZED",
-         CLKIN_PERIOD_G     => 6.4,
-         DIVCLK_DIVIDE_G    => 1,
-         CLKFBOUT_MULT_F_G  => 6.0,
-         CLKOUT0_DIVIDE_F_G => 3.125)   -- 300 MHz = 937.5 MHz/3.125
-      port map(
-         clkIn     => userClk156Bufg,
-         rstIn     => coreRst,
-         clkOut(0) => refClk300MHz,
-         rstOut(0) => refRst300MHz);
-
-   U_IDELAYCTRL : IDELAYCTRL
+   U_extRst : entity surf.PwrUpRst
       generic map (
-         SIM_DEVICE => "ULTRASCALE")
+         TPD_G => TPD_G)
       port map (
-         RDY    => iDelayCtrlRdy,
-         REFCLK => refClk300MHz,
-         RST    => refRst300MHz);
+         arst   => extRst,
+         clk    => coreClk,
+         rstOut => extReset);
 
    -------------------
    -- FMC Port Mapping
@@ -309,7 +254,7 @@ begin
          serDesData    => open,
          dlyLoad       => (others => '0'),
          dlyCfg        => (others => (others => '0')),
-         iDelayCtrlRdy => iDelayCtrlRdy,
+         iDelayCtrlRdy => '0',
          -- Timing/Trigger Interface
          clk160MHz     => clk160MHz,
          rst160MHz     => rst160MHz,
@@ -317,7 +262,7 @@ begin
          -- PLL Clocking Interface
          fpgaPllClkIn  => '0',
          -- PLL SPI Interface
-         pllRst        => (others => '0'),
+         pllRst        => pllRst,  -- FPGA PLL reset (not external Jitter cleaner)
          pllCsL        => pllCsL,
          pllSck        => pllSck,
          pllSdi        => pllSdi,
@@ -327,7 +272,7 @@ begin
          dPortCmdN     => dPortCmdN,
          -- I2C Interface
          i2cScl        => i2cScl,
-         i2cSda        => i2cSda,
+         i2cSda        => i2cSda,    
          -- FMC LPC Ports
          fmcLaP        => fmcHpc0LaP,
          fmcLaN        => fmcHpc0LaN);
@@ -361,14 +306,24 @@ begin
          I     => gtRefClk320P,
          IB    => gtRefClk320N,
          CEB   => '0',
-         ODIV2 => open,
+         ODIV2 => refClk320Div2,
          O     => refClk320);
+
+   U_BUFG_refClk320 : BUFG_GT
+      port map (
+         I       => refClk320Div2,
+         CE      => '1',
+         CEMASK  => '1',
+         CLR     => '0',
+         CLRMASK => '1',
+         DIV     => "000",
+         O       => refClk320Bufg);
 
    ------------------
    -- SFP LpGBT Lanes
    ------------------
    GEN_SFP :
-   for i in 3 downto 0 generate
+   for i in NUM_LP_GBT_LANES_C-1 downto 0 generate
       U_LpGbtLane : entity work.AtlasRd53LpGbtLane
          generic map (
             TPD_G            => TPD_G,
@@ -401,6 +356,19 @@ begin
             sfpRxN          => sfpRxN(i));
    end generate GEN_SFP;
 
+   GEN_GTH_TERM : if (NUM_LP_GBT_LANES_C /= 4) generate
+      U_GTH_TERM : entity surf.Gthe4ChannelDummy
+         generic map (
+            TPD_G   => TPD_G,
+            WIDTH_G => 4-NUM_LP_GBT_LANES_C)
+         port map (
+            refClk => axilRst,
+            gtTxP  => sfpTxP(3 downto NUM_LP_GBT_LANES_C),
+            gtTxN  => sfpTxN(3 downto NUM_LP_GBT_LANES_C),
+            gtRxP  => sfpRxP(3 downto NUM_LP_GBT_LANES_C),
+            gtRxN  => sfpRxN(3 downto NUM_LP_GBT_LANES_C));
+   end generate;
+
    --------------------
    -- AXI-Lite: PLL SPI
    --------------------
@@ -418,11 +386,15 @@ begin
          axiReadSlave   => axilReadSlaves(4),
          axiWriteMaster => axilWriteMasters(4),
          axiWriteSlave  => axilWriteSlaves(4),
+         -- Status Interface
+         booting        => pllbooting,
          -- SPI Ports
          coreSclk       => pllSck,
          coreSDin       => pllSdo,
          coreSDout      => pllSdi,
          coreCsb        => pllCsL);
+
+   pllRst <= (others => pllbooting);
 
    ----------------------------
    -- Drive the unused CMD line
