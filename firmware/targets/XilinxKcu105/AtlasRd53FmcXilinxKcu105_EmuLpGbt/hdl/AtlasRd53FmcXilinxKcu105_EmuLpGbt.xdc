@@ -44,6 +44,9 @@ set_property -dict { IOSTANDARD LVDS } [get_ports { fmcHpcLaP[29] fmcHpcLaN[29] 
 
 ##############################################################################
 
+set_property -dict { IOSTANDARD DIFF_HSTL_I_18 } [get_ports { smaUserGpioP smaUserGpioN }]
+set_property -dict { IOSTANDARD DIFF_HSTL_I_18 } [get_ports { smaUserClkP  smaUserClkN  }]
+
 set_property PACKAGE_PIN K6 [get_ports { gtRefClk320P }]
 set_property PACKAGE_PIN K5 [get_ports { gtRefClk320N }]
 

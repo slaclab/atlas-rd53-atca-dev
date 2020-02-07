@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 #-----------------------------------------------------------------------------
 # This file is part of the 'ATLAS RD53 ATCA DEV'. It is subject to 
 # the license terms in the LICENSE.txt file found in the top-level directory 
@@ -16,9 +15,9 @@ import surf.devices.silabs as silabs  # firmware/submodules/surf
 import surf.devices.nxp    as nxp     # firmware/submodules/surf
 import surf.devices.ti     as ti      # firmware/submodules/surf
 
-import rogue
-import rogue.hardware.axi
+import pyrogue.protocols
 
+import rogue
 rogue.Version.minVersion('4.7.0') 
 
 class RudpRoot(pr.Root):
@@ -34,7 +33,7 @@ class RudpRoot(pr.Root):
             port    = 8192,
             packVer = 2,
         )          
-        self._RudpSrp = self.rudpSrp.application(0)
+        self._RudpSrp = self._Rudp.application(0)
                 
         # Connect the SRPv3 streams
         self._srp = rogue.protocols.srp.SrpV3()
@@ -53,7 +52,7 @@ class RudpRoot(pr.Root):
             description = 'firmware/submodules/surf/python/surf/devices/silabs/_Si5345.py: FMC_HPC', 
             offset      = (1*0x0001_0000), 
             memBase     = self._srp,
-        ))          
+        ))
         
         self.add(silabs.Si5345(      
             name        = 'Pll[1]', 
@@ -61,7 +60,7 @@ class RudpRoot(pr.Root):
             offset      = (2*0x0001_0000), 
             memBase     = self._srp,
         ))                  
-        
+
         # Add I2C GPIO device
         self.add(nxp.Pca9506(      
             name        = 'Gpio', 
@@ -77,3 +76,11 @@ class RudpRoot(pr.Root):
             offset      = (4*0x0001_0000 + 1*0x0000_0400), 
             memBase     = self._srp,
         ))           
+        
+    def start(self, **kwargs):                        
+        super().start(**kwargs)
+        
+        # Set the default PLL configuration files
+        self.Pll[0].CsvFilePath.set('../firmware/targets/XilinxKcu105/AtlasRd53FmcXilinxKcu105_EmuLpGbt/pll-config/AtlasRd53FmcXilinxKcu105_EmuLpGbt.csv')
+        self.Pll[1].CsvFilePath.set('../firmware/targets/XilinxKcu105/AtlasRd53FmcXilinxKcu105_EmuLpGbt/pll-config/AtlasRd53FmcXilinxKcu105_lpcRefClk.csv')
+        

@@ -52,6 +52,10 @@ entity AtlasRd53FmcXilinxKcu105_EmuLpGbt is
    port (
       extRst       : in    sl;
       led          : out   slv(7 downto 0);
+      smaUserGpioP : out   sl;
+      smaUserGpioN : out   sl;
+      smaUserClkP  : out   sl;
+      smaUserClkN  : out   sl;
       -- 300Mhz System Clock
       sysClk300P   : in    sl;
       sysClk300N   : in    sl;
@@ -96,8 +100,8 @@ architecture top_level of AtlasRd53FmcXilinxKcu105_EmuLpGbt is
    constant NUM_AXIL_MASTERS_C : positive := 5;
 
    constant VERSION_INDEX_C : natural := 0;
-   constant PLL_INDEX_C     : natural := 1; -- [1:2]
-   constant I2C_INDEX_C     : natural := 3; 
+   constant PLL_INDEX_C     : natural := 1;  -- [1:2]
+   constant I2C_INDEX_C     : natural := 3;
    constant LP_GBT_INDEX_C  : natural := 4;
 
    constant AXIL_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXIL_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXIL_MASTERS_C, x"0000_0000", 20, 16);
@@ -169,6 +173,24 @@ begin
    led(2) <= rxLinkUp(4*2);
    led(1) <= rxLinkUp(4*1);
    led(0) <= rxLinkUp(4*0);
+
+   U_smaUserGpio : entity surf.ClkOutBufDiff
+      generic map (
+         TPD_G        => TPD_G,
+         XIL_DEVICE_G => XIL_DEVICE_C)
+      port map (
+         clkIn   => clk160MHz,
+         clkOutP => smaUserGpioP,
+         clkOutN => smaUserGpioN);
+
+   U_smaUserClk : entity surf.ClkOutBufDiff
+      generic map (
+         TPD_G        => TPD_G,
+         XIL_DEVICE_G => XIL_DEVICE_C)
+      port map (
+         clkIn   => rxRecClk,  -- emulation LP-GBT recovered clock used as jitter cleaner reference
+         clkOutP => smaUserClkP,
+         clkOutN => smaUserClkN);
 
    --------------------------------
    -- 160 MHz External Reference Clock
@@ -352,7 +374,7 @@ begin
          coreSDin       => pllSdo,
          coreSDout      => pllSdi,
          coreCsb        => pllCsL);
-         
+
    U_PLL1 : entity surf.Si5345
       generic map (
          TPD_G              => TPD_G,
@@ -371,7 +393,7 @@ begin
          coreSclk       => fmcLpcLaP(3),
          coreSDin       => fmcLpcLaN(4),
          coreSDout      => fmcLpcLaN(3),
-         coreCsb        => fmcLpcLaP(4));         
+         coreCsb        => fmcLpcLaP(4));
 
    ---------------------------
    -- AXI-Lite: I2C Reg Access

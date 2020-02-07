@@ -15,7 +15,6 @@ source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 # # Bypass the debug chipscope generation
 # return
 
-
 # Open the synthesis design
 open_run synth_1
 
@@ -39,6 +38,23 @@ ConfigProbe ${ilaName} {GEN_SFP[0].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/MGT_T
 ConfigProbe ${ilaName} {GEN_SFP[0].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/rx_reset_done_all}
 ConfigProbe ${ilaName} {GEN_SFP[0].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/rxValid}
 ConfigProbe ${ilaName} {GEN_SFP[0].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/txValid}
+
+WriteDebugProbes ${ilaName} 
+
+#############################################################################################
+
+set ilaName u_ila_uplink_40MHz
+CreateDebugCore ${ilaName}
+set_property C_DATA_DEPTH 1024 [get_debug_cores ${ilaName}]
+SetDebugCoreClk ${ilaName} {GEN_SFP[0].U_LpGbtLane/lpgbtFpga_top_inst/uplinkClk_o}
+
+ConfigProbe ${ilaName} {GEN_SFP[0].U_LpGbtLane/lpgbtFpga_top_inst/uplink_mgtword_s[*]}
+
+ConfigProbe ${ilaName} {GEN_SFP[0].U_LpGbtLane/lpgbtFpga_top_inst/mgt_rxslide_s}
+ConfigProbe ${ilaName} {GEN_SFP[0].U_LpGbtLane/lpgbtFpga_top_inst/uplinkClkEn_o}
+ConfigProbe ${ilaName} {GEN_SFP[0].U_LpGbtLane/lpgbtFpga_top_inst/uplinkClkEn_s}
+ConfigProbe ${ilaName} {GEN_SFP[0].U_LpGbtLane/lpgbtFpga_top_inst/uplinkReady_o}
+ConfigProbe ${ilaName} {GEN_SFP[0].U_LpGbtLane/lpgbtFpga_top_inst/uplinkReady_s}
 
 WriteDebugProbes ${ilaName} 
 
