@@ -258,6 +258,15 @@ begin
          gtwiz_userclk_tx_usrclk2_out => tx_wordclk_sig,
          gtwiz_userclk_tx_active_out  => gtwiz_userclk_tx_active_int);
 
+   U_tx_wordclk : BUFGCE_DIV
+      generic map (
+         BUFGCE_DIVIDE => 4)
+      port map (
+         I   => tx_wordclk_sig,
+         CE  => '1',
+         CLR => '0',
+         O   => tx_wordclk40_sig);
+
    gtwiz_userclk_rx_inst : xlx_ku_mgt_ip_10g24_emu_example_gtwiz_userclk_rx
       port map(
          gtwiz_userclk_rx_srcclk_in   => rxoutclk_sig,
@@ -274,8 +283,6 @@ begin
          CE  => '1',
          CLR => '0',
          O   => rx_wordclk40_sig);
-
-   tx_wordclk40_sig <= rx_wordclk40_sig;
 
    ------------------
    -- Gearbox Modules

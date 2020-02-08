@@ -19,6 +19,7 @@ use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
 library surf;
+use surf.StdRtlPkg.all;
 
 use work.lpgbtfpga_package.all;
 
@@ -26,6 +27,8 @@ library unisim;
 use unisim.vcomponents.all;
 
 entity LpGbtFpga10g24 is
+   generic (
+      SIMULATION_G : boolean := false);
    port (
       -- Down link
       donwlinkClk_o               : out std_logic;  --! Downlink datapath clock (either 320 or 40MHz)
@@ -79,6 +82,11 @@ architecture mapping of LpGbtFpga10g24 is
    signal uplinkClk_s   : std_logic := '0';
    signal uplinkClkEn_s : std_logic := '1';
 
+   signal uplinkRst_s : std_logic := '0';
+   signal uplinkUp_s  : std_logic := '0';
+   signal wdtRst      : std_logic := '0';
+   signal wdtReset    : std_logic := '0';
+
 begin
 
    donwlinkClk_o   <= downlinkClk_s;
@@ -122,7 +130,7 @@ begin
          -- Resets      --
          --=============--
          MGT_TXRESET_i    => downlinkRst_i,
-         MGT_RXRESET_i    => uplinkRst_i,
+         MGT_RXRESET_i    => uplinkRst_s,
          --=============--
          -- Control     --
          --=============--
@@ -145,9 +153,36 @@ begin
          TXn_o            => mgt_txn_o,
          TXp_o            => mgt_txp_o);
 
+   ------------------------------
+   -- Uplink WDT Reset Monitoring
+   ------------------------------
+   GEN_WDT : if (SIMULATION_G = false) generate
+      U_uplinkRst : entity surf.PwrUpRst
+         generic map (
+            DURATION_G => getTimeRatio(156.25E+6, 1.0))  -- 1 s reset
+         port map (
+            arst   => wdtReset,
+            clk    => clk_mgtfreedrpclk_i,  -- Stable clock reference
+            rstOut => uplinkRst_s);
+
+      U_WTD0 : entity surf.WatchDogRst
+         generic map(
+            DURATION_G => getTimeRatio(156.25E+6, 0.25))  -- 4 s timeout
+         port map (
+            clk    => clk_mgtfreedrpclk_i,
+            monIn  => uplinkUp_s,
+            rstOut => wdtRst);
+
+      wdtReset <= wdtRst or uplinkRst_i;
+   end generate;
+   BYP_WDT : if (SIMULATION_G = true) generate
+      uplinkRst_s <= uplinkRst_i;
+   end generate;
+
    uplinkClk_o   <= uplinkClk_s;
+   uplinkReady_o <= uplinkUp_s;
+   uplinkUp_s    <= mgt_rxrdy_s and uplinkReady_s;
    uplinkClkEn_o <= mgt_rxrdy_s and uplinkReady_s and uplinkClkEn_s;
-   uplinkReady_o <= mgt_rxrdy_s and uplinkReady_s;
 
    uplink_inst : entity work.lpgbtfpga_Uplink
       generic map(

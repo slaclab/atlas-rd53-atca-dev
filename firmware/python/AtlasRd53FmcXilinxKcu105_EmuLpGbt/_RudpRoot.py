@@ -17,6 +17,7 @@ import surf.devices.ti     as ti      # firmware/submodules/surf
 
 import pyrogue.protocols
 
+import common
 import rogue
 rogue.Version.minVersion('4.7.0') 
 
@@ -73,9 +74,18 @@ class RudpRoot(pr.Root):
         self.add(ti.Lmk61e2(      
             name        = 'Lmk', 
             description = 'firmware/submodules/surf/python/surf/devices/ti/_Lmk61e2.py', 
-            offset      = (4*0x0001_0000 + 1*0x0000_0400), 
+            offset      = (3*0x0001_0000 + 1*0x0000_0400), 
             memBase     = self._srp,
         ))           
+        
+        # Add RD53/LpGBT Monitoring
+        self.add(common.AtlasRd53EmuLpGbtLaneReg(      
+            name        = 'Ctrl', 
+            offset      = (4*0x0001_0000), 
+            NUM_ELINK_G = 4, 
+            memBase     = self._srp,
+            expand      = True,
+        ))            
         
     def start(self, **kwargs):                        
         super().start(**kwargs)

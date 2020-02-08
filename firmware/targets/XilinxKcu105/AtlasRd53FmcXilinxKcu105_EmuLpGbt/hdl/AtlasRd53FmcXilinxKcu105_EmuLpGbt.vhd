@@ -6,20 +6,7 @@
 --    SFP[0] = 1GbE RUDP
 --    SFP[1] = emulation LP-GBT
 -------------------------------------------------------------------------------
--- Recommend External Clock Reference:
---
--- 1) Using the on-board FMC 160 MHz reference clock on the ZCU102
---   A) requires a FMC on the ZCU102
---   B) PLL FW .mem file configured to use on-board 160 MHz reference
--- 2) ZCU102 FMC generates the GTH 320 MHz reference clock used by the LpGBT 
--- 3) The same 320 MHz clock used by the SMA_TX_P/N to send a 160 MHz clock (3.2Gb/s sending "1111111111_0000000000" pattern)
--- 4) Connect the ZCU102 SMA_TX to the KCU105 SMA_CLK
--- 5) Received SMA_CLK is send to KCU105 FMC 
---    A)  PLL FW .mem file configured to use FPGA clock (instead of on-board 160 MHz reference)
--- 6) KCU105 FMC generates the GTH 320 MHz reference clock used by the emulation LpGBT 
---
--------------------------------------------------------------------------------
--- Note: This 160 MHz reference can be ASYNC from the source LP-GBT 160 MHz reference.
+-- Note: This design requires two FMC cards installed (HPC and LPC bays)
 -------------------------------------------------------------------------------
 -- This file is part of 'ATLAS RD53 FMC DEV'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -52,9 +39,9 @@ entity AtlasRd53FmcXilinxKcu105_EmuLpGbt is
    port (
       extRst       : in    sl;
       led          : out   slv(7 downto 0);
-      smaUserGpioP : out   sl;
+      smaUserGpioP : out   sl; -- Copy of the TX's QPLL reference clock for debugging
       smaUserGpioN : out   sl;
-      smaUserClkP  : out   sl;
+      smaUserClkP  : out   sl; -- Copy of the recovered RX clock for debugging
       smaUserClkN  : out   sl;
       -- 300Mhz System Clock
       sysClk300P   : in    sl;
@@ -165,10 +152,10 @@ architecture top_level of AtlasRd53FmcXilinxKcu105_EmuLpGbt is
 
 begin
 
-   led(7) <= '1';
+   led(7) <= downlinkUp;
    led(6) <= downlinkUp;
    led(5) <= uplinkUp;
-   led(4) <= phyReady;
+   led(4) <= uplinkUp;
    led(3) <= rxLinkUp(4*3);
    led(2) <= rxLinkUp(4*2);
    led(1) <= rxLinkUp(4*1);

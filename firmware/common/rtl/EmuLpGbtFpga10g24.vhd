@@ -26,6 +26,8 @@ library unisim;
 use unisim.vcomponents.all;
 
 entity EmuLpGbtFpga10g24 is
+   generic (
+      SIMULATION_G : boolean := false);
    port (
       -- Up link
       uplinkClk_o                 : out std_logic;  --! Clock provided by the Rx serdes: in phase with data

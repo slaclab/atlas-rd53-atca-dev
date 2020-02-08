@@ -39,8 +39,8 @@ entity XilinxZcu102LpGbt is
       extRst       : in    sl;
       led          : out   slv(7 downto 0);
       -- Broadcast External Timing Clock
-      smaTxP       : out   sl;
-      smaTxN       : out   sl;
+      smaTxP       : out   sl;          -- Copy of 160 MHz clock for debugging
+      smaTxN       : out   sl;          -- Copy of 160 MHz clock for debugging
       smaRxP       : in    sl;          -- RX unused
       smaRxN       : in    sl;          -- RX unused      
       -- Clocks
@@ -61,7 +61,7 @@ end XilinxZcu102LpGbt;
 
 architecture TOP_LEVEL of XilinxZcu102LpGbt is
 
-   constant NUM_LP_GBT_LANES_C : positive range 1 to 4 := 1;
+   constant NUM_LP_GBT_LANES_C : positive range 1 to 4 := 4;
 
    constant PLL_GPIO_I2C_CONFIG_C : I2cAxiLiteDevArray(0 to 1) := (
       0              => MakeI2cAxiLiteDevType(
@@ -139,6 +139,7 @@ architecture TOP_LEVEL of XilinxZcu102LpGbt is
 -- attribute dont_touch of rst160MHz      : signal is "TRUE";
 -- attribute dont_touch of downlinkUp     : signal is "TRUE";
 -- attribute dont_touch of uplinkUp       : signal is "TRUE";
+
 begin
 
    led(7 downto 4) <= downlinkUp;
@@ -272,7 +273,7 @@ begin
          dPortCmdN     => dPortCmdN,
          -- I2C Interface
          i2cScl        => i2cScl,
-         i2cSda        => i2cSda,    
+         i2cSda        => i2cSda,
          -- FMC LPC Ports
          fmcLaP        => fmcHpc0LaP,
          fmcLaN        => fmcHpc0LaN);

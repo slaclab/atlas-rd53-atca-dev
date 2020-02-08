@@ -136,6 +136,8 @@ begin
    -- LpGBT FPGA
    -------------
    U_LpGbtFpga10g24 : entity work.LpGbtFpga10g24
+      generic map (
+         SIMULATION_G => true)
       port map (
          -- Down link
          donwlinkClk_o       => downlinkClk(0),
@@ -165,6 +167,8 @@ begin
    -- Emulation LpGBT FPGA
    -----------------------
    U_EmuLpGbtFpga10g24 : entity work.EmuLpGbtFpga10g24
+      generic map (
+         SIMULATION_G => true)
       port map (
          -- Up link
          uplinkClk_o         => uplinkClk(1),

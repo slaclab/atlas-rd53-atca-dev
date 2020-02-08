@@ -54,8 +54,8 @@ entity xlx_ku_mgt_10g24 is
       --==============--
       -- Data         --
       --==============--
-      MGT_USRWORD_i    : in  std_logic_vector(255 downto 0);
-      MGT_USRWORD_o    : out std_logic_vector(255 downto 0);
+      MGT_USRWORD_i : in  std_logic_vector(255 downto 0);
+      MGT_USRWORD_o : out std_logic_vector(255 downto 0);
 
       --===============--
       -- Serial intf.  --
@@ -185,6 +185,7 @@ architecture structural of xlx_ku_mgt_10g24 is
    signal rx_reset_done_all : std_logic := '0';
    signal txValid           : std_logic := '0';
    signal rxValid           : std_logic := '0';
+   signal disconnected      : std_logic := '0';
 
 begin
 
@@ -212,7 +213,9 @@ begin
          asyncRst => rx_reset_done_all,
          syncRst  => MGT_RXREADY_s);
 
-   MGT_USRWORD_o <= MGT_USRWORD_s when(MGT_RXREADY_s = '1') else (others => '0');
+   MGT_USRWORD_o <= MGT_USRWORD_s when ((MGT_RXREADY_s = '1') and (disconnected = '0')) else (others => '0');
+
+   disconnected <= '1' when(MGT_USRWORD_s = x"5555555555555555555555555555555555555555555555555555555555555555") else '0';
 
    ---------
    -- Resets

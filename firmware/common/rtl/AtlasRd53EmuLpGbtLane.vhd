@@ -38,9 +38,9 @@ entity AtlasRd53EmuLpGbtLane is
       axilClk         : in  sl;
       axilRst         : in  sl;
       axilReadMaster  : in  AxiLiteReadMasterType;
-      axilReadSlave   : out AxiLiteReadSlaveType  := AXI_LITE_READ_SLAVE_EMPTY_OK_C;
+      axilReadSlave   : out AxiLiteReadSlaveType;
       axilWriteMaster : in  AxiLiteWriteMasterType;
-      axilWriteSlave  : out AxiLiteWriteSlaveType := AXI_LITE_WRITE_SLAVE_EMPTY_OK_C;
+      axilWriteSlave  : out AxiLiteWriteSlaveType;
       -- Timing Interface
       clk160MHz       : in  sl;
       rst160MHz       : in  sl;
@@ -52,7 +52,7 @@ entity AtlasRd53EmuLpGbtLane is
       rxLinkUp        : in  slv(NUM_ELINK_G-1 downto 0);
       -- SFP Interface
       refClk160       : in  sl;  -- Using jitter clean FMC 320 MHz reference
-      drpClk          : in sl;
+      drpClk          : in  sl;
       rxRecClk        : out sl;
       qplllock        : in  slv(1 downto 0);
       qplloutclk      : in  slv(1 downto 0);
@@ -68,8 +68,8 @@ end AtlasRd53EmuLpGbtLane;
 
 architecture rtl of AtlasRd53EmuLpGbtLane is
 
-   signal invCmd : slv(NUM_ELINK_G-1 downto 0) := (others => '0');
-   signal dlyCmd : slv(NUM_ELINK_G-1 downto 0) := (others => '0');
+   signal invCmd : slv(NUM_ELINK_G-1 downto 0);
+   signal dlyCmd : slv(NUM_ELINK_G-1 downto 0);
 
    signal data : Slv8Array(NUM_ELINK_G-1 downto 0);
 
@@ -96,32 +96,36 @@ architecture rtl of AtlasRd53EmuLpGbtLane is
    signal uplinkRst      : sl;
    signal uplinkClkEn    : sl;
 
-   signal reset160MHz : sl;
-   signal pwrUpRst    : sl;
-
 begin
 
    downlinkUp <= downlinkReady;
    uplinkUp   <= uplinkReady;
 
-   U_rst160MHz : entity surf.RstPipeline
+   ---------------------------
+   -- Axi-Lite Register Module
+   ---------------------------
+   U_AxilReg : entity work.AtlasRd53EmuLpGbtLaneReg
       generic map (
-         TPD_G => TPD_G)
+         TPD_G       => TPD_G,
+         NUM_ELINK_G => NUM_ELINK_G)
       port map (
-         clk    => clk160MHz,
-         rstIn  => rst160MHz,
-         rstOut => reset160MHz);
-
-   -------------------------
-   -- Generate the uplinkRst
-   -------------------------
-   U_uplinkRst : entity surf.PwrUpRst
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         arst   => axilRst,
-         clk    => uplinkClk,
-         rstOut => uplinkRst);
+         -- Config/status Interface (clk160MHz domain)
+         clk160MHz       => clk160MHz,
+         rst160MHz       => rst160MHz,
+         downlinkUp      => downlinkReady,
+         uplinkUp        => uplinkReady,
+         rxLinkUp        => rxLinkUp,
+         invCmd          => invCmd,
+         dlyCmd          => dlyCmd,
+         downlinkRst     => downlinkRst,
+         uplinkRst       => uplinkRst,
+         -- AXI-Lite Interface (axilClk domain)
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => axilReadMaster,
+         axilReadSlave   => axilReadSlave,
+         axilWriteMaster => axilWriteMaster,
+         axilWriteSlave  => axilWriteSlave);
 
    -------------------------
    -- DATA Generation Module
@@ -146,7 +150,7 @@ begin
          port map (
             -- Slave Interface
             slaveClk    => clk160MHz,
-            slaveRst    => reset160MHz,
+            slaveRst    => rst160MHz,
             slaveData   => data(i),
             slaveValid  => '1',
             slaveReady  => open,
@@ -167,7 +171,7 @@ begin
          -- Up link
          uplinkClk_o         => uplinkClk,      -- 40 MHz
          uplinkClkEn_o       => uplinkClkEn,    -- 40 MHz strobe
-         uplinkRst_i         => pwrUpRst,       -- ASYNC RST
+         uplinkRst_i         => uplinkRst,      -- ASYNC RST
          uplinkUserData_i    => uplinkUserData,
          uplinkEcData_i      => uplinkEcData,
          uplinkIcData_i      => uplinkIcData,
@@ -175,7 +179,7 @@ begin
          -- Down link
          donwlinkClk_o       => donwlinkClk,    -- 40 MHz
          downlinkClkEn_o     => downlinkClkEn,  -- 40 MHz strobe
-         downlinkRst_i       => pwrUpRst,       -- ASYNC RST
+         downlinkRst_i       => downlinkRst,    -- ASYNC RST
          downlinkUserData_o  => downlinkUserData,
          downlinkEcData_o    => downlinkEcData,
          downlinkIcData_o    => downlinkIcData,
@@ -192,25 +196,6 @@ begin
          mgt_rxp_i           => sfpRxP,
          mgt_txn_o           => sfpTxN,
          mgt_txp_o           => sfpTxP);
-
-   U_pwrUpRst : entity surf.PwrUpRst
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         arst   => axilRst,
-         clk    => axilClk,
-         rstOut => pwrUpRst);
-         
-   ---------------------------
-   -- Generate the downlinkRst
-   ---------------------------
-   U_downlinkRst : entity surf.PwrUpRst
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         arst   => axilRst,
-         clk    => donwlinkClk,
-         rstOut => downlinkRst);
 
    ------------------------
    -- CMD Generation Module
