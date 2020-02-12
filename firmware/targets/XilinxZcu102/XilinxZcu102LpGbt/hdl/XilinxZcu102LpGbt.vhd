@@ -36,7 +36,6 @@ entity XilinxZcu102LpGbt is
       TPD_G        : time := 1 ns;
       BUILD_INFO_G : BuildInfoType);
    port (
-      extRst       : in    sl;
       led          : out   slv(7 downto 0);
       -- Broadcast External Timing Clock
       smaTxP       : out   sl;          -- Copy of 160 MHz clock for debugging
@@ -114,7 +113,6 @@ architecture TOP_LEVEL of XilinxZcu102LpGbt is
    signal clk160MHz : sl := '0';
    signal rst160MHz : sl := '0';
    signal pllClkOut : sl := '0';
-   signal extReset  : sl := '0';
 
    signal pllCsL : sl := '0';
    signal pllSck : sl := '0';
@@ -231,17 +229,9 @@ begin
          CLKOUT0_DIVIDE_G => 8)         -- 156.25 MHz
       port map(
          clkIn     => coreClk,
-         rstIn     => extReset,
+         rstIn     => coreRst,
          clkOut(0) => axilClk,
          rstOut(0) => axilRst);
-
-   U_extRst : entity surf.PwrUpRst
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         arst   => extRst,
-         clk    => coreClk,
-         rstOut => extReset);
 
    -------------------
    -- FMC Port Mapping

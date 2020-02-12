@@ -159,15 +159,15 @@ begin
    GEN_WDT : if (SIMULATION_G = false) generate
       U_uplinkRst : entity surf.PwrUpRst
          generic map (
-            DURATION_G => getTimeRatio(156.25E+6, 1.0))  -- 1 s reset
+            DURATION_G => getTimeRatio(39.0625E+6, 1.0))  -- 1 s reset
          port map (
             arst   => wdtReset,
             clk    => clk_mgtfreedrpclk_i,  -- Stable clock reference
             rstOut => uplinkRst_s);
 
-      U_WTD0 : entity surf.WatchDogRst
+      U_WTD : entity surf.WatchDogRst
          generic map(
-            DURATION_G => getTimeRatio(156.25E+6, 0.25))  -- 4 s timeout
+            DURATION_G => getTimeRatio(39.0625E+6, 0.25))  -- 4 s timeout
          port map (
             clk    => clk_mgtfreedrpclk_i,
             monIn  => uplinkUp_s,

@@ -428,10 +428,10 @@ begin
             -- AXI-Lite interface (axilClk domain)
             axilClk         => axilClk,
             axilRst         => axilRst,
-            axilReadMaster  => axilReadMasters(LP_GBT_INDEX_C),
-            axilReadSlave   => axilReadSlaves(LP_GBT_INDEX_C),
-            axilWriteMaster => axilWriteMasters(LP_GBT_INDEX_C),
-            axilWriteSlave  => axilWriteSlaves(LP_GBT_INDEX_C),
+            axilReadMaster  => axilReadMasters(LP_GBT_INDEX_C+i),
+            axilReadSlave   => axilReadSlaves(LP_GBT_INDEX_C+i),
+            axilWriteMaster => axilWriteMasters(LP_GBT_INDEX_C+i),
+            axilWriteSlave  => axilWriteSlaves(LP_GBT_INDEX_C+i),
             -- Timing Interface
             clk160MHz       => clk160MHz,
             rst160MHz       => rst160MHz,
