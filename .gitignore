@@ -34,6 +34,7 @@ build.info
 build*
 .Xil*
 *.str
+release*
 
 # Only .bit.gz and .mcs.gz should be committed to git
 *.bit
