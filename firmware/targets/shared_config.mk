@@ -4,4 +4,4 @@ export TIG_PULSE = 1
 export PRJ_VERSION = 0x01000200
 
 # Define release
-export RELEASE = atlas_rd53_atca_dev
+export RELEASE = atlas-rd53-atca-dev
