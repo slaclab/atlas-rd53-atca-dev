@@ -17,7 +17,7 @@ import surf.devices.ti     as ti      # firmware/submodules/surf
 
 import pyrogue.protocols
 
-import common
+import atlas_rd53_atca_dev as common
 import rogue
 rogue.Version.minVersion('4.7.0') 
 
