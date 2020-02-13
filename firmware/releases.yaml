@@ -45,7 +45,7 @@ Targets:
       - bin
 
 Releases:
-  atlas_rd53_atca_dev:
+  atlas-rd53-atca-dev:
     Targets:
       - AtlasAtcaLinkAggRd53Rtm_BackplaneEth
       - AtlasAtcaLinkAggRd53Rtm_EmuLpGbt
