@@ -37,29 +37,32 @@ entity AtlasRd53LpGbtLane is
       AXIL_BASE_ADDR_G : slv(31 downto 0));
    port (
       -- AXI-Lite interface (axilClk domain)
-      axilClk         : in  sl;
-      axilRst         : in  sl;
-      axilReadMaster  : in  AxiLiteReadMasterType;
-      axilReadSlave   : out AxiLiteReadSlaveType  := AXI_LITE_READ_SLAVE_EMPTY_OK_C;
-      axilWriteMaster : in  AxiLiteWriteMasterType;
-      axilWriteSlave  : out AxiLiteWriteSlaveType := AXI_LITE_WRITE_SLAVE_EMPTY_OK_C;
+      axilClk          : in  sl;
+      axilRst          : in  sl;
+      axilReadMaster   : in  AxiLiteReadMasterType;
+      axilReadSlave    : out AxiLiteReadSlaveType  := AXI_LITE_READ_SLAVE_EMPTY_OK_C;
+      axilWriteMaster  : in  AxiLiteWriteMasterType;
+      axilWriteSlave   : out AxiLiteWriteSlaveType := AXI_LITE_WRITE_SLAVE_EMPTY_OK_C;
       -- DMA interface (axilClk domain)
-      dmaIbMaster     : out AxiStreamMasterType;
-      dmaIbSlave      : in  AxiStreamSlaveType;
-      dmaObMaster     : in  AxiStreamMasterType;
-      dmaObSlave      : out AxiStreamSlaveType;
+      dmaIbMaster      : out AxiStreamMasterType;
+      dmaIbSlave       : in  AxiStreamSlaveType;
+      dmaObMaster      : in  AxiStreamMasterType;
+      dmaObSlave       : out AxiStreamSlaveType;
+      -- Streaming Config/Trig Interface (clk160MHz domain)
+      emuTimingMasters : in  AxiStreamMasterArray(5 downto 0);
+      emuTimingSlaves  : out AxiStreamSlaveArray(5 downto 0);
       -- Clocks and Resets
-      refClk320       : in  sl;  -- Using jitter clean FMC 320 MHz reference
-      clk160MHz       : in  sl;
-      rst160MHz       : in  sl;
+      refClk320        : in  sl;  -- Using jitter clean FMC 320 MHz reference
+      clk160MHz        : in  sl;
+      rst160MHz        : in  sl;
       -- Status
-      downlinkUp      : out sl;
-      uplinkUp        : out sl;
+      downlinkUp       : out sl;
+      uplinkUp         : out sl;
       -- SFP Interface
-      sfpTxP          : out sl;
-      sfpTxN          : out sl;
-      sfpRxP          : in  sl;
-      sfpRxN          : in  sl);
+      sfpTxP           : out sl;
+      sfpTxN           : out sl;
+      sfpRxP           : in  sl;
+      sfpRxN           : in  sl);
 end AtlasRd53LpGbtLane;
 
 architecture rtl of AtlasRd53LpGbtLane is
@@ -146,7 +149,9 @@ architecture rtl of AtlasRd53LpGbtLane is
    signal linkUp       : Slv4Array(NUM_ELINK_C-1 downto 0);
    signal hdrErrDet    : Slv4Array(NUM_ELINK_C-1 downto 0);
 
-   signal pwrUpRst : sl;
+   signal pwrUpRst          : sl;
+   signal downlinkReadySync : sl;
+   signal uplinkReadySync   : sl;
 
 begin
 
@@ -163,6 +168,14 @@ begin
          arst   => axilRst,
          clk    => donwlinkClk,
          rstOut => downlinkRst);
+
+   U_downlinkReadySync : entity surf.Synchronizer
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk     => clk160MHz,
+         dataIn  => downlinkReady,
+         dataOut => downlinkReadySync);
 
    --------------------
    -- AXI-Lite Crossbar
@@ -211,6 +224,8 @@ begin
             hdrErrDet       => hdrErrDet(i),
             linkUp          => linkUp(i),
             cmdBusy         => cmdBusy(i),
+            downlinkReady   => downlinkReadySync,
+            uplinkReady     => uplinkReadySync,
             bitSlip         => rxBitSlip(i),
             enable          => open,
             selectRate      => open,
@@ -268,8 +283,8 @@ begin
             AXIS_CONFIG_G => AXIS_CONFIG_G)
          port map (
             -- Streaming EMU Trig Interface (clk160MHz domain)
-            emuTimingMaster => AXI_STREAM_MASTER_INIT_C,
-            emuTimingSlave  => open,
+            emuTimingMaster => emuTimingMasters(i),
+            emuTimingSlave  => emuTimingSlaves(i),
             -- Streaming Config Interface (axisClk domain)
             axisClk         => axilClk,
             axisRst         => axilRst,
@@ -298,7 +313,7 @@ begin
             slaveClk     => clk160MHz,
             slaveRst     => rst160MHz,
             slaveData(0) => cmd(i),
-            slaveValid   => '1',
+            slaveValid   => downlinkReadySync,
             slaveReady   => open,
             -- Master Interface
             masterClk    => donwlinkClk,
@@ -357,6 +372,14 @@ begin
          clk    => uplinkClk,
          rstOut => uplinkRst);
 
+   U_uplinkReadySync : entity surf.Synchronizer
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk     => clk160MHz,
+         dataIn  => uplinkReady,
+         dataOut => uplinkReadySync);
+
    -------------------------
    -- DATA Generation Module
    -------------------------
@@ -397,8 +420,8 @@ begin
          generic map (
             TPD_G => TPD_G)
          port map (
-            clk           => uplinkClk,
-            rst           => uplinkRst,
+            clk           => clk160MHz,
+            rst           => rst160MHz,
             rxHeader      => rxHeader(i),
             rxHeaderValid => rxValid(i)(0),
             bitSlip       => rxBitSlip(i)(0),
@@ -417,8 +440,8 @@ begin
             SIDEBAND_WIDTH_G => 2,
             TAPS_G           => SCRAMBLER_TAPS_C)
          port map (
-            clk            => uplinkClk,
-            rst            => uplinkRst,
+            clk            => clk160MHz,
+            rst            => rst160MHz,
             -- Inbound Interface
             inputValid     => unscramblerValid(i)(0),
             inputData      => rxData(i),
@@ -439,8 +462,8 @@ begin
             TPD_G => TPD_G)
          port map (
             -- Timing Interface
-            clk160MHz          => uplinkClk,
-            rst160MHz          => uplinkRst,
+            clk160MHz          => clk160MHz,
+            rst160MHz          => rst160MHz,
             -- Parallel Interface
             rxLinkUp           => rxAligned(i),
             valid              => valid(i),
@@ -479,8 +502,8 @@ begin
             MASTER_AXI_CONFIG_G => INT_AXIS_CONFIG_C)
          port map (
             -- Slave Port
-            sAxisClk    => uplinkClk,
-            sAxisRst    => uplinkRst,
+            sAxisClk    => clk160MHz,
+            sAxisRst    => rst160MHz,
             sAxisMaster => dataMasters(i),
             sAxisCtrl   => dataCtrl(i),
             -- Master Port

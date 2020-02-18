@@ -35,6 +35,8 @@ class RceRoot(pr.Root):
         # Add RCE version device
         self.add(rce.RceVersion( 
             description = 'firmware/submodules/rce-gen3-fw-lib/python/RceG3/_RceVersion.py'
+            intOffset   = 0xB0000000, # Internal registers offset (zynq=0x80000000, zynquplus=0xB0000000)
+            bsiOffset   = 0xB0010000, # BSI I2C Slave Registers   (zynq=0x84000000, zynquplus=0xB0010000)
             memBase     = self._RceMemMap,
         ))
 
@@ -42,10 +44,26 @@ class RceRoot(pr.Root):
         self.add(silabs.Si5345(      
             name        = 'Pll', 
             description = 'firmware/submodules/surf/python/surf/devices/silabs/_Si5345.py', 
+            offset      = (0xB400_0000 + 4*0x0010_0000), 
+            memBase     = self._RceMemMap,
+        ))
+        
+        # Add Firmware Trigger LUT device
+        self.add(rd53Lib.EmuTimingLut(      
+            name        = 'EmuTimingLut', 
+            description = 'firmware/submodules/atlas-rd53-fw-lib/python/AtlasRd53/_EmuTiming.py', 
+            offset      = (0xB400_0000 + 5*0x0010_0000), 
+            memBase     = self._RceMemMap,
+        )) 
+
+        # Add Firmware Trigger FSM device
+        self.add(rd53Lib.EmuTimingFsm(      
+            name        = 'EmuTimingFsm', 
+            description = 'firmware/submodules/atlas-rd53-fw-lib/python/AtlasRd53/_EmuTiming.py', 
             offset      = (0xB400_0000 + 6*0x0010_0000), 
             memBase     = self._RceMemMap,
-        ))  
-
+        ))
+        
         # Loop through the SFP links
         for sfp in range(4):
         

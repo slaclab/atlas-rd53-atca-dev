@@ -76,7 +76,7 @@ architecture TOP_LEVEL of XilinxZcu102LpGbt is
          endianness  => '0',            -- Little endian   
          repeatStart => '1'));          -- Repeat Start  
 
-   constant NUM_AXIL_MASTERS_C : natural := 5;
+   constant NUM_AXIL_MASTERS_C : natural := 7;
 
    constant AXIL_XBAR_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXIL_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXIL_MASTERS_C, x"B400_0000", 26, 20);
 
@@ -105,6 +105,9 @@ architecture TOP_LEVEL of XilinxZcu102LpGbt is
    signal dmaIbSlaves  : AxiStreamSlaveArray(3 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
    signal dmaObMasters : AxiStreamMasterArray(3 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
    signal dmaObSlaves  : AxiStreamSlaveArray(3 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
+
+   signal emuTimingMasters : AxiStreamMasterArray(23 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
+   signal emuTimingSlaves  : AxiStreamSlaveArray(23 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
 
    signal refClk320     : sl := '0';
    signal refClk320Div2 : sl := '0';
@@ -322,29 +325,32 @@ begin
             AXIL_BASE_ADDR_G => AXIL_XBAR_CONFIG_C(i).baseAddr)
          port map (
             -- AXI-Lite interface (axilClk domain)
-            axilClk         => axilClk,
-            axilRst         => axilRst,
-            axilReadMaster  => axilReadMasters(i),
-            axilReadSlave   => axilReadSlaves(i),
-            axilWriteMaster => axilWriteMasters(i),
-            axilWriteSlave  => axilWriteSlaves(i),
+            axilClk          => axilClk,
+            axilRst          => axilRst,
+            axilReadMaster   => axilReadMasters(i),
+            axilReadSlave    => axilReadSlaves(i),
+            axilWriteMaster  => axilWriteMasters(i),
+            axilWriteSlave   => axilWriteSlaves(i),
             -- DMA interface (axilClk domain)
-            dmaIbMaster     => dmaIbMasters(i),
-            dmaIbSlave      => dmaIbSlaves(i),
-            dmaObMaster     => dmaObMasters(i),
-            dmaObSlave      => dmaObSlaves(i),
+            dmaIbMaster      => dmaIbMasters(i),
+            dmaIbSlave       => dmaIbSlaves(i),
+            dmaObMaster      => dmaObMasters(i),
+            dmaObSlave       => dmaObSlaves(i),
+            -- Streaming EMU Trig Interface (clk160MHz domain)
+            emuTimingMasters => emuTimingMasters(6*i+5 downto 6*i),
+            emuTimingSlaves  => emuTimingSlaves(6*i+5 downto 6*i),
             -- Clocks and Resets
-            refClk320       => refClk320,
-            clk160MHz       => clk160MHz,
-            rst160MHz       => rst160MHz,
+            refClk320        => refClk320,
+            clk160MHz        => clk160MHz,
+            rst160MHz        => rst160MHz,
             -- Status
-            downlinkUp      => downlinkUp(i),
-            uplinkUp        => uplinkUp(i),
+            downlinkUp       => downlinkUp(i),
+            uplinkUp         => uplinkUp(i),
             -- SFP Interface
-            sfpTxP          => sfpTxP(i),
-            sfpTxN          => sfpTxN(i),
-            sfpRxP          => sfpRxP(i),
-            sfpRxN          => sfpRxN(i));
+            sfpTxP           => sfpTxP(i),
+            sfpTxN           => sfpTxN(i),
+            sfpRxP           => sfpRxP(i),
+            sfpRxN           => sfpRxN(i));
    end generate GEN_SFP;
 
    GEN_GTH_TERM : if (NUM_LP_GBT_LANES_C /= 4) generate
@@ -386,6 +392,28 @@ begin
          coreCsb        => pllCsL);
 
    pllRst <= (others => pllbooting);
+
+   ----------------------------------
+   -- Emulation Timing/Trigger Module
+   ----------------------------------
+   U_EmuTiming : entity atlas_rd53_fw_lib.AtlasRd53EmuTiming
+      generic map(
+         TPD_G        => TPD_G,
+         NUM_AXIS_G   => 24,
+         ADDR_WIDTH_G => 10)
+      port map(
+         -- AXI-Lite Interface (axilClk domain)
+         axilClk          => axilClk,
+         axilRst          => axilRst,
+         axilReadMasters  => axilReadMasters(6 downto 5),
+         axilReadSlaves   => axilReadSlaves(6 downto 5),
+         axilWriteMasters => axilWriteMasters(6 downto 5),
+         axilWriteSlaves  => axilWriteSlaves(6 downto 5),
+         -- Streaming RD53 Trig Interface (clk160MHz domain)
+         clk160MHz        => clk160MHz,
+         rst160MHz        => rst160MHz,
+         emuTimingMasters => emuTimingMasters,
+         emuTimingSlaves  => emuTimingSlaves);
 
    ----------------------------
    -- Drive the unused CMD line
