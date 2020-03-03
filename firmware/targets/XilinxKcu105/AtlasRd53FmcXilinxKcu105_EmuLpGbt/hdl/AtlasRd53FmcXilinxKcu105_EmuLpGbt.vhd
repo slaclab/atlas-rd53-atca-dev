@@ -39,9 +39,9 @@ entity AtlasRd53FmcXilinxKcu105_EmuLpGbt is
    port (
       extRst       : in    sl;
       led          : out   slv(7 downto 0);
-      smaUserGpioP : out   sl; -- Copy of the TX's QPLL reference clock for debugging
+      smaUserGpioP : out   sl;  -- Copy of the TX's QPLL reference clock for debugging
       smaUserGpioN : out   sl;
-      smaUserClkP  : out   sl; -- Copy of the recovered RX clock for debugging
+      smaUserClkP  : out   sl;  -- Copy of the recovered RX clock for debugging
       smaUserClkN  : out   sl;
       -- 300Mhz System Clock
       sysClk300P   : in    sl;
@@ -156,10 +156,10 @@ begin
    led(6) <= downlinkUp;
    led(5) <= uplinkUp;
    led(4) <= uplinkUp;
-   led(3) <= rxLinkUp(4*3);
-   led(2) <= rxLinkUp(4*2);
-   led(1) <= rxLinkUp(4*1);
-   led(0) <= rxLinkUp(4*0);
+   led(3) <= rxLinkUp(4*3+3);
+   led(2) <= rxLinkUp(4*2+3);
+   led(1) <= rxLinkUp(4*1+3);
+   led(0) <= rxLinkUp(4*0+3);
 
    U_smaUserGpio : entity surf.ClkOutBufDiff
       generic map (
@@ -446,14 +446,14 @@ begin
          cmdOutP         => dPortCmdP,
          cmdOutN         => dPortCmdN,
          -- Deserialization Interface (clk160MHz domain)
-         serDesData(0)   => serDesData(4*0),
-         serDesData(1)   => serDesData(4*1),
-         serDesData(2)   => serDesData(4*2),
-         serDesData(3)   => serDesData(4*3),
-         rxLinkUp(0)     => rxLinkUp(4*0),
-         rxLinkUp(1)     => rxLinkUp(4*1),
-         rxLinkUp(2)     => rxLinkUp(4*2),
-         rxLinkUp(3)     => rxLinkUp(4*3),
+         serDesData(0)   => serDesData(4*0+3),
+         serDesData(1)   => serDesData(4*1+3),
+         serDesData(2)   => serDesData(4*2+3),
+         serDesData(3)   => serDesData(4*3+3),
+         rxLinkUp(0)     => rxLinkUp(4*0+3),
+         rxLinkUp(1)     => rxLinkUp(4*1+3),
+         rxLinkUp(2)     => rxLinkUp(4*2+3),
+         rxLinkUp(3)     => rxLinkUp(4*3+3),
          -- SFP Interface
          refClk160       => refClk160,
          drpClk          => drpClk,
