@@ -84,14 +84,17 @@ architecture top_level of AtlasRd53FmcXilinxKcu105_EmuLpGbt is
 
    constant AXIL_CLK_FREQ_C : real := 156.25E+6;  -- Units of Hz
 
-   constant NUM_AXIL_MASTERS_C : positive := 5;
+   constant NUM_AXIL_MASTERS_C : positive := 6;
 
    constant VERSION_INDEX_C : natural := 0;
    constant PLL_INDEX_C     : natural := 1;  -- [1:2]
    constant I2C_INDEX_C     : natural := 3;
    constant LP_GBT_INDEX_C  : natural := 4;
+   constant RX_INDEX_C      : natural := 5;
 
-   constant AXIL_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXIL_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXIL_MASTERS_C, x"0000_0000", 20, 16);
+   constant AXIL_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXIL_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXIL_MASTERS_C, x"0000_0000", 24, 16);
+
+   constant RX_CONFIG_C : AxiLiteCrossbarMasterConfigArray(15 downto 0) := genAxiLiteConfig(16, AXIL_CONFIG_C(RX_INDEX_C).baseAddr, 16, 8);
 
    signal axilClk         : sl;
    signal axilRst         : sl;
@@ -104,6 +107,11 @@ architecture top_level of AtlasRd53FmcXilinxKcu105_EmuLpGbt is
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXIL_MASTERS_C-1 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_OK_C);
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXIL_MASTERS_C-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXIL_MASTERS_C-1 downto 0)  := (others => AXI_LITE_READ_SLAVE_EMPTY_OK_C);
+
+   signal rxWriteMasters : AxiLiteWriteMasterArray(15 downto 0);
+   signal rxWriteSlaves  : AxiLiteWriteSlaveArray(15 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_OK_C);
+   signal rxReadMasters  : AxiLiteReadMasterArray(15 downto 0);
+   signal rxReadSlaves   : AxiLiteReadSlaveArray(15 downto 0)  := (others => AXI_LITE_READ_SLAVE_EMPTY_OK_C);
 
    signal sysClk300NB   : sl;
    signal sysClk300     : sl;
@@ -137,6 +145,7 @@ architecture top_level of AtlasRd53FmcXilinxKcu105_EmuLpGbt is
    signal dlyLoad    : slv(15 downto 0)       := (others => '0');
    signal rxLinkUp   : slv(15 downto 0)       := (others => '0');
    signal dlyCfg     : Slv9Array(15 downto 0) := (others => (others => '0'));
+   signal selectRate : Slv2Array(15 downto 0) := (others => (others => '0'));
 
    signal i2cScl : sl;
    signal i2cSda : sl;
@@ -288,6 +297,24 @@ begin
          mAxiReadMasters     => axilReadMasters,
          mAxiReadSlaves      => axilReadSlaves);
 
+   U_RX_XBAR : entity surf.AxiLiteCrossbar
+      generic map (
+         TPD_G              => TPD_G,
+         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_MASTER_SLOTS_G => 16,
+         MASTERS_CONFIG_G   => RX_CONFIG_C)
+      port map (
+         axiClk              => axilClk,
+         axiClkRst           => axilRst,
+         sAxiWriteMasters(0) => axilWriteMasters(RX_INDEX_C),
+         sAxiWriteSlaves(0)  => axilWriteSlaves(RX_INDEX_C),
+         sAxiReadMasters(0)  => axilReadMasters(RX_INDEX_C),
+         sAxiReadSlaves(0)   => axilReadSlaves(RX_INDEX_C),
+         mAxiWriteMasters    => rxWriteMasters,
+         mAxiWriteSlaves     => rxWriteSlaves,
+         mAxiReadMasters     => rxReadMasters,
+         mAxiReadSlaves      => rxReadSlaves);
+
    -------------------
    -- FMC Port Mapping
    -------------------
@@ -408,19 +435,25 @@ begin
    -- Using AuroraRxLane for this is IDELAY alignment feature
    ----------------------------------------------------------
    GEN_LANE : for i in 15 downto 0 generate
-      U_Rx : entity atlas_rd53_fw_lib.AuroraRxLane
+      U_Rx : entity work.AuroraRxLaneWrapper
          generic map (
             TPD_G => TPD_G)
          port map (
-            -- RD53 ASIC Serial Interface
-            serDesData => serDesData(i),
-            dlyLoad    => dlyLoad(i),
-            dlyCfg     => dlyCfg(i),
-            -- Timing Interface
-            clk160MHz  => clk160MHz,
-            rst160MHz  => rst160MHz,
-            -- Output
-            rxLinkUp   => rxLinkUp(i));
+            -- RD53 ASIC Serial Interface  (clk160MHz domain)
+            clk160MHz       => clk160MHz,
+            rst160MHz       => rst160MHz,
+            serDesData      => serDesData(i),
+            dlyLoad         => dlyLoad(i),
+            dlyCfg          => dlyCfg(i),
+            rxLinkUp        => rxLinkUp(i),
+            selectRate      => selectRate(i),
+            -- AXI-Lite interface (axilClk domain)
+            axilClk         => axilClk,
+            axilRst         => axilRst,
+            axilReadMaster  => rxReadMasters(i),
+            axilReadSlave   => rxReadSlaves(i),
+            axilWriteMaster => rxWriteMasters(i),
+            axilWriteSlave  => rxWriteSlaves(i));
    end generate GEN_LANE;
 
    -----------------------------------------

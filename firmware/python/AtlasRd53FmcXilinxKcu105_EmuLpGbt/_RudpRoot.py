@@ -85,8 +85,17 @@ class RudpRoot(pr.Root):
             NUM_ELINK_G = 4, 
             memBase     = self._srp,
             expand      = True,
-        ))            
-        
+        )) 
+
+        # Add the AuroraRxLane
+        for i in range(16):
+            self.add(common.AuroraRxLaneWrapper(      
+                name        = f'Rx[{i}]', 
+                offset      = (5*0x0001_0000)+i*0x100, 
+                memBase     = self._srp,
+                expand      = False,
+            ))
+            
     def start(self, **kwargs):                        
         super().start(**kwargs)
         
