@@ -4,4 +4,6 @@ export TIG_PULSE = 1
 export PRJ_VERSION = 0x01000300
 
 # Define release
+ifndef RELEASE
 export RELEASE = all
+endif
