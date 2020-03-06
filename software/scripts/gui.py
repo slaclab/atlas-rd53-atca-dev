@@ -17,6 +17,7 @@ import pyrogue.gui
 import pyrogue.pydm
 import rogue
 
+import AtlasAtcaLinkAggRd53Rtm_EmuLpGbt
 import AtlasRd53FmcXilinxKcu105_EmuLpGbt
 
 #################################################################
@@ -32,33 +33,67 @@ parser.add_argument(
     "--ip", 
     type     = str,
     required = True,
-    # default  = '192.168.2.10',
     help     = "FPGA IP Address",
 )  
 
 parser.add_argument(
-    "--platform", 
+    "--remoteDevice", 
     type     = str,
-    required = False,
-    default  = 'LinkAgg',
+    required = True,
     help     = "LinkAgg or Kcu105",
 )  
 
+parser.add_argument(
+    "--guiType",
+    type     = str,
+    required = False,
+    default  = 'PyDM',
+    help     = "Sets the GUI type (PyDM or PyQt)",
+)
+    
 # Get the arguments
 args = parser.parse_args()
 
 #################################################################
 
 # Select the hardware type
-if args.platform == 'kcu1500':
+if args.remoteDevice == 'LinkAgg':
+    myRoot = AtlasAtcaLinkAggRd53Rtm_EmuLpGbt.RudpRoot
+elif args.remoteDevice == 'Kcu105':
     myRoot = AtlasRd53FmcXilinxKcu105_EmuLpGbt.RudpRoot
 else:
-    myRoot = AtlasRd53FmcXilinxKcu105_EmuLpGbt.RudpRoot
-
+    raise ValueError("Invalid Remote Device (%s)" % (args.remoteDevice) )
+    
 #################################################################
 
 with myRoot(ip=args.ip) as root:
 
-    pyrogue.pydm.runPyDM(root=root)
+    ######################
+    # Development PyDM GUI
+    ######################
+    if (args.guiType == 'PyDM'):
+
+        pyrogue.pydm.runPyDM(root=root)
+
+    #################
+    # Legacy PyQT GUI
+    #################
+    elif (args.guiType == 'PyQt'):
+
+        # Create GUI
+        appTop = pyrogue.gui.application(sys.argv)
+        guiTop = pyrogue.gui.GuiTop()
+        guiTop.addTree(root)
+        guiTop.resize(800, 1000)
+
+        # Run gui
+        appTop.exec_()
+        root.stop()
+
+    ####################
+    # Undefined GUI type
+    ####################
+    else:
+        raise ValueError("Invalid GUI type (%s)" % (args.guiType) )
     
 #################################################################
