@@ -57,12 +57,14 @@ class RudpRoot(pr.Root):
             
         # Add I2C GPIO device
         for i in range(4):
-            self.add(nxp.Pca9555(      
-                name        = f'Gpio[{i}]', 
-                description = 'firmware/submodules/surf/python/surf/devices/nxp/_Pca9555.py', 
-                offset      = 0x84000000 + (i*0x0100_0000), 
-                memBase     = self._srp,
-            ))
+            for j in range(3):
+                index    = (i*3)+j
+                baseAddr = 0x84000000 + (i*0x0100_0000)
+                self.add(nxp.Pca9555(      
+                    name        = f'Gpio[{index}]',
+                    offset      = baseAddr + (j*0x400),
+                    memBase     = self._srp,
+                ))
         
         # Add the AuroraRxLane
         for i in range(3):
@@ -73,6 +75,6 @@ class RudpRoot(pr.Root):
                 baseAddr = 0x88000000 + (i*0x0100_0000)
                 self.add(common.AuroraRxLaneWrapper(      
                     name        = f'Rx[{mDp}][{ch}]', 
-                    offset      = baseAddr + (index*0x100), 
+                    offset      = baseAddr + (j*0x100), 
                     memBase     = self._srp,
                 ))
