@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
--- File       : AtlasAtcaLinkAggRd53Rtm_EmuLpGbt.vhd
+-- File       : AtlasAtcaLinkAggTestFrontPanelSgmii.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: Top Level Firmware for reading out RD53 on 24 mDP via RTM
+-- Description: Simple Firmware Example (dual front panel SGMII only)
 -------------------------------------------------------------------------------
 -- This file is part of 'ATLAS ATCA LINK AGG DEV'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -27,7 +27,7 @@ use atlas_atca_link_agg_fw_lib.AtlasAtcaLinkAggPkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity AtlasAtcaLinkAggRd53Rtm_EmuLpGbt is
+entity AtlasAtcaLinkAggTestFrontPanelSgmii is
    generic (
       TPD_G        : time    := 1 ns;
       SIMULATION_G : boolean := false;
@@ -123,183 +123,124 @@ entity AtlasAtcaLinkAggRd53Rtm_EmuLpGbt is
       -- SYSMON Ports
       vPIn           : in    sl;
       vNIn           : in    sl);
-end AtlasAtcaLinkAggRd53Rtm_EmuLpGbt;
+end AtlasAtcaLinkAggTestFrontPanelSgmii;
 
-architecture top_level of AtlasAtcaLinkAggRd53Rtm_EmuLpGbt is
+architecture top_level of AtlasAtcaLinkAggTestFrontPanelSgmii is
 
    constant ETH_CONFIG_C : EthConfigArray := (
-      -----------------------------------------------------------------------------------
-      ETH_FAB1_IDX_C => ETH_PORT_DISABLED_C,  -- Disabling slot#1 communication
-      ETH_FAB2_IDX_C => ETH_PORT_DISABLED_C,  -- Disabling slot#2 communication
-      ETH_FAB3_IDX_C => ETH_PORT_DISABLED_C,  -- Disabling slot#3 communication
-      ETH_FAB4_IDX_C => ETH_PORT_DISABLED_C,  -- Disabling slot#4 communication
-      -----------------------------------------------------------------------------------
-      ETH_FP0_IDX_C  => ETH_PORT_SRP_ONLY_C,  -- Using Front Panel SFP for SRPv3 configuration only
-      ETH_FP1_IDX_C  => ETH_PORT_SRP_ONLY_C);  -- Using Front Panel SFP for SRPv3 configuration only
-
-   signal axilClk         : sl;
-   signal axilRst         : sl;
-   signal axilReadMaster  : AxiLiteReadMasterType;
-   signal axilReadSlave   : AxiLiteReadSlaveType;
-   signal axilWriteMaster : AxiLiteWriteMasterType;
-   signal axilWriteSlave  : AxiLiteWriteSlaveType;
-
-   signal srvIbMasters : AxiStreamOctalMasterArray(NUM_ETH_C-1 downto 0);
-   signal srvIbSlaves  : AxiStreamOctalSlaveArray(NUM_ETH_C-1 downto 0);
-   signal srvObMasters : AxiStreamOctalMasterArray(NUM_ETH_C-1 downto 0);
-   signal srvObSlaves  : AxiStreamOctalSlaveArray(NUM_ETH_C-1 downto 0);
-
-   signal cltIbMasters : AxiStreamOctalMasterArray(NUM_ETH_C-1 downto 0);
-   signal cltIbSlaves  : AxiStreamOctalSlaveArray(NUM_ETH_C-1 downto 0);
-   signal cltObMasters : AxiStreamOctalMasterArray(NUM_ETH_C-1 downto 0);
-   signal cltObSlaves  : AxiStreamOctalSlaveArray(NUM_ETH_C-1 downto 0);
+      ETH_FAB1_IDX_C => ETH_PORT_DISABLED_C,
+      ETH_FAB2_IDX_C => ETH_PORT_DISABLED_C,
+      ETH_FAB3_IDX_C => ETH_PORT_DISABLED_C,
+      ETH_FAB4_IDX_C => ETH_PORT_DISABLED_C,
+      ETH_FP0_IDX_C  => ETH_PORT_SRP_ONLY_C,
+      ETH_FP1_IDX_C  => ETH_PORT_SRP_ONLY_C);
 
    signal ref156Clk : sl;
    signal ref156Rst : sl;
-   signal ipmiBsi   : BsiBusType;
 
-   signal dPortDataP : Slv4Array(23 downto 0);
-   signal dPortDataN : Slv4Array(23 downto 0);
-   signal dPortCmdP  : slv(23 downto 0);
-   signal dPortCmdN  : slv(23 downto 0);
+   signal smaClk     : sl;
+   signal smaClkBufg : sl;
 
-   signal i2cScl : slv(3 downto 0);
-   signal i2cSda : slv(3 downto 0);
+   signal srvMasters : AxiStreamOctalMasterArray(NUM_ETH_C-1 downto 0);
+   signal srvSlaves  : AxiStreamOctalSlaveArray(NUM_ETH_C-1 downto 0);
+   signal cltMasters : AxiStreamOctalMasterArray(NUM_ETH_C-1 downto 0);
+   signal cltSlaves  : AxiStreamOctalSlaveArray(NUM_ETH_C-1 downto 0);
 
 begin
 
-   U_RTM_Mapping : entity work.AtlasAtcaLinkAggRd53RtmMapping
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         -- mDP DATA/CMD Interface
-         dPortDataP => dPortDataP,
-         dPortDataN => dPortDataN,
-         dPortCmdP  => dPortCmdP,
-         dPortCmdN  => dPortCmdN,
-         -- I2C Interface
-         i2cScl     => i2cScl,
-         i2cSda     => i2cSda,
-         -- RTM Ports
-         rtmIo      => rtmIo,
-         dpmToRtmP  => dpmToRtmP,
-         dpmToRtmN  => dpmToRtmN,
-         rtmToDpmP  => rtmToDpmP,
-         rtmToDpmN  => rtmToDpmN);
+   fpBusyOut  <= not(fpTrigInL);
+   fpSpareOut <= not(fpSpareInL);
 
-   U_App : entity work.Application
+   U_smaClk : IBUFDS_GTE4
+      generic map (
+         REFCLK_EN_TX_PATH  => '0',
+         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
+         REFCLK_ICNTL_RX    => "00")
+      port map (
+         I     => smaClkP,
+         IB    => smaClkN,
+         CEB   => '0',
+         ODIV2 => smaClk,
+         O     => open);
+
+   U_smaClkBufg : BUFG_GT
+      port map (
+         I       => smaClk,
+         CE      => '1',
+         CEMASK  => '1',
+         CLR     => '0',
+         CLRMASK => '1',
+         DIV     => "000",              -- Divide by 1
+         O       => smaClkBufg);
+
+   U_fpgaToPllClk : entity surf.ClkOutBufDiff
       generic map (
          TPD_G        => TPD_G,
-         SIMULATION_G => SIMULATION_G)
+         XIL_DEVICE_G => XIL_DEVICE_C)
       port map (
-         -----------------------------
-         --  Interfaces to Application
-         -----------------------------
-         -- AXI-Lite Interface (axilClk domain): Address Range = [0x80000000:0xFFFFFFFF]
-         axilClk         => axilClk,
-         axilRst         => axilRst,
-         axilReadMaster  => axilReadMaster,
-         axilReadSlave   => axilReadSlave,
-         axilWriteMaster => axilWriteMaster,
-         axilWriteSlave  => axilWriteSlave,
-         -- Server Streaming Interface (axilClk domain)
-         srvIbMasters    => srvIbMasters,
-         srvIbSlaves     => srvIbSlaves,
-         srvObMasters    => srvObMasters,
-         srvObSlaves     => srvObSlaves,
-         -- Client Streaming Interface (axilClk domain)
-         cltIbMasters    => cltIbMasters,
-         cltIbSlaves     => cltIbSlaves,
-         cltObMasters    => cltObMasters,
-         cltObSlaves     => cltObSlaves,
-         -- Misc. Interface 
-         ref156Clk       => ref156Clk,
-         ref156Rst       => ref156Rst,
-         ipmiBsi         => ipmiBsi,
-         -- mDP DATA/CMD Interface
-         dPortDataP      => dPortDataP,
-         dPortDataN      => dPortDataN,
-         dPortCmdP       => dPortCmdP,
-         dPortCmdN       => dPortCmdN,
-         -- I2C Interface
-         i2cScl          => i2cScl,
-         i2cSda          => i2cSda,
-         --------------------- 
-         --  Application Ports
-         --------------------- 
-         -- Jitter Cleaner PLL Ports
-         fpgaToPllClkP   => fpgaToPllClkP,
-         fpgaToPllClkN   => fpgaToPllClkN,
-         pllToFpgaClkP   => pllToFpgaClkP,
-         pllToFpgaClkN   => pllToFpgaClkN,
-         -- Front Panel Clock/LED/TTL Ports
-         smaClkP         => smaClkP,
-         smaClkN         => smaClkN,
-         ledRedL         => ledRedL,
-         ledBlueL        => ledBlueL,
-         ledGreenL       => ledGreenL,
-         fpTrigInL       => fpTrigInL,
-         fpBusyOut       => fpBusyOut,
-         fpSpareOut      => fpSpareOut,
-         fpSpareInL      => fpSpareInL,
-         -- Backplane Clocks Ports
-         bpClkIn         => bpClkIn,
-         bpClkOut        => bpClkOut,
-         -- Front Panel QSFP+ Ports
-         qsfpEthRefClkP  => qsfpEthRefClkP,
-         qsfpEthRefClkN  => qsfpEthRefClkN,
-         qsfpRef160ClkP  => qsfpRef160ClkP,
-         qsfpRef160ClkN  => qsfpRef160ClkN,
-         qsfpPllClkP     => qsfpPllClkP,
-         qsfpPllClkN     => qsfpPllClkN,
-         qsfpTxP         => qsfpTxP,
-         qsfpTxN         => qsfpTxN,
-         qsfpRxP         => qsfpRxP,
-         qsfpRxN         => qsfpRxN,
-         -- Front Panel SFP+ Ports
-         sfpEthRefClkP   => sfpEthRefClkP,
-         sfpEthRefClkN   => sfpEthRefClkN,
-         sfpRef160ClkP   => sfpRef160ClkP,
-         sfpRef160ClkN   => sfpRef160ClkN,
-         sfpPllClkP      => sfpPllClkP,
-         sfpPllClkN      => sfpPllClkN,
-         sfpTxP          => sfpTxP,
-         sfpTxN          => sfpTxN,
-         sfpRxP          => sfpRxP,
-         sfpRxN          => sfpRxN);
+         clkIn   => smaClkBufg,
+         clkOutP => fpgaToPllClkP,
+         clkOutN => fpgaToPllClkN);
+
+   U_TERM_GTs : entity surf.Gthe4ChannelDummy
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => 4)
+      port map (
+         refClk => ref156Clk,
+         gtRxP  => sfpRxP,
+         gtRxN  => sfpRxN,
+         gtTxP  => sfpTxP,
+         gtTxN  => sfpTxN);
+
+   GEN_QSFP :
+   for i in 1 downto 0 generate
+      U_TERM_GTs : entity surf.Gtye4ChannelDummy
+         generic map (
+            TPD_G   => TPD_G,
+            WIDTH_G => 4)
+         port map (
+            refClk => ref156Clk,
+            gtRxP  => qsfpRxP(i),
+            gtRxN  => qsfpRxN(i),
+            gtTxP  => qsfpTxP(i),
+            gtTxN  => qsfpTxN(i));
+   end generate GEN_QSFP;
 
    U_Core : entity atlas_atca_link_agg_fw_lib.AtlasAtcaLinkAggCore
       generic map (
-         TPD_G              => TPD_G,
-         SIMULATION_G       => SIMULATION_G,
-         BUILD_INFO_G       => BUILD_INFO_G,
-         MEMORY_INIT_FILE_G => "AtlasAtcaLinkAggRd53Rtm_EmuLpGbt.mem",
-         ETH_CONFIG_G       => ETH_CONFIG_C)
+         TPD_G        => TPD_G,
+         SIMULATION_G => SIMULATION_G,
+         BUILD_INFO_G => BUILD_INFO_G,
+         ETH_CONFIG_G => ETH_CONFIG_C)
       port map (
          -----------------------------
          --  Interfaces to Application
          -----------------------------
          -- AXI-Lite Interface (axilClk domain): Address Range = [0x80000000:0xFFFFFFFF]
-         axilClk         => axilClk,
-         axilRst         => axilRst,
-         axilReadMaster  => axilReadMaster,
-         axilReadSlave   => axilReadSlave,
-         axilWriteMaster => axilWriteMaster,
-         axilWriteSlave  => axilWriteSlave,
+         axilClk         => open,
+         axilRst         => open,
+         axilReadMaster  => open,
+         axilReadSlave   => AXI_LITE_READ_SLAVE_EMPTY_SLVERR_C,
+         axilWriteMaster => open,
+         axilWriteSlave  => AXI_LITE_WRITE_SLAVE_EMPTY_SLVERR_C,
          -- Server Streaming Interface (axilClk domain)
-         srvIbMasters    => srvIbMasters,
-         srvIbSlaves     => srvIbSlaves,
-         srvObMasters    => srvObMasters,
-         srvObSlaves     => srvObSlaves,
+         srvIbMasters    => srvMasters,  -- Loopback
+         srvIbSlaves     => srvSlaves,   -- Loopback
+         srvObMasters    => srvMasters,  -- Loopback
+         srvObSlaves     => srvSlaves,   -- Loopback
          -- Client Streaming Interface (axilClk domain)
-         cltIbMasters    => cltIbMasters,
-         cltIbSlaves     => cltIbSlaves,
-         cltObMasters    => cltObMasters,
-         cltObSlaves     => cltObSlaves,
+         cltIbMasters    => cltMasters,  -- Loopback
+         cltIbSlaves     => cltSlaves,   -- Loopback
+         cltObMasters    => cltMasters,  -- Loopback
+         cltObSlaves     => cltSlaves,   -- Loopback
          -- Misc. Interface 
          ref156Clk       => ref156Clk,
          ref156Rst       => ref156Rst,
-         ipmiBsi         => ipmiBsi,
+         ipmiBsi         => open,
+         ledRedL         => ledRedL,
+         ledBlueL        => ledBlueL,
+         ledGreenL       => ledGreenL,
          -------------------   
          --  Top Level Ports
          -------------------   

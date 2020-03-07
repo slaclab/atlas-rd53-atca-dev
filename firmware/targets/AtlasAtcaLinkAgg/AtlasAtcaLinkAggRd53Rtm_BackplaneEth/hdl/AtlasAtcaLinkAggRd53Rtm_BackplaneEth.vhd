@@ -177,8 +177,8 @@ architecture top_level of AtlasAtcaLinkAggRd53Rtm_BackplaneEth is
    signal dPortCmdP  : slv(23 downto 0);
    signal dPortCmdN  : slv(23 downto 0);
 
-   signal i2cScl    : slv(3 downto 0);
-   signal i2cSda    : slv(3 downto 0);
+   signal i2cScl : slv(3 downto 0);
+   signal i2cSda : slv(3 downto 0);
 
 begin
 
