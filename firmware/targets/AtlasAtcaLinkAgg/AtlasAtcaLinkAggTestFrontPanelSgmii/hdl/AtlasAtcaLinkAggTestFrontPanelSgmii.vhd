@@ -128,12 +128,28 @@ end AtlasAtcaLinkAggTestFrontPanelSgmii;
 architecture top_level of AtlasAtcaLinkAggTestFrontPanelSgmii is
 
    constant ETH_CONFIG_C : EthConfigArray := (
-      ETH_FAB1_IDX_C => ETH_PORT_DISABLED_C,
-      ETH_FAB2_IDX_C => ETH_PORT_DISABLED_C,
-      ETH_FAB3_IDX_C => ETH_PORT_DISABLED_C,
-      ETH_FAB4_IDX_C => ETH_PORT_DISABLED_C,
-      ETH_FP0_IDX_C  => ETH_PORT_SRP_ONLY_C,
-      ETH_FP1_IDX_C  => ETH_PORT_SRP_ONLY_C);
+      -----------------------------------------------------------------------------------
+      ETH_FAB1_IDX_C => (               -- Using slot#1 COB for data processing
+         enable      => true,
+         enDhcp      => true,
+         enXvc       => false,
+         enSrp       => false,          -- No SRPv3 channel access
+         fabConfig   => ETH_10G_4LANE,  -- Using 10GbE XAUI
+         -- Streaming Data Server Configurations
+         numSrvData  => 1,  -- Moving all the data to one RSSI client on one RCE element
+         enSrvDataTx => true,
+         enSrvDataRx => true,
+         -- Streaming Data Client Configurations
+         numCltData  => 0,              -- Client disabled
+         enCltDataTx => false,
+         enCltDataRx => false),
+      -----------------------------------------------------------------------------------
+      ETH_FAB2_IDX_C => ETH_PORT_DISABLED_C,  -- Disabling slot#2 communication
+      ETH_FAB3_IDX_C => ETH_PORT_DISABLED_C,  -- Disabling slot#3 communication
+      ETH_FAB4_IDX_C => ETH_PORT_DISABLED_C,  -- Disabling slot#4 communication
+      -----------------------------------------------------------------------------------
+      ETH_FP0_IDX_C  => ETH_PORT_SRP_ONLY_C,  -- Using Front Panel SFP for SRPv3 configuration only
+      ETH_FP1_IDX_C  => ETH_PORT_SRP_ONLY_C);  -- Using Front Panel SFP for SRPv3 configuration only
 
    signal ref156Clk : sl;
    signal ref156Rst : sl;
