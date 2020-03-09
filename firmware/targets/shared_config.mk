@@ -1,7 +1,7 @@
 export TIG_PULSE = 1
 
-# Define Firmware Version: v1.1.0.1
-export PRJ_VERSION = 0x01010001
+# Define Firmware Version: v1.1.0.2
+export PRJ_VERSION = 0x01010002
 
 # Define release
 ifndef RELEASE

@@ -153,6 +153,15 @@ begin
    fpBusyOut  <= not(fpTrigInL);
    fpSpareOut <= not(fpSpareInL);
 
+   U_fpgaToPllClk : entity surf.ClkOutBufDiff
+      generic map (
+         TPD_G        => TPD_G,
+         XIL_DEVICE_G => XIL_DEVICE_C)
+      port map (
+         clkIn   => '0',
+         clkOutP => fpgaToPllClkP,
+         clkOutN => fpgaToPllClkN);
+
    U_TERM_GTs : entity surf.Gthe4ChannelDummy
       generic map (
          TPD_G   => TPD_G,
@@ -192,9 +201,9 @@ begin
          axilClk         => open,
          axilRst         => open,
          axilReadMaster  => open,
-         axilReadSlave   => AXI_LITE_READ_SLAVE_EMPTY_SLVERR_C,
+         axilReadSlave   => AXI_LITE_READ_SLAVE_EMPTY_OK_C,
          axilWriteMaster => open,
-         axilWriteSlave  => AXI_LITE_WRITE_SLAVE_EMPTY_SLVERR_C,
+         axilWriteSlave  => AXI_LITE_WRITE_SLAVE_EMPTY_OK_C,
          -- Server Streaming Interface (axilClk domain)
          srvIbMasters    => srvMasters,  -- Loopback
          srvIbSlaves     => srvSlaves,   -- Loopback

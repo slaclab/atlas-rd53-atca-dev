@@ -39,7 +39,8 @@ parser.add_argument(
 parser.add_argument(
     "--remoteDevice", 
     type     = str,
-    required = True,
+    required = False,
+    default  = 'LinkAgg',
     help     = "LinkAgg or Kcu105",
 )  
 
