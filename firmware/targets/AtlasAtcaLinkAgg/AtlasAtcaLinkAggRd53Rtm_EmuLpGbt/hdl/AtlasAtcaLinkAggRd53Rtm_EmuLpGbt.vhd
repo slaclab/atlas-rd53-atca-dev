@@ -129,21 +129,7 @@ architecture top_level of AtlasAtcaLinkAggRd53Rtm_EmuLpGbt is
 
    constant ETH_CONFIG_C : EthConfigArray := (
       -----------------------------------------------------------------------------------
-      ETH_FAB1_IDX_C => (               -- Using slot#1 COB for data processing
-         enable      => true,
-         enDhcp      => true,
-         enXvc       => false,
-         enSrp       => false,          -- No SRPv3 channel access
-         fabConfig   => ETH_10G_4LANE,  -- Using 10GbE XAUI
-         -- Streaming Data Server Configurations
-         numSrvData  => 1,  -- Moving all the data to one RSSI client on one RCE element
-         enSrvDataTx => true,
-         enSrvDataRx => true,
-         -- Streaming Data Client Configurations
-         numCltData  => 0,              -- Client disabled
-         enCltDataTx => false,
-         enCltDataRx => false),
-      -----------------------------------------------------------------------------------
+      ETH_FAB1_IDX_C => ETH_PORT_DISABLED_C,  -- Disabling slot#2 communication
       ETH_FAB2_IDX_C => ETH_PORT_DISABLED_C,  -- Disabling slot#2 communication
       ETH_FAB3_IDX_C => ETH_PORT_DISABLED_C,  -- Disabling slot#3 communication
       ETH_FAB4_IDX_C => ETH_PORT_DISABLED_C,  -- Disabling slot#4 communication

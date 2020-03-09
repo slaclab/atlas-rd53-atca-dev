@@ -129,21 +129,7 @@ architecture top_level of AtlasAtcaLinkAggTestFrontPanelSgmii is
 
    constant ETH_CONFIG_C : EthConfigArray := (
       -----------------------------------------------------------------------------------
-      ETH_FAB1_IDX_C => (               -- Using slot#1 COB for data processing
-         enable      => true,
-         enDhcp      => true,
-         enXvc       => false,
-         enSrp       => false,          -- No SRPv3 channel access
-         fabConfig   => ETH_10G_4LANE,  -- Using 10GbE XAUI
-         -- Streaming Data Server Configurations
-         numSrvData  => 1,  -- Moving all the data to one RSSI client on one RCE element
-         enSrvDataTx => true,
-         enSrvDataRx => true,
-         -- Streaming Data Client Configurations
-         numCltData  => 0,              -- Client disabled
-         enCltDataTx => false,
-         enCltDataRx => false),
-      -----------------------------------------------------------------------------------
+      ETH_FAB1_IDX_C => ETH_PORT_DISABLED_C,  -- Disabling slot#2 communication
       ETH_FAB2_IDX_C => ETH_PORT_DISABLED_C,  -- Disabling slot#2 communication
       ETH_FAB3_IDX_C => ETH_PORT_DISABLED_C,  -- Disabling slot#3 communication
       ETH_FAB4_IDX_C => ETH_PORT_DISABLED_C,  -- Disabling slot#4 communication
@@ -166,37 +152,6 @@ begin
 
    fpBusyOut  <= not(fpTrigInL);
    fpSpareOut <= not(fpSpareInL);
-
-   U_smaClk : IBUFDS_GTE4
-      generic map (
-         REFCLK_EN_TX_PATH  => '0',
-         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
-         REFCLK_ICNTL_RX    => "00")
-      port map (
-         I     => smaClkP,
-         IB    => smaClkN,
-         CEB   => '0',
-         ODIV2 => smaClk,
-         O     => open);
-
-   U_smaClkBufg : BUFG_GT
-      port map (
-         I       => smaClk,
-         CE      => '1',
-         CEMASK  => '1',
-         CLR     => '0',
-         CLRMASK => '1',
-         DIV     => "000",              -- Divide by 1
-         O       => smaClkBufg);
-
-   U_fpgaToPllClk : entity surf.ClkOutBufDiff
-      generic map (
-         TPD_G        => TPD_G,
-         XIL_DEVICE_G => XIL_DEVICE_C)
-      port map (
-         clkIn   => smaClkBufg,
-         clkOutP => fpgaToPllClkP,
-         clkOutN => fpgaToPllClkN);
 
    U_TERM_GTs : entity surf.Gthe4ChannelDummy
       generic map (
