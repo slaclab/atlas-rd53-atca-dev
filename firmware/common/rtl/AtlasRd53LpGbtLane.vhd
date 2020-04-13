@@ -258,8 +258,7 @@ begin
    U_DeMux : entity atlas_rd53_fw_lib.CmdAxisDeMux
       generic map (
          TPD_G         => TPD_G,
-         NUM_MASTERS_G => NUM_ELINK_C,
-         PIPE_STAGES_G => 1)
+         NUM_MASTERS_G => NUM_ELINK_C)
       port map (
          -- Clock and reset
          axisClk      => axilClk,
