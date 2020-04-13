@@ -2,14 +2,14 @@
 -- File       : AuroraRxLaneWrapper.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'ATLAS RD53 DEV'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'ATLAS RD53 DEV', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'ATLAS RD53 DEV', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -134,15 +134,15 @@ begin
       axiSlaveRegisterR(axilEp, x"04", 0, muxSlVectorArray(statusCnt, 1));
       axiSlaveRegisterR(axilEp, x"08", 0, muxSlVectorArray(statusCnt, 2));
       axiSlaveRegisterR(axilEp, x"0C", 0, statusOut);
-      
+
       axiSlaveRegister (axilEp, x"10", 0, v.lockingCntCfg);
       axiSlaveRegister (axilEp, x"14", 0, v.eyescanCfg);
       axiSlaveRegister (axilEp, x"18", 0, v.usrDlyCfg);
       axiSlaveRegister (axilEp, x"1C", 0, v.selectRate);
-      
+
       axiSlaveRegister (axilEp, x"20", 0, v.enUsrDlyCfg);
       axiSlaveRegister (axilEp, x"24", 0, v.polarity);
-      
+
       axiSlaveRegister (axilEp, x"F8", 0, v.rollOverEn);
       axiSlaveRegister (axilEp, x"FC", 0, v.cntRst);
 
@@ -235,9 +235,9 @@ begin
          statusIn(2)  => bitSlip,
          statusIn(1)  => hdrErrDet,
          statusIn(0)  => linkUp,
-         -- Output Status bit Signals (rdClk domain)  
+         -- Output Status bit Signals (rdClk domain)
          statusOut    => statusOut,
-         -- Status Bit Counters Signals (rdClk domain) 
+         -- Status Bit Counters Signals (rdClk domain)
          cntRstIn     => r.cntRst,
          rollOverEnIn => r.rollOverEn,
          cntOut       => statusCnt,

@@ -2,14 +2,14 @@
 -- File       : AtlasRd53EmuLpGbtLaneReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'ATLAS RD53 DEV'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'ATLAS RD53 DEV', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'ATLAS RD53 DEV', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -218,9 +218,9 @@ begin
          statusIn(NUM_ELINK_G+1)          => uplinkUp,
          statusIn(NUM_ELINK_G+0)          => downlinkUp,
          statusIn(NUM_ELINK_G-1 downto 0) => rxLinkUp,
-         -- Output Status bit Signals (rdClk domain)  
+         -- Output Status bit Signals (rdClk domain)
          statusOut                        => statusOut,
-         -- Status Bit Counters Signals (rdClk domain) 
+         -- Status Bit Counters Signals (rdClk domain)
          cntRstIn                         => r.cntRst,
          rollOverEnIn                     => r.rollOverEn,
          cntOut                           => statusCnt,

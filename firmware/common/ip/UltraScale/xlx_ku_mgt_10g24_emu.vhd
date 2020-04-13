@@ -5,11 +5,11 @@
 -- Description: Wrapper on GTH IP core
 -------------------------------------------------------------------------------
 -- This file is part of 'ATLAS RD53 FMC DEV'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'ATLAS RD53 FMC DEV', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'ATLAS RD53 FMC DEV', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -203,7 +203,7 @@ begin
 
    ----------
    -- Outputs
-   ----------       
+   ----------
    MGT_TXUSRCLK_o <= tx_wordclk40_sig;
    U_TXREADY : entity surf.RstSync
       generic map(
@@ -342,7 +342,7 @@ begin
 
    -------------
    -- GTH Module
-   -------------   
+   -------------
    xlx_ku_mgt_std_i : xlx_ku_mgt_ip_10g24_emu
       port map (
 

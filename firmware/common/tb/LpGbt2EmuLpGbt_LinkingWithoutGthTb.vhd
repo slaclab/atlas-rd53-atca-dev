@@ -5,11 +5,11 @@
 -- Description: Simulation Testbed for testing the GTH Linking Up
 -------------------------------------------------------------------------------
 -- This file is part of 'SLAC Firmware Standard Library'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'SLAC Firmware Standard Library', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'SLAC Firmware Standard Library', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -191,8 +191,8 @@ begin
          clk  => clk,
          slip => lpSlip,
          din  => emuTx,
-         dout => lpRx);   
-   
+         dout => lpRx);
+
    -- U_lpSlip : entity surf.Gearbox
       -- generic map (
          -- SLAVE_WIDTH_G  => WIDTH_C,
@@ -206,8 +206,8 @@ begin
          -- masterValid => valid(0),
          -- masterReady => ready(0));
    -- lpRx <= emuTx256b(index*WIDTH_C+WIDTH_C-1 downto index*WIDTH_C);
-   
-         
+
+
    -- U_lpResize : entity surf.Gearbox
       -- generic map (
          -- SLAVE_WIDTH_G  => 256,
@@ -244,7 +244,7 @@ begin
          enableFECErrCounter         => '1',
          fecCorrectionCount          => open,
          downlinkRdy_o               => downlinkReady(1),
-         -- uplink data        
+         -- uplink data
          uplinkClkEn_i               => uplinkClkEn(1),
          rst_uplink_i                => rst,
          upLinkData0                 => uplinkCnt(1)(31 downto 0),
@@ -271,7 +271,7 @@ begin
          GT_RXDATA_IN                => emuRx,
          -- General Configuration
          fecMode                     => '1',   -- ‘1’ = FEC 12
-         txDataRate                  => '1');  -- ‘1’ = 10.24 Gb/s   
+         txDataRate                  => '1');  -- ‘1’ = 10.24 Gb/s
 
    uplinkClkEn(1) <= clkEn;
    U_emuSlip : entity work.BarrelShifter
@@ -281,8 +281,8 @@ begin
          clk  => clk,
          slip => emuSlip,
          din  => lpTx,
-         dout => emuRx);   
-   
+         dout => emuRx);
+
    -- U_emuSlip : entity surf.Gearbox
       -- generic map (
          -- SLAVE_WIDTH_G  => WIDTH_C,
@@ -295,9 +295,9 @@ begin
          -- masterData  => lpTx256b,
          -- masterValid => valid(1),
          -- masterReady => ready(1));
-         
-   -- emuRx <= lpTx256b(index*WIDTH_C+WIDTH_C-1 downto index*WIDTH_C);      
-         
+
+   -- emuRx <= lpTx256b(index*WIDTH_C+WIDTH_C-1 downto index*WIDTH_C);
+
    -- U_emuResize : entity surf.Gearbox
       -- generic map (
          -- SLAVE_WIDTH_G  => 256,

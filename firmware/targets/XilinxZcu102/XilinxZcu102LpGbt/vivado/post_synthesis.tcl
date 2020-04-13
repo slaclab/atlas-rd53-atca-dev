@@ -1,10 +1,10 @@
 ##############################################################################
 ## This file is part of 'ATLAS RD53 FMC DEV'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'ATLAS RD53 FMC DEV', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'ATLAS RD53 FMC DEV', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
@@ -39,7 +39,7 @@ ConfigProbe ${ilaName} {GEN_SFP[0].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/rx_re
 ConfigProbe ${ilaName} {GEN_SFP[0].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/rxValid}
 ConfigProbe ${ilaName} {GEN_SFP[0].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/txValid}
 
-WriteDebugProbes ${ilaName} 
+WriteDebugProbes ${ilaName}
 
 #############################################################################################
 
@@ -56,6 +56,6 @@ ConfigProbe ${ilaName} {GEN_SFP[0].U_LpGbtLane/lpgbtFpga_top_inst/uplinkClkEn_s}
 ConfigProbe ${ilaName} {GEN_SFP[0].U_LpGbtLane/lpgbtFpga_top_inst/uplinkReady_o}
 ConfigProbe ${ilaName} {GEN_SFP[0].U_LpGbtLane/lpgbtFpga_top_inst/uplinkReady_s}
 
-WriteDebugProbes ${ilaName} 
+WriteDebugProbes ${ilaName}
 
 #############################################################################################

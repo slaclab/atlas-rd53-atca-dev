@@ -5,11 +5,11 @@
 -- Description: Top Level Firmware Target
 -------------------------------------------------------------------------------
 -- This file is part of 'ATLAS RD53 FMC DEV'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'ATLAS RD53 FMC DEV', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'ATLAS RD53 FMC DEV', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -264,7 +264,7 @@ begin
          -- Clock and reset
          axisClk      => axilClk,
          axisRst      => axilRst,
-         -- Slave         
+         -- Slave
          sAxisMaster  => dmaObMaster,
          sAxisSlave   => dmaObSlave,
          -- Masters
@@ -483,9 +483,9 @@ begin
             -- AutoReg and Read back Interface
             dataMaster         => dataMasters(i));
 
-      ---------------------         
+      ---------------------
       -- Outbound Data FIFO
-      ---------------------       
+      ---------------------
       U_DataFifo : entity surf.AxiStreamFifoV2
          generic map (
             -- General Configurations

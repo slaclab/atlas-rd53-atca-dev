@@ -5,11 +5,11 @@
 -- Description: Top Level Firmware Target
 -------------------------------------------------------------------------------
 -- This file is part of 'ATLAS RD53 FMC DEV'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'ATLAS RD53 FMC DEV', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'ATLAS RD53 FMC DEV', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -41,7 +41,7 @@ entity XilinxZcu102LpGbt is
       smaTxP       : out   sl;          -- Copy of 160 MHz clock for debugging
       smaTxN       : out   sl;          -- Copy of 160 MHz clock for debugging
       smaRxP       : in    sl;          -- RX unused
-      smaRxN       : in    sl;          -- RX unused      
+      smaRxN       : in    sl;          -- RX unused
       -- Clocks
       gtRefClk320P : in    sl;          -- FMC_HPC0_GBTCLK0_M2C_C_P
       gtRefClk320N : in    sl;          -- FMC_HPC0_GBTCLK0_M2C_C_N
@@ -67,14 +67,14 @@ architecture TOP_LEVEL of XilinxZcu102LpGbt is
          i2cAddress  => "0100000",      -- PCA9505DGG
          dataSize    => 8,              -- in units of bits
          addrSize    => 8,              -- in units of bits
-         endianness  => '0',            -- Little endian                   
-         repeatStart => '1'),           -- Repeat Start 
+         endianness  => '0',            -- Little endian
+         repeatStart => '1'),           -- Repeat Start
       1              => MakeI2cAxiLiteDevType(
          i2cAddress  => "1011000",      -- LMK61E2
          dataSize    => 8,              -- in units of bits
          addrSize    => 8,              -- in units of bits
-         endianness  => '0',            -- Little endian   
-         repeatStart => '1'));          -- Repeat Start  
+         endianness  => '0',            -- Little endian
+         repeatStart => '1'));          -- Repeat Start
 
    constant NUM_AXIL_MASTERS_C : natural := 7;
 
@@ -172,9 +172,9 @@ begin
    dmaClk <= (others => axilClk);
    dmaRst <= (others => axilRst);
 
-   ----------------------------------------         
+   ----------------------------------------
    -- Move AXI-Lite to another clock domain
-   ----------------------------------------         
+   ----------------------------------------
    U_AxiLiteAsync : entity surf.AxiLiteAsync
       generic map (
          TPD_G           => TPD_G,

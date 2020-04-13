@@ -5,11 +5,11 @@
 -- Description: Simple Firmware Example (dual front panel SGMII only)
 -------------------------------------------------------------------------------
 -- This file is part of 'ATLAS ATCA LINK AGG DEV'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'ATLAS ATCA LINK AGG DEV', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'ATLAS ATCA LINK AGG DEV', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -33,9 +33,9 @@ entity AtlasAtcaLinkAggTestFrontPanelSgmii is
       SIMULATION_G : boolean := false;
       BUILD_INFO_G : BuildInfoType);
    port (
-      --------------------- 
+      ---------------------
       --  Application Ports
-      --------------------- 
+      ---------------------
       -- Jitter Cleaner PLL Ports
       fpgaToPllClkP  : out   sl;
       fpgaToPllClkN  : out   sl;
@@ -82,9 +82,9 @@ entity AtlasAtcaLinkAggTestFrontPanelSgmii is
       dpmToRtmN      : inout Slv16Array(3 downto 0);
       rtmToDpmP      : inout Slv16Array(3 downto 0);
       rtmToDpmN      : inout Slv16Array(3 downto 0);
-      -------------------   
+      -------------------
       --  Top Level Ports
-      -------------------   
+      -------------------
       -- Jitter Cleaner PLL Ports
       pllSpiCsL      : out   sl;
       pllSpiSclk     : out   sl;
@@ -214,16 +214,16 @@ begin
          cltIbSlaves     => cltSlaves,   -- Loopback
          cltObMasters    => cltMasters,  -- Loopback
          cltObSlaves     => cltSlaves,   -- Loopback
-         -- Misc. Interface 
+         -- Misc. Interface
          ref156Clk       => ref156Clk,
          ref156Rst       => ref156Rst,
          ipmiBsi         => open,
          ledRedL         => ledRedL,
          ledBlueL        => ledBlueL,
          ledGreenL       => ledGreenL,
-         -------------------   
+         -------------------
          --  Top Level Ports
-         -------------------   
+         -------------------
          -- Jitter Cleaner PLL Ports
          pllSpiCsL       => pllSpiCsL,
          pllSpiSclk      => pllSpiSclk,

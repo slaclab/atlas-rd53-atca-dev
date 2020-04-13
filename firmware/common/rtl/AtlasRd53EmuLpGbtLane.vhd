@@ -2,15 +2,15 @@
 -- File       : AtlasRd53EmuLpGbtLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: Receives the CMD from LpGBT 
+-- Description: Receives the CMD from LpGBT
 --              and does the SELECTIO delay alignment before LpGBT transmit
 -------------------------------------------------------------------------------
 -- This file is part of 'ATLAS RD53 FMC DEV'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'ATLAS RD53 FMC DEV', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'ATLAS RD53 FMC DEV', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -234,7 +234,7 @@ begin
       cmdMask(i) <= cmd(i) xor invCmd(i);
 
       --------------------------
-      -- Generate a delayed copy 
+      -- Generate a delayed copy
       --------------------------
       process(clk160MHz)
       begin

@@ -5,11 +5,11 @@
 -- Description: Top-Level Application Wrapper
 -------------------------------------------------------------------------------
 -- This file is part of 'ATLAS ATCA LINK AGG DEV'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'ATLAS ATCA LINK AGG DEV', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'ATLAS ATCA LINK AGG DEV', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -57,7 +57,7 @@ entity Application is
       cltIbSlaves     : in    AxiStreamOctalSlaveArray(NUM_ETH_C-1 downto 0)  := (others => (others => AXI_STREAM_SLAVE_FORCE_C));
       cltObMasters    : in    AxiStreamOctalMasterArray(NUM_ETH_C-1 downto 0) := (others => (others => AXI_STREAM_MASTER_INIT_C));
       cltObSlaves     : out   AxiStreamOctalSlaveArray(NUM_ETH_C-1 downto 0)  := (others => (others => AXI_STREAM_SLAVE_FORCE_C));
-      -- Misc. Interface 
+      -- Misc. Interface
       ref156Clk       : in    sl;
       ref156Rst       : in    sl;
       ipmiBsi         : in    BsiBusType;
@@ -69,9 +69,9 @@ entity Application is
       -- I2C Interface
       i2cScl          : inout slv(3 downto 0);
       i2cSda          : inout slv(3 downto 0);
-      --------------------- 
+      ---------------------
       --  Application Ports
-      --------------------- 
+      ---------------------
       -- Jitter Cleaner PLL Ports
       fpgaToPllClkP   : out   sl;
       fpgaToPllClkN   : out   sl;
@@ -121,20 +121,20 @@ architecture mapping of Application is
          i2cAddress  => "0100000",      -- PCA9555
          dataSize    => 8,              -- in units of bits
          addrSize    => 8,              -- in units of bits
-         endianness  => '0',            -- Little endian                   
-         repeatStart => '1'),           -- Repeat Start  
+         endianness  => '0',            -- Little endian
+         repeatStart => '1'),           -- Repeat Start
       1              => MakeI2cAxiLiteDevType(
          i2cAddress  => "0100001",      -- PCA9555
          dataSize    => 8,              -- in units of bits
          addrSize    => 8,              -- in units of bits
-         endianness  => '0',            -- Little endian                   
-         repeatStart => '1'),           -- Repeat Start  
+         endianness  => '0',            -- Little endian
+         repeatStart => '1'),           -- Repeat Start
       2              => MakeI2cAxiLiteDevType(
          i2cAddress  => "0100010",      -- PCA9555
          dataSize    => 8,              -- in units of bits
          addrSize    => 8,              -- in units of bits
          endianness  => '0',            -- Little endian
-         repeatStart => '1'));          -- Repeat Start           
+         repeatStart => '1'));          -- Repeat Start
 
    constant NUM_AXIL_MASTERS_C : positive := 11;
 
@@ -262,7 +262,7 @@ begin
    end generate;
 
    ---------------------------------------------------------------------------------
-   -- External Reference clock (required for synchronizing to remote LpGBT receiver) 
+   -- External Reference clock (required for synchronizing to remote LpGBT receiver)
    ---------------------------------------------------------------------------------
    U_fpgaToPllClk : entity surf.ClkOutBufDiff
       generic map (
@@ -328,13 +328,13 @@ begin
       generic map (
          BUFGCE_DIVIDE => 4)
       port map (
-         I   => axilClk,                -- 156.25 MHz 
+         I   => axilClk,                -- 156.25 MHz
          CE  => '1',
          CLR => '0',
-         O   => drpClk);                -- 39.0625 MHz         
+         O   => drpClk);                -- 39.0625 MHz
 
    --------------------------
-   -- Reference 300 MHz clock 
+   -- Reference 300 MHz clock
    --------------------------
    U_MMCM : entity surf.ClockManagerUltraScale
       generic map(
@@ -440,9 +440,9 @@ begin
          mAxiReadMasters     => rxReadMasters(2*32+31 downto 2*32),
          mAxiReadSlaves      => rxReadSlaves(2*32+31 downto 2*32));
 
-   ------------------------------         
+   ------------------------------
    -- High Speed SelectIO Modules
-   ------------------------------         
+   ------------------------------
    U_Selectio : entity atlas_rd53_fw_lib.AtlasRd53HsSelectio
       generic map(
          TPD_G        => TPD_G,

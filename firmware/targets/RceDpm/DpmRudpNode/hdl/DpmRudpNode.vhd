@@ -3,17 +3,17 @@
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: RUDP DPM: Top Level Firmware
--- 
--- Refer to atlas-rd53-atca-dev/firmware/targets/RceDpm/DpmRudpNode/README.md 
+--
+-- Refer to atlas-rd53-atca-dev/firmware/targets/RceDpm/DpmRudpNode/README.md
 -- for how to setup the RCE and how to establish the RUDP connections
--- 
+--
 -------------------------------------------------------------------------------
 -- This file is part of 'RCE Development Firmware'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'RCE Development Firmware', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'RCE Development Firmware', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 ------------------------------------------------------------------------------
 
@@ -86,8 +86,8 @@ architecture TOP_LEVEL of DpmRudpNode is
 
    constant APP_AXIS_CONFIG_C : AxiStreamConfigArray(0 downto 0) := (others => RCEG3_AXIS_DMA_CONFIG_C);
 
-   constant AXIL_CLK_FREQ_C    : real     := 156.25E+6;  -- In units of Hz   
-   constant TIMEOUT_C          : real     := 1.0E-3;  -- In units of seconds   
+   constant AXIL_CLK_FREQ_C    : real     := 156.25E+6;  -- In units of Hz
+   constant TIMEOUT_C          : real     := 1.0E-3;  -- In units of seconds
    constant WINDOW_ADDR_SIZE_C : positive := 6;
    constant MAX_SEG_SIZE_C     : positive := 1024;
 
@@ -210,9 +210,9 @@ begin
    dmaIbMasters(2) <= dmaObMasters(2);
    dmaObSlaves(2)  <= dmaIbSlaves(2);
 
-   ----------------------------------------         
+   ----------------------------------------
    -- Move AXI-Lite to another clock domain
-   ----------------------------------------         
+   ----------------------------------------
    U_AxiLiteAsync : entity surf.AxiLiteAsync
       generic map (
          TPD_G           => TPD_G,

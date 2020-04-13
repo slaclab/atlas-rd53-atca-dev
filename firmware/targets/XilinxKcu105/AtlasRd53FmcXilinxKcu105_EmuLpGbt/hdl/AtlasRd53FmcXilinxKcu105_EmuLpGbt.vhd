@@ -2,18 +2,18 @@
 -- File       : AtlasRd53FmcXilinxKcu105_EmuLpGbt.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 --    SFP[0] = 1GbE RUDP
 --    SFP[1] = emulation LP-GBT
 -------------------------------------------------------------------------------
 -- Note: This design requires two FMC cards installed (HPC and LPC bays)
 -------------------------------------------------------------------------------
 -- This file is part of 'ATLAS RD53 FMC DEV'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'ATLAS RD53 FMC DEV', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'ATLAS RD53 FMC DEV', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -73,14 +73,14 @@ architecture top_level of AtlasRd53FmcXilinxKcu105_EmuLpGbt is
          i2cAddress  => "0100000",      -- PCA9505DGG
          dataSize    => 8,              -- in units of bits
          addrSize    => 8,              -- in units of bits
-         endianness  => '0',            -- Little endian                   
-         repeatStart => '1'),           -- Repeat Start 
+         endianness  => '0',            -- Little endian
+         repeatStart => '1'),           -- Repeat Start
       1              => MakeI2cAxiLiteDevType(
          i2cAddress  => "1011000",      -- PCA9505DGG
          dataSize    => 8,              -- in units of bits
          addrSize    => 8,              -- in units of bits
-         endianness  => '0',            -- Little endian   
-         repeatStart => '1'));          -- Repeat Start   
+         endianness  => '0',            -- Little endian
+         repeatStart => '1'));          -- Repeat Start
 
    constant AXIL_CLK_FREQ_C : real := 156.25E+6;  -- Units of Hz
 
@@ -351,7 +351,7 @@ begin
 
    --------------------
    -- AxiVersion Module
-   --------------------         
+   --------------------
    U_AxiVersion : entity surf.AxiVersion
       generic map (
          TPD_G        => TPD_G,
@@ -506,7 +506,7 @@ begin
       generic map (
          BUFGCE_DIVIDE => 4)
       port map (
-         I   => axilClk,                -- 156.25 MHz 
+         I   => axilClk,                -- 156.25 MHz
          CE  => '1',
          CLR => '0',
          O   => drpClk);                -- 39.0625 MHz

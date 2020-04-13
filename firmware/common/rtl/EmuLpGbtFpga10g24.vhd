@@ -5,11 +5,11 @@
 -- Description: Emulation LpGBT 10.24 Wrapper
 -------------------------------------------------------------------------------
 -- This file is part of 'ATLAS RD53 FMC DEV'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'ATLAS RD53 FMC DEV', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'ATLAS RD53 FMC DEV', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -158,7 +158,7 @@ begin
          enableFECErrCounter         => enableFECErrCounter_i,
          fecCorrectionCount          => fecCorrectionCount_o,
          downlinkRdy_o               => downlinkReady_o,
-         -- uplink data        
+         -- uplink data
          uplinkClkEn_i               => uplinkClkEn_s,
          rst_uplink_i                => uplinkRst_s,
          upLinkData0                 => uplinkUserData_i(31 downto 0),

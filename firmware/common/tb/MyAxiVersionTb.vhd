@@ -4,11 +4,11 @@
 -- Description: Simulation Testbed for testing the MyAxiVersionTb module
 -------------------------------------------------------------------------------
 -- This file is part of 'SLAC Firmware Standard Library'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'SLAC Firmware Standard Library', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'SLAC Firmware Standard Library', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@ architecture testbed of MyAxiVersionTb is
       ETH_FAB4_IDX_C => ETH_PORT_DISABLED_C,  -- Disabling slot#4 communication
       -----------------------------------------------------------------------------------
       ETH_FP0_IDX_C  => ETH_PORT_SRP_ONLY_C,  -- Using Front Panel SFP for SRPv3 configuration only
-      ETH_FP1_IDX_C  => ETH_PORT_SRP_ONLY_C);  -- Using Front Panel SFP for SRPv3 configuration only   
+      ETH_FP1_IDX_C  => ETH_PORT_SRP_ONLY_C);  -- Using Front Panel SFP for SRPv3 configuration only
 
    function genRouteTable
       return slv is
@@ -120,7 +120,7 @@ begin
 
    --------------------------
    -- AXI-Lite: Crossbar Core
-   --------------------------  
+   --------------------------
    U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,

@@ -5,11 +5,11 @@
 -- Description: Top Level Firmware for reading out RD53 on 24 mDP via RTM
 -------------------------------------------------------------------------------
 -- This file is part of 'ATLAS ATCA LINK AGG DEV'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'ATLAS ATCA LINK AGG DEV', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'ATLAS ATCA LINK AGG DEV', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -33,9 +33,9 @@ entity AtlasAtcaLinkAggRd53Rtm_BackplaneEth is
       SIMULATION_G : boolean := false;
       BUILD_INFO_G : BuildInfoType);
    port (
-      --------------------- 
+      ---------------------
       --  Application Ports
-      --------------------- 
+      ---------------------
       -- Jitter Cleaner PLL Ports
       fpgaToPllClkP  : out   sl;
       fpgaToPllClkN  : out   sl;
@@ -82,9 +82,9 @@ entity AtlasAtcaLinkAggRd53Rtm_BackplaneEth is
       dpmToRtmN      : inout Slv16Array(3 downto 0);
       rtmToDpmP      : inout Slv16Array(3 downto 0);
       rtmToDpmN      : inout Slv16Array(3 downto 0);
-      -------------------   
+      -------------------
       --  Top Level Ports
-      -------------------   
+      -------------------
       -- Jitter Cleaner PLL Ports
       pllSpiCsL      : out   sl;
       pllSpiSclk     : out   sl;
@@ -226,7 +226,7 @@ begin
          cltIbSlaves     => cltIbSlaves,
          cltObMasters    => cltObMasters,
          cltObSlaves     => cltObSlaves,
-         -- Misc. Interface 
+         -- Misc. Interface
          ref156Clk       => ref156Clk,
          ref156Rst       => ref156Rst,
          ipmiBsi         => ipmiBsi,
@@ -238,9 +238,9 @@ begin
          -- I2C Interface
          i2cScl          => i2cScl,
          i2cSda          => i2cSda,
-         --------------------- 
+         ---------------------
          --  Application Ports
-         --------------------- 
+         ---------------------
          -- Jitter Cleaner PLL Ports
          fpgaToPllClkP   => fpgaToPllClkP,
          fpgaToPllClkN   => fpgaToPllClkN,
@@ -309,13 +309,13 @@ begin
          cltIbSlaves     => cltIbSlaves,
          cltObMasters    => cltObMasters,
          cltObSlaves     => cltObSlaves,
-         -- Misc. Interface 
+         -- Misc. Interface
          ref156Clk       => ref156Clk,
          ref156Rst       => ref156Rst,
          ipmiBsi         => ipmiBsi,
-         -------------------   
+         -------------------
          --  Top Level Ports
-         -------------------   
+         -------------------
          -- Jitter Cleaner PLL Ports
          pllSpiCsL       => pllSpiCsL,
          pllSpiSclk      => pllSpiSclk,

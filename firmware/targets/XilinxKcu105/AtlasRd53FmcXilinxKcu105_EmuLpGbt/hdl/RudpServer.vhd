@@ -5,11 +5,11 @@
 -- Description: RUDP Server Module
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'Example Project Firmware', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'Example Project Firmware', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -63,7 +63,7 @@ architecture mapping of RudpServer is
       TUSER_BITS_C  => 2,
       TUSER_MODE_C  => TUSER_FIRST_LAST_C);
 
-   constant TIMEOUT_C          : real     := 1.0E-3;  -- In units of seconds   
+   constant TIMEOUT_C          : real     := 1.0E-3;  -- In units of seconds
    constant WINDOW_ADDR_SIZE_C : positive := ite(JUMBO_G, 3, 4);
    constant MAX_SEG_SIZE_C     : positive := ite(JUMBO_G, 8192, 1024);  -- Jumbo frame chucking
 
@@ -117,7 +117,7 @@ begin
       port map (
          -- Local Configurations
          localMac(0)     => localMac,
-         -- Streaming DMA Interface 
+         -- Streaming DMA Interface
          dmaClk(0)       => dmaClk,
          dmaRst(0)       => dmaRst,
          dmaIbMasters(0) => obMacMaster,
@@ -143,7 +143,7 @@ begin
       port map (
          EFUSEUSR => efuse);
 
-   localMac(23 downto 0)  <= x"56_00_08";  -- 08:00:56:XX:XX:XX (big endian SLV)   
+   localMac(23 downto 0)  <= x"56_00_08";  -- 08:00:56:XX:XX:XX (big endian SLV)
    localMac(47 downto 24) <= efuse(31 downto 8);
 
    ----------------------
@@ -228,7 +228,7 @@ begin
          GEN_SYNC_FIFO_G     => true,
          AXI_STREAM_CONFIG_G => AXIS_CONFIG_C)
       port map (
-         -- Streaming Slave (Rx) Interface (sAxisClk domain) 
+         -- Streaming Slave (Rx) Interface (sAxisClk domain)
          sAxisClk         => dmaClk,
          sAxisRst         => dmaRst,
          sAxisMaster      => appIbMaster,
