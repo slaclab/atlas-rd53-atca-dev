@@ -1,10 +1,10 @@
 #-----------------------------------------------------------------------------
-# This file is part of the 'ATLAS RD53 ATCA DEV'. It is subject to 
-# the license terms in the LICENSE.txt file found in the top-level directory 
-# of this distribution and at: 
-#    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-# No part of the 'ATLAS RD53 ATCA DEV', including this file, may be 
-# copied, modified, propagated, or distributed except according to the terms 
+# This file is part of the 'ATLAS RD53 ATCA DEV'. It is subject to
+# the license terms in the LICENSE.txt file found in the top-level directory
+# of this distribution and at:
+#    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+# No part of the 'ATLAS RD53 ATCA DEV', including this file, may be
+# copied, modified, propagated, or distributed except according to the terms
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
@@ -30,19 +30,19 @@ argBool = lambda s: s.lower() in ['true', 't', 'yes', '1']
 
 # Add arguments
 parser.add_argument(
-    "--ip", 
+    "--ip",
     type     = str,
     required = True,
     help     = "FPGA IP Address",
-)  
+)
 
 parser.add_argument(
-    "--remoteDevice", 
+    "--remoteDevice",
     type     = str,
     required = False,
     default  = 'LinkAgg',
     help     = "LinkAgg or Kcu105",
-)  
+)
 
 parser.add_argument(
     "--guiType",
@@ -51,7 +51,7 @@ parser.add_argument(
     default  = 'PyDM',
     help     = "Sets the GUI type (PyDM or PyQt)",
 )
-    
+
 # Get the arguments
 args = parser.parse_args()
 
@@ -64,7 +64,7 @@ elif args.remoteDevice == 'Kcu105':
     myRoot = AtlasRd53FmcXilinxKcu105_EmuLpGbt.RudpRoot
 else:
     raise ValueError("Invalid Remote Device (%s)" % (args.remoteDevice) )
-    
+
 #################################################################
 
 with myRoot(ip=args.ip) as root:
@@ -96,5 +96,5 @@ with myRoot(ip=args.ip) as root:
     ####################
     else:
         raise ValueError("Invalid GUI type (%s)" % (args.guiType) )
-    
+
 #################################################################
