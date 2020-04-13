@@ -255,7 +255,7 @@ begin
    ---------------------------------------------------------------------
    -- Demux the DMA outbound stream into different steam CMD AXI Streams
    ---------------------------------------------------------------------
-   U_DeMux : entity surf.AxiStreamDeMux
+   U_DeMux : entity atlas_rd53_fw_lib.CmdAxisDeMux
       generic map (
          TPD_G         => TPD_G,
          NUM_MASTERS_G => NUM_ELINK_C,

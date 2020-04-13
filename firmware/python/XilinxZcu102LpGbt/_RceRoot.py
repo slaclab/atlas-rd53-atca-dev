@@ -25,9 +25,10 @@ class RceRoot(pr.Root):
         super().__init__(**kwargs)
         
         # Init local variables
-        self._Dma  = [[None for elink in range(6)] for sfp in range(4)]
-        self._Cmd  = [[None for elink in range(6)] for sfp in range(4)]
-        self._Data = [[None for elink in range(6)] for sfp in range(4)]
+        self._Dma    = [[None for elink in range(6+1)] for sfp in range(4)]
+        self._Cmd    = [[None for elink in range(6)]   for sfp in range(4)]
+        self._CmdAll = [ None for sfp   in range(4)]
+        self._Data   = [[None for elink in range(6)]   for sfp in range(4)]
         
         # Create the mmap interface
         self._RceMemMap = rogue.hardware.axi.AxiMemMap('/dev/rce_memmap')
@@ -66,6 +67,12 @@ class RceRoot(pr.Root):
         
         # Loop through the SFP links
         for sfp in range(4):
+        
+            # Create DMA[sfp].DEST[6]
+            self._dma[sfp][6] = rogue.hardware.axi.AxiStreamDma(f'/dev/axi_stream_dma_{sfp}',6,True)  
+
+            # Connect DMA[sfp].DEST[elink] --> CMDAll[sfp] (same CMD on all elinks)
+            self._dma[sfp][6] >> self._CmdAll[sfp]            
         
             # Loop through the elinks
             for elink in range(6):
