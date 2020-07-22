@@ -178,6 +178,9 @@ architecture mapping of Application is
    signal dlyLoad    : slv(95 downto 0);
    signal dlyCfg     : Slv9Array(95 downto 0);
 
+   signal cmdBusyOut : slv(23 downto 0);
+   signal cmdBusyAll : sl;
+
    signal ref160Clock : sl;
    signal ref160Clk   : sl;
    signal ref160Rst   : sl;
@@ -457,6 +460,9 @@ begin
             VALID_THOLD_G => VALID_THOLD_C,
             XIL_DEVICE_G  => XIL_DEVICE_C)
          port map (
+            -- CMD busy Flags
+            cmdBusyOut      => cmdBusyOut(i),
+            cmdBusyAll      => cmdBusyAll,
             -- AXI-Lite Interface
             axilClk         => axilClk,
             axilRst         => axilRst,
@@ -487,6 +493,13 @@ begin
             dPortCmdP       => dPortCmdP(i),
             dPortCmdN       => dPortCmdN(i));
    end generate GEN_mDP;
+
+   process(clk160MHz)
+   begin
+      if rising_edge(clk160MHz) then
+         cmdBusyAll <= uOr(cmdBusyOut) after TPD_G;
+      end if;
+   end process;
 
    U_MuxConfig : entity surf.AxiStreamMux
       generic map (

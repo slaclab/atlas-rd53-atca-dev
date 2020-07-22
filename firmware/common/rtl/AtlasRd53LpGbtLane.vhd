@@ -149,6 +149,8 @@ architecture rtl of AtlasRd53LpGbtLane is
    signal linkUp       : Slv4Array(NUM_ELINK_C-1 downto 0);
    signal hdrErrDet    : Slv4Array(NUM_ELINK_C-1 downto 0);
 
+   signal cmdBusyAll : sl;
+
    signal pwrUpRst          : sl;
    signal downlinkReadySync : sl;
    signal uplinkReadySync   : sl;
@@ -224,6 +226,7 @@ begin
             hdrErrDet       => hdrErrDet(i),
             linkUp          => linkUp(i),
             cmdBusy         => cmdBusy(i),
+            cmdBusyAll      => cmdBusyAll,
             downlinkReady   => downlinkReadySync,
             uplinkReady     => uplinkReadySync,
             bitSlip         => rxBitSlip(i),
@@ -251,6 +254,13 @@ begin
             axilWriteSlave  => axilWriteSlaves(i));
 
    end generate GEN_CTRL_STATUS;
+
+   process(clk160MHz)
+   begin
+      if rising_edge(clk160MHz) then
+         cmdBusyAll <= uOr(cmdBusy) after TPD_G;
+      end if;
+   end process;
 
    ---------------------------------------------------------------------
    -- Demux the DMA outbound stream into different steam CMD AXI Streams
