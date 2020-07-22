@@ -17,6 +17,7 @@ RogueScripts:
   - ../software/scripts/gui.py
 
 Targets:
+  ###############################################
   AtlasAtcaLinkAggRd53Rtm_EmuLpGbt:
     ImageDir: targets/AtlasAtcaLinkAgg/AtlasAtcaLinkAggRd53Rtm_EmuLpGbt/images
     Extensions:
@@ -31,34 +32,42 @@ Targets:
     ImageDir: targets/AtlasAtcaLinkAgg/AtlasAtcaLinkAggTestFrontPanelSgmii/images
     Extensions:
       - bit
-      - mcs      
+      - mcs
+  ###############################################
   DpmIbertTester:
     ImageDir: targets/RceDpm/DpmIbertTester/images
-    Extensions:
-      - bit  
+    Extensions: bit
   DpmRudpNode:
     ImageDir: targets/RceDpm/DpmRudpNode/images
-    Extensions:
-      - bit        
+    Extensions: bit
+  DpmPgp3_6Gbps:
+    ImageDir: targets/RceDpm/DpmPgp3_6Gbps/images
+    Extensions: bit
+  ###############################################
   AtlasRd53FmcXilinxKcu105_EmuLpGbt:
     ImageDir: targets/XilinxKcu105/AtlasRd53FmcXilinxKcu105_EmuLpGbt/images
-    Extensions:
-      - bit
+    Extensions: bit
+  ###############################################
   XilinxZcu102LpGbt:
     ImageDir: targets/XilinxZcu102/XilinxZcu102LpGbt/images
-    Extensions:
-      - bin
-
+    Extensions: bin
+  ###############################################
 Releases:
   all:
     Primary: True
     Targets:
+      ###############################################
       - AtlasAtcaLinkAggRd53Rtm_EmuLpGbt
       # - AtlasAtcaLinkAggRd53Rtm_BackplaneEth
       # - AtlasAtcaLinkAggTestFrontPanelSgmii
+      ###############################################
       - DpmIbertTester
       - DpmRudpNode
+      - DpmPgp3_6Gbps
+      ###############################################
       - AtlasRd53FmcXilinxKcu105_EmuLpGbt
+      ###############################################
       - XilinxZcu102LpGbt
+      ###############################################
     Types:
       - Rogue

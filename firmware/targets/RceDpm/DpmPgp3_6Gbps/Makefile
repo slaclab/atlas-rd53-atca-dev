@@ -1,10 +1,11 @@
-export TIG_PULSE = 1
+# Use the PGPv3 6G core
+export INCLUDE_PGP3_6G = 1
 
 # Define target output
-target: prom
+target: bit
 
 # Define target part
-export PRJ_PART = XCKU15P-FFVA1156-2-E
+export PRJ_PART = XC7Z045FFG900-2
 
 # Using a non-standard target directory structure, 
 # which requires me to define the TOP_DIR path
