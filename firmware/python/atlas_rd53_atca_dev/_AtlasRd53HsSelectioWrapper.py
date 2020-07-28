@@ -19,9 +19,9 @@ class AtlasRd53HsSelectioWrapper(pr.Device):
         remapEnum = [[] for _ in range(128)]
         for i in range(128):
             if (i<96):
-                remapEnum[i] = i: f'Ch{i}'
+                remapEnum[i] = f'Ch{i}'
             else:
-                remapEnum[i] = i: f'Disabled{i}'
+                remapEnum[i] = f'Disabled{i}'
 
         for i in range(128):
             self.add(pr.RemoteVariable(
@@ -31,7 +31,7 @@ class AtlasRd53HsSelectioWrapper(pr.Device):
                 bitSize      = 7,
                 bitOffset    = 0,
                 mode         = 'RW',
-                enum         = remapEnum,
+                enum         = dict(zip(range(128), remapEnum)),
             ))
         for i in range(128):
             self.add(pr.RemoteVariable(
@@ -41,5 +41,5 @@ class AtlasRd53HsSelectioWrapper(pr.Device):
                 bitSize      = 7,
                 bitOffset    = 7,
                 mode         = 'RW',
-                enum         = remapEnum,
+                enum         = dict(zip(range(128), remapEnum)),
             ))

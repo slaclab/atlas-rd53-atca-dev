@@ -53,7 +53,7 @@ Releases:
     Primary: True
     Targets:
       - AtlasAtcaLinkAggRd53Rtm_EmuLpGbt
-      - XilinxKcu1500Pgp3_6Gbps
+      # - XilinxKcu1500Pgp3_6Gbps
       - DpmIbertTester
       - DpmRudpNode
       - DpmPgp3_6Gbps

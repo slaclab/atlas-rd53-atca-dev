@@ -37,6 +37,7 @@ class RudpRoot(pr.Root):
             port    = 8193,
             packVer = 2,
         )
+        self.add(self._Rudp)
         self._RudpSrp = self._Rudp.application(0)
 
         ###########################
