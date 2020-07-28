@@ -29,7 +29,9 @@ class RudpRoot(pr.Root):
             **kwargs):
         super().__init__(**kwargs)
 
+        ###################################################
         # Create the RUDP connection and map SRP to DEST[0]
+        ###################################################
         self._Rudp = pr.protocols.UdpRssiPack(
             host    = ip,
             port    = 8193,
@@ -37,44 +39,65 @@ class RudpRoot(pr.Root):
         )
         self._RudpSrp = self._Rudp.application(0)
 
+        ###########################
         # Connect the SRPv3 streams
+        ###########################
         self._srp = rogue.protocols.srp.SrpV3()
         self._RudpSrp == self._srp
 
+        ###################################
         # Add the Core ATCA Link Agg device
+        ###################################
         self.add(linkAgg.Core(
             memBase     = self._srp,
         ))
 
-        # Add RD53/LpGBT Monitoring
-        for i in range(4):
-            self.add(common.AtlasRd53EmuLpGbtLaneReg(
-                name        = f'Ctrl[{i}]',
-                offset      = 0x80000000 + (i*0x0100_0000),
-                NUM_ELINK_G = 6,
-                memBase     = self._srp,
-            ))
-
+        #####################
         # Add I2C GPIO device
+        #####################
         for i in range(4):
             for j in range(3):
                 index    = (i*3)+j
-                baseAddr = 0x84000000 + (i*0x0100_0000)
+                baseAddr = 0x80000000 + (i*0x0100_0000)
                 self.add(nxp.Pca9555(
                     name        = f'Gpio[{index}]',
                     offset      = baseAddr + (j*0x400),
                     memBase     = self._srp,
                 ))
 
+        ######################
         # Add the AuroraRxLane
-        for i in range(3):
+        ######################
+        for i in range(4):
             for j in range(32):
-                index    = (i*32)+j
-                mDp      = index // 4
-                ch       = index % 4
-                baseAddr = 0x88000000 + (i*0x0100_0000)
-                self.add(common.AuroraRxLaneWrapper(
-                    name        = f'Rx[{mDp}][{ch}]',
-                    offset      = baseAddr + (j*0x100),
-                    memBase     = self._srp,
-                ))
+                index  = (i*32)+j
+                lpGBT  = index // 6
+                elink  = index % 6
+                baseAddr = 0x84000000 + (i*0x0100_0000)
+                if (index < (6*12)): # (6 per lpGBT link) x (4 SFP links + 8 QSFP links)
+                    self.add(common.AuroraRxLaneWrapper(
+                        name        = f'Rx[{lpGBT}][{elink}]',
+                        offset      = baseAddr + (j*0x100),
+                        memBase     = self._srp,
+                    ))
+
+        ###########################
+        # Add RD53/LpGBT Monitoring
+        ###########################
+        # for i in range(12): # SFP and QSFP
+        for i in range(4):  # SFP only
+            self.add(common.AtlasRd53EmuLpGbtLaneReg(
+                name        = f'Ctrl[{i}]',
+                offset      = 0x88000000 + (i*0x0010_0000),
+                NUM_ELINK_G = 6,
+                memBase     = self._srp,
+            ))
+
+        #########################
+        # Add RX PHY/APP Crossbar
+        #########################
+        self.add(common.AtlasRd53HsSelectioWrapper(
+            name        = f'RxPhyXbar',
+            offset      = 0x89000000,
+            memBase     = self._srp,
+        ))

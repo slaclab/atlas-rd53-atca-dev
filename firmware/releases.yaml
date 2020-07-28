@@ -23,13 +23,8 @@ Targets:
     Extensions:
       - bit
       - mcs
-  AtlasAtcaLinkAggRd53Rtm_BackplaneEth:
-    ImageDir: targets/AtlasAtcaLinkAgg/AtlasAtcaLinkAggRd53Rtm_BackplaneEth/images
-    Extensions:
-      - bit
-      - mcs
-  AtlasAtcaLinkAggTestFrontPanelSgmii:
-    ImageDir: targets/AtlasAtcaLinkAgg/AtlasAtcaLinkAggTestFrontPanelSgmii/images
+  XilinxKcu1500Pgp3_6Gbps:
+    ImageDir: targets/AtlasAtcaLinkAgg/XilinxKcu1500Pgp3_6Gbps/images
     Extensions:
       - bit
       - mcs
@@ -58,8 +53,7 @@ Releases:
     Primary: True
     Targets:
       - AtlasAtcaLinkAggRd53Rtm_EmuLpGbt
-      # - AtlasAtcaLinkAggRd53Rtm_BackplaneEth
-      # - AtlasAtcaLinkAggTestFrontPanelSgmii
+      - XilinxKcu1500Pgp3_6Gbps
       - DpmIbertTester
       - DpmRudpNode
       - DpmPgp3_6Gbps

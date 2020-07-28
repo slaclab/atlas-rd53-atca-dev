@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AtlasAtcaLinkAggRd53Rtm_BackplaneEth.vhd
+-- File       : AtlasAtcaLinkAggRd53Rtm_Pgp3.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: Top Level Firmware for reading out RD53 on 24 mDP via RTM
@@ -27,7 +27,7 @@ use atlas_atca_link_agg_fw_lib.AtlasAtcaLinkAggPkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity AtlasAtcaLinkAggRd53Rtm_BackplaneEth is
+entity AtlasAtcaLinkAggRd53Rtm_Pgp3 is
    generic (
       TPD_G        : time    := 1 ns;
       SIMULATION_G : boolean := false;
@@ -123,27 +123,13 @@ entity AtlasAtcaLinkAggRd53Rtm_BackplaneEth is
       -- SYSMON Ports
       vPIn           : in    sl;
       vNIn           : in    sl);
-end AtlasAtcaLinkAggRd53Rtm_BackplaneEth;
+end AtlasAtcaLinkAggRd53Rtm_Pgp3;
 
-architecture top_level of AtlasAtcaLinkAggRd53Rtm_BackplaneEth is
+architecture top_level of AtlasAtcaLinkAggRd53Rtm_Pgp3 is
 
    constant ETH_CONFIG_C : EthConfigArray := (
       -----------------------------------------------------------------------------------
-      ETH_FAB1_IDX_C => (               -- Using slot#1 COB for data processing
-         enable      => true,
-         enDhcp      => true,
-         enXvc       => false,
-         enSrp       => false,          -- No SRPv3 channel access
-         fabConfig   => ETH_10G_4LANE,  -- Using 10GbE XAUI
-         -- Streaming Data Server Configurations
-         numSrvData  => 1,  -- Moving all the data to one RSSI client on one RCE element
-         enSrvDataTx => true,
-         enSrvDataRx => true,
-         -- Streaming Data Client Configurations
-         numCltData  => 0,              -- Client disabled
-         enCltDataTx => false,
-         enCltDataRx => false),
-      -----------------------------------------------------------------------------------
+      ETH_FAB1_IDX_C => ETH_PORT_DISABLED_C,  -- Disabling slot#1 communication
       ETH_FAB2_IDX_C => ETH_PORT_DISABLED_C,  -- Disabling slot#2 communication
       ETH_FAB3_IDX_C => ETH_PORT_DISABLED_C,  -- Disabling slot#3 communication
       ETH_FAB4_IDX_C => ETH_PORT_DISABLED_C,  -- Disabling slot#4 communication
@@ -174,8 +160,8 @@ architecture top_level of AtlasAtcaLinkAggRd53Rtm_BackplaneEth is
 
    signal dPortDataP : Slv4Array(23 downto 0);
    signal dPortDataN : Slv4Array(23 downto 0);
-   signal dPortCmdP  : slv(23 downto 0);
-   signal dPortCmdN  : slv(23 downto 0);
+   signal dPortCmdP  : slv(31 downto 0);
+   signal dPortCmdN  : slv(31 downto 0);
 
    signal i2cScl : slv(3 downto 0);
    signal i2cSda : slv(3 downto 0);

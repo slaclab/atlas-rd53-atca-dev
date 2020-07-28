@@ -44,6 +44,9 @@ set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 DQS_BIAS TRUE EQUALI
 set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 DQS_BIAS TRUE EQUALIZATION EQ_LEVEL0 } [get_ports { dpmToRtmP[*][10] }]; # DATA[5][2]
 set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 DQS_BIAS TRUE EQUALIZATION EQ_LEVEL0 } [get_ports { dpmToRtmP[*][11] }]; # DATA[5][3]
 
+set_property -dict { IOSTANDARD LVDS } [get_ports { dpmToRtmP[*][15] }]; #  CMD[6]
+set_property -dict { IOSTANDARD LVDS } [get_ports { rtmToDpmP[*][15] }]; #  CMD[7]
+
 ##############################################################################
 
 ####################
@@ -57,14 +60,14 @@ set_clock_groups -asynchronous -group [get_clocks fabEthRefClkP] -group [get_clo
 
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_Core/U_ClkRst/GEN_REAL.U_PLL/CLKOUT0]] -group [get_clocks pllToFpgaClkP]
 
-set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_App/U_Selectio/U_Bufg160/O]] -group [get_clocks -of_objects [get_pins {U_App/GEN_SFP[*].U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/U_rx_wordclk/O}]]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_App/U_Selectio/U_Selectio/U_Bufg160/O]] -group [get_clocks -of_objects [get_pins {U_App/GEN_SFP[*].U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/U_rx_wordclk/O}]]
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins {U_App/GEN_SFP[*].U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/gtwiz_userclk_tx_inst/gen_gtwiz_userclk_tx_main.bufg_gt_usrclk2_inst/O}]] -group [get_clocks -of_objects [get_pins {U_App/GEN_SFP[*].U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/U_rx_wordclk/O}]]
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins {U_App/GEN_SFP[*].U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/xlx_ku_mgt_std_i/inst/gen_gtwizard_gthe4_top.xlx_ku_mgt_ip_10g24_emu_gtwizard_gthe4_inst/gen_gtwizard_gthe4.gen_channel_container[1].gen_enabled_channel.gthe4_channel_wrapper_inst/channel_inst/gthe4_channel_gen.gen_gthe4_channel_inst[0].GTHE4_CHANNEL_PRIM_INST/RXOUTCLK}]] -group [get_clocks -of_objects [get_pins {U_App/GEN_SFP[*].U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/U_rx_wordclk/O}]]
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins {U_App/GEN_SFP[*].U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/gtwiz_userclk_tx_inst/gen_gtwiz_userclk_tx_main.bufg_gt_usrclk2_inst/O}]] -group [get_clocks -of_objects [get_pins {U_App/GEN_SFP[*].U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/xlx_ku_mgt_std_i/inst/gen_gtwizard_gthe4_top.xlx_ku_mgt_ip_10g24_emu_gtwizard_gthe4_inst/gen_gtwizard_gthe4.gen_channel_container[1].gen_enabled_channel.gthe4_channel_wrapper_inst/channel_inst/gthe4_channel_gen.gen_gthe4_channel_inst[0].GTHE4_CHANNEL_PRIM_INST/RXOUTCLK}]]
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins {U_App/GEN_SFP[*].U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/xlx_ku_mgt_std_i/inst/gen_gtwizard_gthe4_top.xlx_ku_mgt_ip_10g24_emu_gtwizard_gthe4_inst/gen_gtwizard_gthe4.gen_channel_container[1].gen_enabled_channel.gthe4_channel_wrapper_inst/channel_inst/gthe4_channel_gen.gen_gthe4_channel_inst[0].GTHE4_CHANNEL_PRIM_INST/RXOUTCLK}]] -group [get_clocks -of_objects [get_pins {U_App/GEN_SFP[*].U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/gtwiz_userclk_tx_inst/gen_gtwiz_userclk_tx_main.bufg_gt_usrclk2_inst/O}]]
 
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_Core/U_ClkRst/GEN_REAL.U_PLL/CLKOUT0]] -group [get_clocks -of_objects [get_pins {U_App/GEN_SFP[*].U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/U_tx_wordclk/O}]]
-set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_App/U_Selectio/U_Bufg160/O]] -group [get_clocks -of_objects [get_pins {U_App/GEN_SFP[*].U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/U_tx_wordclk/O}]]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_App/U_Selectio/U_Selectio/U_Bufg160/O]] -group [get_clocks -of_objects [get_pins {U_App/GEN_SFP[*].U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/U_tx_wordclk/O}]]
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins {U_App/GEN_SFP[*].U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/U_rx_wordclk/O}]] -group [get_clocks -of_objects [get_pins {U_App/GEN_SFP[*].U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/U_tx_wordclk/O}]]
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins {U_App/GEN_SFP[*].U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/U_tx_wordclk/O}]] -group [get_clocks -of_objects [get_pins {U_App/GEN_SFP[*].U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/gtwiz_userclk_tx_inst/gen_gtwiz_userclk_tx_main.bufg_gt_usrclk2_inst/O}]]
-set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_Core/U_ClkRst/GEN_REAL.U_PLL/CLKOUT0]] -group [get_clocks -of_objects [get_pins U_App/U_Selectio/U_Bufg160/O]]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_Core/U_ClkRst/GEN_REAL.U_PLL/CLKOUT0]] -group [get_clocks -of_objects [get_pins U_App/U_Selectio/U_Selectio/U_Bufg160/O]]

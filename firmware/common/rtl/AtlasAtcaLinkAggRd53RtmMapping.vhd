@@ -33,8 +33,8 @@ entity AtlasAtcaLinkAggRd53RtmMapping is
       -- mDP DATA/CMD Interface
       dPortDataP : out   Slv4Array(23 downto 0);
       dPortDataN : out   Slv4Array(23 downto 0);
-      dPortCmdP  : in    slv(23 downto 0);
-      dPortCmdN  : in    slv(23 downto 0);
+      dPortCmdP  : in    slv(31 downto 0);
+      dPortCmdN  : in    slv(31 downto 0);
       -- I2C Interface
       i2cScl     : inout slv(3 downto 0);
       i2cSda     : inout slv(3 downto 0);
@@ -90,6 +90,18 @@ begin
          dPortDataN(6*dpm+3+i)(3) <= rtmToDpmN(dpm)(i*4+3);
 
       end generate GEN_VEC;
+
+      --------------------------------------------
+      -- ERM8 Upgrade Path for Additional commands
+      --------------------------------------------
+      dpmToRtmP(dpm)(15) <= dPortCmdP(2*dpm+0+24);
+      dpmToRtmN(dpm)(15) <= dPortCmdN(2*dpm+0+24);
+      
+      --------------------------------------------
+      -- ERM8 Upgrade Path for Additional commands
+      --------------------------------------------      
+      rtmToDpmP(dpm)(15) <= dPortCmdP(2*dpm+1+24);
+      rtmToDpmN(dpm)(15) <= dPortCmdN(2*dpm+1+24);
 
    end generate GEN_DPM;
 

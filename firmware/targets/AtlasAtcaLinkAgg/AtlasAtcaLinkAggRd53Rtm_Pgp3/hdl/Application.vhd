@@ -23,6 +23,7 @@ use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
 use surf.I2cPkg.all;
+use surf.Pgp3Pkg.all;
 
 library atlas_rd53_fw_lib;
 
@@ -64,8 +65,8 @@ entity Application is
       -- mDP DATA/CMD Interface
       dPortDataP      : in    Slv4Array(23 downto 0);
       dPortDataN      : in    Slv4Array(23 downto 0);
-      dPortCmdP       : out   slv(23 downto 0);
-      dPortCmdN       : out   slv(23 downto 0);
+      dPortCmdP       : out   slv(31 downto 0);
+      dPortCmdN       : out   slv(31 downto 0);
       -- I2C Interface
       i2cScl          : inout slv(3 downto 0);
       i2cSda          : inout slv(3 downto 0);
@@ -116,6 +117,19 @@ end Application;
 
 architecture mapping of Application is
 
+   impure function RxPhyRemapDefault return Slv7Array is
+      variable i      : natural;
+      variable retVar : Slv7Array(127 downto 0);
+   begin
+      for i in 0 to 127 loop
+         retVar(i) := toSlv(i, 7);
+      end loop;
+      return retVar;
+   end function;
+
+   constant RX_PHY_TO_APP_INIT_C : Slv7Array(127 downto 0) := RxPhyRemapDefault;
+   constant RX_APP_TO_PHY_INIT_C : Slv7Array(127 downto 0) := RxPhyRemapDefault;
+
    constant VALID_THOLD_C : positive := (1024/8);
 
    constant I2C_CONFIG_C : I2cAxiLiteDevArray(0 to 2) := (
@@ -138,62 +152,60 @@ architecture mapping of Application is
          endianness  => '0',            -- Little endian
          repeatStart => '1'));          -- Repeat Start
 
-   constant NUM_AXIL_MASTERS_C : positive := 8;
+   constant NUM_AXIL_MASTERS_C : positive := 10;
 
-   constant RX_PHY_INDEX_C : natural := 0;
-   constant EMU_INDEX_C    : natural := 1;  -- [1:2]
-   constant I2C_INDEX_C    : natural := 4;  -- [4:7]
+   constant RX_PHY_INDEX_C       : natural := 0;
+   constant EMU_INDEX_C          : natural := 1;  -- [1:2]
+   constant I2C_INDEX_C          : natural := 4;  -- [4:7]
+   constant RX_PHY_REMAP_INDEX_C : natural := 8;
+   constant PGP_INDEX_C          : natural := 9;
 
    constant AXIL_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXIL_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXIL_MASTERS_C, APP_AXIL_BASE_ADDR_C, 28, 24);
 
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXIL_MASTERS_C-1 downto 0);
-   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXIL_MASTERS_C-1 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_OK_C);
+   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXIL_MASTERS_C-1 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C);
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXIL_MASTERS_C-1 downto 0);
-   signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXIL_MASTERS_C-1 downto 0)  := (others => AXI_LITE_READ_SLAVE_EMPTY_OK_C);
+   signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXIL_MASTERS_C-1 downto 0)  := (others => AXI_LITE_READ_SLAVE_EMPTY_DECERR_C);
 
-   constant RX_PHY_CONFIG_C : AxiLiteCrossbarMasterConfigArray(23 downto 0) := genAxiLiteConfig(24, AXIL_CONFIG_C(RX_PHY_INDEX_C).baseAddr, 24, 16);
+   constant RX_PHY_CONFIG_C : AxiLiteCrossbarMasterConfigArray(31 downto 0) := genAxiLiteConfig(32, AXIL_CONFIG_C(RX_PHY_INDEX_C).baseAddr, 24, 16);
 
-   signal rxPhyWriteMasters : AxiLiteWriteMasterArray(23 downto 0);
-   signal rxPhyWriteSlaves  : AxiLiteWriteSlaveArray(23 downto 0);
-   signal rxPhyReadMasters  : AxiLiteReadMasterArray(23 downto 0);
-   signal rxPhyReadSlaves   : AxiLiteReadSlaveArray(23 downto 0);
+   signal rxPhyWriteMasters : AxiLiteWriteMasterArray(31 downto 0);
+   signal rxPhyWriteSlaves  : AxiLiteWriteSlaveArray(31 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C);
+   signal rxPhyReadMasters  : AxiLiteReadMasterArray(31 downto 0);
+   signal rxPhyReadSlaves   : AxiLiteReadSlaveArray(31 downto 0)  := (others => AXI_LITE_READ_SLAVE_EMPTY_DECERR_C);
 
-   signal mDataMasters : AxiStreamMasterArray(23 downto 0);
-   signal mDataSlaves  : AxiStreamSlaveArray(23 downto 0);
-   signal mDataMaster  : AxiStreamMasterType;
-   signal mDataSlave   : AxiStreamSlaveType;
+   signal mDataMasters : AxiStreamMasterArray(31 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
+   signal mDataSlaves  : AxiStreamSlaveArray(31 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
 
-   signal mConfigMasters : AxiStreamMasterArray(23 downto 0);
-   signal mConfigSlaves  : AxiStreamSlaveArray(23 downto 0);
-   signal mConfigMaster  : AxiStreamMasterType;
-   signal mConfigSlave   : AxiStreamSlaveType;
+   signal mConfigMasters : AxiStreamMasterArray(31 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
+   signal mConfigSlaves  : AxiStreamSlaveArray(31 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
 
-   signal sConfigMasters : AxiStreamMasterArray(23 downto 0);
-   signal sConfigSlaves  : AxiStreamSlaveArray(23 downto 0);
+   signal sConfigMasters : AxiStreamMasterArray(31 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
+   signal sConfigSlaves  : AxiStreamSlaveArray(31 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
 
-   signal emuTimingMasters : AxiStreamMasterArray(23 downto 0);
-   signal emuTimingSlaves  : AxiStreamSlaveArray(23 downto 0);
+   signal emuTimingMasters : AxiStreamMasterArray(31 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
+   signal emuTimingSlaves  : AxiStreamSlaveArray(31 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
 
-   signal serDesData : Slv8Array(95 downto 0);
-   signal dlyLoad    : slv(95 downto 0);
-   signal dlyCfg     : Slv9Array(95 downto 0);
+   signal serDesData : Slv8Array(127 downto 0) := (others => (others => '0'));
+   signal dlyLoad    : slv(127 downto 0)       := (others => '0');
+   signal dlyCfg     : Slv9Array(127 downto 0) := (others => (others => '0'));
 
-   signal cmdBusyOut : slv(23 downto 0);
-   signal cmdBusyAll : sl;
+   signal cmdBusyOut : slv(31 downto 0) := (others => '0');
+   signal cmdBusyAll : sl               := '0';
 
-   signal ref160Clock : sl;
-   signal ref160Clk   : sl;
-   signal ref160Rst   : sl;
+   signal ref160Clock : sl := '0';
+   signal ref160Clk   : sl := '0';
+   signal ref160Rst   : sl := '1';
 
-   signal clk160MHz : sl;
-   signal rst160MHz : sl;
+   signal clk160MHz : sl := '0';
+   signal rst160MHz : sl := '1';
 
-   signal smaClk       : sl;
-   signal pllToFpgaClk : sl;
+   signal smaClk       : sl := '0';
+   signal pllToFpgaClk : sl := '0';
 
-   signal iDelayCtrlRdy : sl;
-   signal refClk300MHz  : sl;
-   signal refRst300MHz  : sl;
+   signal iDelayCtrlRdy : sl := '0';
+   signal refClk300MHz  : sl := '0';
+   signal refRst300MHz  : sl := '1';
 
    attribute IODELAY_GROUP                 : string;
    attribute IODELAY_GROUP of U_IDELAYCTRL : label is "rd53_aurora";
@@ -301,26 +313,33 @@ begin
    ------------------------------
    -- High Speed SelectIO Modules
    ------------------------------
-   U_Selectio : entity atlas_rd53_fw_lib.AtlasRd53HsSelectio
+   U_Selectio : entity work.AtlasRd53HsSelectioWrapper
       generic map(
-         TPD_G        => TPD_G,
-         SIMULATION_G => SIMULATION_G,
-         NUM_CHIP_G   => 24,
-         XIL_DEVICE_G => "ULTRASCALE_PLUS")
+         TPD_G                => TPD_G,
+         SIMULATION_G         => SIMULATION_G,
+         RX_PHY_TO_APP_INIT_C => RX_PHY_TO_APP_INIT_C,
+         RX_APP_TO_PHY_INIT_C => RX_APP_TO_PHY_INIT_C)
       port map (
-         ref160Clk     => ref160Clk,
-         ref160Rst     => ref160Rst,
+         ref160Clk       => ref160Clk,
+         ref160Rst       => ref160Rst,
          -- Deserialization Interface
-         serDesData    => serDesData,
-         dlyLoad       => dlyLoad,
-         dlyCfg        => dlyCfg,
-         iDelayCtrlRdy => iDelayCtrlRdy,
+         serDesData      => serDesData,
+         dlyLoad         => dlyLoad,
+         dlyCfg          => dlyCfg,
+         iDelayCtrlRdy   => iDelayCtrlRdy,
          -- mDP DATA Interface
-         dPortDataP    => dPortDataP,
-         dPortDataN    => dPortDataN,
+         dPortDataP      => dPortDataP,
+         dPortDataN      => dPortDataN,
          -- Timing Clock/Reset Interface
-         clk160MHz     => clk160MHz,
-         rst160MHz     => rst160MHz);
+         clk160MHz       => clk160MHz,
+         rst160MHz       => rst160MHz,
+         -- AXI-Lite Interface (axilClk domain)
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => axilReadMasters(RX_PHY_REMAP_INDEX_C),
+         axilReadSlave   => axilReadSlaves(RX_PHY_REMAP_INDEX_C),
+         axilWriteMaster => axilWriteMasters(RX_PHY_REMAP_INDEX_C),
+         axilWriteSlave  => axilWriteSlaves(RX_PHY_REMAP_INDEX_C));
 
    --------------------
    -- AXI-Lite Crossbar
@@ -347,7 +366,7 @@ begin
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
-         NUM_MASTER_SLOTS_G => 24,
+         NUM_MASTER_SLOTS_G => 32,
          MASTERS_CONFIG_G   => RX_PHY_CONFIG_C)
       port map (
          axiClk              => axilClk,
@@ -362,20 +381,6 @@ begin
          mAxiReadSlaves      => rxPhyReadSlaves);
 
    NOT_SIM : if (SIMULATION_G = false) generate
-
-      ----------------------------------------------------
-      -- https://www.xilinx.com/support/answers/70060.html
-      ----------------------------------------------------
-      U_TERM_GTs : entity surf.Gthe4ChannelDummy
-         generic map (
-            TPD_G   => TPD_G,
-            WIDTH_G => 4)
-         port map (
-            refClk => ref156Clk,
-            gtRxP  => sfpRxP,
-            gtRxN  => sfpRxN,
-            gtTxP  => sfpTxP,
-            gtTxN  => sfpTxN);
 
       ----------------------------------------------------
       -- https://www.xilinx.com/support/answers/70060.html
@@ -429,7 +434,7 @@ begin
    U_EmuTiming : entity atlas_rd53_fw_lib.AtlasRd53EmuTiming
       generic map(
          TPD_G         => TPD_G,
-         NUM_AXIS_G    => 24,
+         NUM_AXIS_G    => 32,
          ADDR_WIDTH_G  => 10,
          SYNTH_MODE_G  => "xpm",
          MEMORY_TYPE_G => "block")
@@ -451,12 +456,13 @@ begin
    -- Rd53 CMD/DATA Modules
    ------------------------
    GEN_mDP :
-   for i in 23 downto 0 generate
+   for i in 31 downto 0 generate
       U_Core : entity atlas_rd53_fw_lib.AtlasRd53Core
          generic map (
             TPD_G         => TPD_G,
             SIMULATION_G  => SIMULATION_G,
-            AXIS_CONFIG_G => APP_AXIS_CONFIG_C,
+            EN_RX_G       => ite((i < 24), true, false),  -- Only implement 24 RX core to fit into the FPGA
+            AXIS_CONFIG_G => PGP3_AXIS_CONFIG_C,
             VALID_THOLD_G => VALID_THOLD_C,
             XIL_DEVICE_G  => XIL_DEVICE_C)
          port map (
@@ -501,78 +507,33 @@ begin
       end if;
    end process;
 
-   U_MuxConfig : entity surf.AxiStreamMux
+   U_Pgp3PhyGthQuad : entity work.Pgp3PhyGthQuad
       generic map (
-         TPD_G          => TPD_G,
-         NUM_SLAVES_G   => 24,
-         ILEAVE_EN_G    => true,
-         ILEAVE_REARB_G => VALID_THOLD_C,
-         PIPE_STAGES_G  => 1)
+         TPD_G            => TPD_G,
+         SIMULATION_G     => SIMULATION_G,
+         NUM_VC_G         => 16,        -- 8CMD/8DATA per lane
+         AXIL_BASE_ADDR_G => AXIL_CONFIG_C(PGP_INDEX_C).baseAddr)
       port map (
-         -- Clock and reset
-         axisClk      => axilClk,
-         axisRst      => axilRst,
-         -- Slaves
-         sAxisMasters => mConfigMasters,
-         sAxisSlaves  => mConfigSlaves,
-         -- Master
-         mAxisMaster  => mConfigMaster,
-         mAxisSlave   => mConfigSlave);
-
-   U_MuxData : entity surf.AxiStreamMux
-      generic map (
-         TPD_G          => TPD_G,
-         NUM_SLAVES_G   => 24,
-         ILEAVE_EN_G    => true,
-         ILEAVE_REARB_G => VALID_THOLD_C,
-         PIPE_STAGES_G  => 1)
-      port map (
-         -- Clock and reset
-         axisClk      => axilClk,
-         axisRst      => axilRst,
-         -- Slaves
-         sAxisMasters => mDataMasters,
-         sAxisSlaves  => mDataSlaves,
-         -- Master
-         mAxisMaster  => mDataMaster,
-         mAxisSlave   => mDataSlave);
-
-   U_Mux : entity surf.AxiStreamMux
-      generic map (
-         TPD_G                => TPD_G,
-         NUM_SLAVES_G         => 2,
-         TDEST_LOW_G          => 7,  -- mConfig.TDEST=[0x0:0x17], mData.TDEST=[0x80:0x97]
-         ILEAVE_EN_G          => true,
-         ILEAVE_ON_NOTVALID_G => false,
-         ILEAVE_REARB_G       => VALID_THOLD_C,
-         PIPE_STAGES_G        => 1)
-      port map (
-         -- Clock and reset
-         axisClk         => axilClk,
-         axisRst         => axilRst,
-         -- Slaves
-         sAxisMasters(0) => mConfigMaster,
-         sAxisMasters(1) => mDataMaster,
-         sAxisSlaves(0)  => mConfigSlave,
-         sAxisSlaves(1)  => mDataSlave,
-         -- Master
-         mAxisMaster     => srvIbMasters(0)(0),
-         mAxisSlave      => srvIbSlaves(0)(0));
-
-   U_DeMux : entity surf.AxiStreamDeMux
-      generic map (
-         TPD_G         => TPD_G,
-         NUM_MASTERS_G => 24,
-         PIPE_STAGES_G => 1)
-      port map (
-         -- Clock and reset
-         axisClk      => axilClk,
-         axisRst      => axilRst,
-         -- Slave
-         sAxisMaster  => srvObMasters(0)(0),
-         sAxisSlave   => srvObSlaves(0)(0),
-         -- Masters
-         mAxisMasters => sConfigMasters,
-         mAxisSlaves  => sConfigSlaves);
+         -- AXI-Lite Interface (axilClk domain)
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => axilReadMasters(PGP_INDEX_C),
+         axilReadSlave   => axilReadSlaves(PGP_INDEX_C),
+         axilWriteMaster => axilWriteMasters(PGP_INDEX_C),
+         axilWriteSlave  => axilWriteSlaves(PGP_INDEX_C),
+         -- Streaming Interface (axilClk domain)
+         rxConfigMasters => sConfigMasters,
+         rxConfigSlaves  => sConfigSlaves,
+         txConfigMasters => mConfigMasters,
+         txConfigSlaves  => mConfigSlaves,
+         txDataMasters   => mDataMasters,
+         txDataSlaves    => mDataSlaves,
+         -- PGP Ports
+         pgpClkP         => sfpEthRefClkP,
+         pgpClkN         => sfpEthRefClkN,
+         pgpRxP          => sfpRxP,
+         pgpRxN          => sfpRxN,
+         pgpTxP          => sfpTxP,
+         pgpTxN          => sfpTxN);
 
 end mapping;
