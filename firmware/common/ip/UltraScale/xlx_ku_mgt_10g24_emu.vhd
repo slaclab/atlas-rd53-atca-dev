@@ -24,6 +24,8 @@ library unisim;
 use unisim.vcomponents.all;
 
 entity xlx_ku_mgt_10g24_emu is
+   generic (
+      SELECT_GT_TYPE_G : boolean := false);  -- Unused
    port (
       --=============--
       -- Clocks      --

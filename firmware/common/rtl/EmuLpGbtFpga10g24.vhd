@@ -27,7 +27,8 @@ use unisim.vcomponents.all;
 
 entity EmuLpGbtFpga10g24 is
    generic (
-      SIMULATION_G : boolean := false);
+      SIMULATION_G     : boolean := false;
+      SELECT_GT_TYPE_G : boolean := false);
    port (
       -- Up link
       uplinkClk_o                 : out std_logic;  --! Clock provided by the Rx serdes: in phase with data
@@ -98,7 +99,9 @@ begin
    downlinkClkEn_o <= mgt_rxrdy_s and downlinkClkEn_s;
 
    mgt_inst : entity work.xlx_ku_mgt_10g24_emu
-      port map(
+      generic map (
+         SELECT_GT_TYPE_G => SELECT_GT_TYPE_G)
+      port map (
          --=============--
          -- Clocks      --
          --=============--

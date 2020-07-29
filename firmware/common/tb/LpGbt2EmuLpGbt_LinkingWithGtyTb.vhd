@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : LpGbt2EmuLpGbt_LinkingWithGthTb.vhd
+-- File       : LpGbt2EmuLpGbt_LinkingWithGtyTb.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: Simulation Testbed for testing the GTH Linking Up
@@ -24,10 +24,10 @@ use surf.StdRtlPkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity LpGbt2EmuLpGbt_LinkingWithGthTb is
-end LpGbt2EmuLpGbt_LinkingWithGthTb;
+entity LpGbt2EmuLpGbt_LinkingWithGtyTb is
+end LpGbt2EmuLpGbt_LinkingWithGtyTb;
 
-architecture testbed of LpGbt2EmuLpGbt_LinkingWithGthTb is
+architecture testbed of LpGbt2EmuLpGbt_LinkingWithGtyTb is
 
    signal downlinkRaw : slv(35 downto 0)  := (others => '0');
    signal uplinkRaw   : slv(233 downto 0) := (others => '0');
@@ -168,7 +168,7 @@ begin
    -----------------------
    U_EmuLpGbtFpga10g24 : entity work.EmuLpGbtFpga10g24
       generic map (
-         SELECT_GT_TYPE_G => false,          -- false = GTH
+         SELECT_GT_TYPE_G => true,           -- true = GTY
          SIMULATION_G     => true)
       port map (
          -- Up link

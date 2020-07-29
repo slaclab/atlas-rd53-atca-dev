@@ -24,6 +24,8 @@ library unisim;
 use unisim.vcomponents.all;
 
 entity xlx_ku_mgt_10g24_emu is
+   generic (
+      SELECT_GT_TYPE_G : boolean := false);  -- false = GTH, true = GTY
    port (
       --=============--
       -- Clocks      --
@@ -127,6 +129,65 @@ architecture structural of xlx_ku_mgt_10g24_emu is
          gthtxn_out                         : out std_logic_vector(0 downto 0);
          gthtxp_out                         : out std_logic_vector(0 downto 0);
          gtpowergood_out                    : out std_logic_vector(0 downto 0);
+         rxoutclk_out                       : out std_logic_vector(0 downto 0);
+         rxpmaresetdone_out                 : out std_logic_vector(0 downto 0);
+         txbufstatus_out                    : out std_logic_vector(1 downto 0);
+         txoutclk_out                       : out std_logic_vector(0 downto 0);
+         txoutclkpcs_out                    : out std_logic_vector(0 downto 0);
+         txpmaresetdone_out                 : out std_logic_vector(0 downto 0)
+         );
+   end component;
+
+   component xlx_ku_gty_ip_10g24_emu
+      port (
+         gtwiz_userclk_tx_reset_in          : in  std_logic_vector(0 downto 0);
+         gtwiz_userclk_tx_active_in         : in  std_logic_vector(0 downto 0);
+         gtwiz_userclk_rx_reset_in          : in  std_logic_vector(0 downto 0);
+         gtwiz_userclk_rx_active_in         : in  std_logic_vector(0 downto 0);
+         gtwiz_buffbypass_rx_reset_in       : in  std_logic_vector(0 downto 0);
+         gtwiz_buffbypass_rx_start_user_in  : in  std_logic_vector(0 downto 0);
+         gtwiz_buffbypass_rx_done_out       : out std_logic_vector(0 downto 0);
+         gtwiz_buffbypass_rx_error_out      : out std_logic_vector(0 downto 0);
+         gtwiz_reset_clk_freerun_in         : in  std_logic_vector(0 downto 0);
+         gtwiz_reset_all_in                 : in  std_logic_vector(0 downto 0);
+         gtwiz_reset_tx_pll_and_datapath_in : in  std_logic_vector(0 downto 0);
+         gtwiz_reset_tx_datapath_in         : in  std_logic_vector(0 downto 0);
+         gtwiz_reset_rx_pll_and_datapath_in : in  std_logic_vector(0 downto 0);
+         gtwiz_reset_rx_datapath_in         : in  std_logic_vector(0 downto 0);
+         gtwiz_reset_qpll0lock_in           : in  std_logic_vector(0 downto 0);
+         gtwiz_reset_rx_cdr_stable_out      : out std_logic_vector(0 downto 0);
+         gtwiz_reset_tx_done_out            : out std_logic_vector(0 downto 0);
+         gtwiz_reset_rx_done_out            : out std_logic_vector(0 downto 0);
+         gtwiz_reset_qpll0reset_out         : out std_logic_vector(0 downto 0);
+         gtwiz_userdata_tx_in               : in  std_logic_vector(63 downto 0);
+         gtwiz_userdata_rx_out              : out std_logic_vector(31 downto 0);
+         drpaddr_in                         : in  std_logic_vector(9 downto 0);
+         drpclk_in                          : in  std_logic_vector(0 downto 0);
+         drpdi_in                           : in  std_logic_vector(15 downto 0);
+         drpen_in                           : in  std_logic_vector(0 downto 0);
+         drpwe_in                           : in  std_logic_vector(0 downto 0);
+         gtrefclk0_in                       : in  std_logic_vector(0 downto 0);
+         gtyrxn_in                          : in  std_logic_vector(0 downto 0);
+         gtyrxp_in                          : in  std_logic_vector(0 downto 0);
+         qpll0clk_in                        : in  std_logic_vector(0 downto 0);
+         qpll0refclk_in                     : in  std_logic_vector(0 downto 0);
+         qpll1clk_in                        : in  std_logic_vector(0 downto 0);
+         qpll1refclk_in                     : in  std_logic_vector(0 downto 0);
+         rxslide_in                         : in  std_logic_vector(0 downto 0);
+         rxusrclk_in                        : in  std_logic_vector(0 downto 0);
+         rxusrclk2_in                       : in  std_logic_vector(0 downto 0);
+         txpippmen_in                       : in  std_logic_vector(0 downto 0);
+         txpippmovrden_in                   : in  std_logic_vector(0 downto 0);
+         txpippmpd_in                       : in  std_logic_vector(0 downto 0);
+         txpippmsel_in                      : in  std_logic_vector(0 downto 0);
+         txpippmstepsize_in                 : in  std_logic_vector(4 downto 0);
+         txusrclk_in                        : in  std_logic_vector(0 downto 0);
+         txusrclk2_in                       : in  std_logic_vector(0 downto 0);
+         drpdo_out                          : out std_logic_vector(15 downto 0);
+         drprdy_out                         : out std_logic_vector(0 downto 0);
+         gtpowergood_out                    : out std_logic_vector(0 downto 0);
+         gtytxn_out                         : out std_logic_vector(0 downto 0);
+         gtytxp_out                         : out std_logic_vector(0 downto 0);
          rxoutclk_out                       : out std_logic_vector(0 downto 0);
          rxpmaresetdone_out                 : out std_logic_vector(0 downto 0);
          txbufstatus_out                    : out std_logic_vector(1 downto 0);
@@ -346,78 +407,159 @@ begin
    -------------
    -- GTH Module
    -------------
-   xlx_ku_mgt_std_i : xlx_ku_mgt_ip_10g24_emu
-      port map (
+   GEN_GTH : if (SELECT_GT_TYPE_G = false) generate
+      xlx_ku_mgt_std_i : xlx_ku_mgt_ip_10g24_emu
+         port map (
 
-         gtwiz_reset_qpll0reset_out(0) => QPLL_RST_o,
-         gtwiz_reset_qpll0lock_in(0)   => QPLL_LOCK_i(0),
-         qpll0clk_in(0)                => QPLL_CLK_i(0),
-         qpll0refclk_in(0)             => QPLL_REFCLK_i(0),
-         qpll1clk_in(0)                => QPLL_CLK_i(1),
-         qpll1refclk_in(0)             => QPLL_REFCLK_i(1),
+            gtwiz_reset_qpll0reset_out(0) => QPLL_RST_o,
+            gtwiz_reset_qpll0lock_in(0)   => QPLL_LOCK_i(0),
+            qpll0clk_in(0)                => QPLL_CLK_i(0),
+            qpll0refclk_in(0)             => QPLL_REFCLK_i(0),
+            qpll1clk_in(0)                => QPLL_CLK_i(1),
+            qpll1refclk_in(0)             => QPLL_REFCLK_i(1),
 
-         rxusrclk_in(0)  => rx_wordclk_int_sig,
-         rxusrclk2_in(0) => rx_wordclk_sig,
-         rxoutclk_out(0) => rxoutclk_sig,
-         txusrclk_in(0)  => tx_wordclk_int_sig,
-         txusrclk2_in(0) => tx_wordclk_sig,
-         txoutclk_out(0) => txoutclk_sig,
+            rxusrclk_in(0)  => rx_wordclk_int_sig,
+            rxusrclk2_in(0) => rx_wordclk_sig,
+            rxoutclk_out(0) => rxoutclk_sig,
+            txusrclk_in(0)  => tx_wordclk_int_sig,
+            txusrclk2_in(0) => tx_wordclk_sig,
+            txoutclk_out(0) => txoutclk_sig,
 
-         gtwiz_userclk_tx_active_in(0) => gtwiz_userclk_tx_active_int,
-         gtwiz_userclk_rx_active_in(0) => gtwiz_userclk_rx_active_int,
-         gtwiz_userclk_tx_reset_in(0)  => tx_reset_sig,
-         gtwiz_userclk_rx_reset_in(0)  => MGT_RXRESET_i,
+            gtwiz_userclk_tx_active_in(0) => gtwiz_userclk_tx_active_int,
+            gtwiz_userclk_rx_active_in(0) => gtwiz_userclk_rx_active_int,
+            gtwiz_userclk_tx_reset_in(0)  => tx_reset_sig,
+            gtwiz_userclk_rx_reset_in(0)  => MGT_RXRESET_i,
 
-         gtwiz_buffbypass_rx_reset_in(0)      => gtwiz_buffbypass_rx_reset_in_s,
-         gtwiz_buffbypass_rx_start_user_in(0) => '0',
-         gtwiz_buffbypass_rx_done_out(0)      => rxfsm_reset_done,
-         gtwiz_buffbypass_rx_error_out        => open,
+            gtwiz_buffbypass_rx_reset_in(0)      => gtwiz_buffbypass_rx_reset_in_s,
+            gtwiz_buffbypass_rx_start_user_in(0) => '0',
+            gtwiz_buffbypass_rx_done_out(0)      => rxfsm_reset_done,
+            gtwiz_buffbypass_rx_error_out        => open,
 
-         gtwiz_reset_clk_freerun_in(0) => MGT_FREEDRPCLK_i,  -- 156.25 MHz/4 = 39.0625 MHz
+            gtwiz_reset_clk_freerun_in(0) => MGT_FREEDRPCLK_i,  -- 156.25 MHz/4 = 39.0625 MHz
 
-         gtwiz_reset_all_in(0)                 => MGT_RXRESET_i,
-         gtwiz_reset_tx_pll_and_datapath_in(0) => tx_reset_sig,
-         gtwiz_reset_tx_datapath_in(0)         => '0',
-         gtwiz_reset_tx_done_out(0)            => tx_reset_done,
+            gtwiz_reset_all_in(0)                 => MGT_RXRESET_i,
+            gtwiz_reset_tx_pll_and_datapath_in(0) => tx_reset_sig,
+            gtwiz_reset_tx_datapath_in(0)         => '0',
+            gtwiz_reset_tx_done_out(0)            => tx_reset_done,
 
-         gtwiz_reset_rx_pll_and_datapath_in(0) => MGT_RXRESET_i,
-         gtwiz_reset_rx_datapath_in(0)         => rx_reset_sig,
-         gtwiz_reset_rx_cdr_stable_out         => open,
-         gtwiz_reset_rx_done_out(0)            => rx_reset_done,
+            gtwiz_reset_rx_pll_and_datapath_in(0) => MGT_RXRESET_i,
+            gtwiz_reset_rx_datapath_in(0)         => rx_reset_sig,
+            gtwiz_reset_rx_cdr_stable_out         => open,
+            gtwiz_reset_rx_done_out(0)            => rx_reset_done,
 
-         gtwiz_userdata_tx_in  => MGT_USRWORD_TX_s,
-         gtwiz_userdata_rx_out => MGT_USRWORD_RX_s,
+            gtwiz_userdata_tx_in  => MGT_USRWORD_TX_s,
+            gtwiz_userdata_rx_out => MGT_USRWORD_RX_s,
 
-         drpclk_in(0) => MGT_FREEDRPCLK_i,  -- 156.25 MHz/4 = 39.0625 MHz
+            drpclk_in(0) => MGT_FREEDRPCLK_i,  -- 156.25 MHz/4 = 39.0625 MHz
 
-         gthrxn_in(0)  => RXn_i,
-         gthrxp_in(0)  => RXp_i,
-         gthtxn_out(0) => TXn_o,
-         gthtxp_out(0) => TXp_o,
+            gthrxn_in(0)  => RXn_i,
+            gthrxp_in(0)  => RXp_i,
+            gthtxn_out(0) => TXn_o,
+            gthtxp_out(0) => TXp_o,
 
-         gtrefclk0_in(0) => MGT_REFCLK_i,
+            gtrefclk0_in(0) => MGT_REFCLK_i,
 
-         rxslide_in(0) => '0',          -- Using ASYNC GEARBOX instead
+            rxslide_in(0) => '0',       -- Using ASYNC GEARBOX instead
 
-         rxpmaresetdone_out(0) => rxpmaresetdone,
-         txpmaresetdone_out(0) => txpmaresetdone,
+            rxpmaresetdone_out(0) => rxpmaresetdone,
+            txpmaresetdone_out(0) => txpmaresetdone,
 
-         -- DRP bus (used by the tx phase aligner)
-         drpaddr_in  => (others => '0'),
-         drpdi_in    => (others => '0'),
-         drpen_in(0) => '0',
-         drpwe_in(0) => '0',
-         drpdo_out   => open,
-         drprdy_out  => open,
+            -- DRP bus (used by the tx phase aligner)
+            drpaddr_in  => (others => '0'),
+            drpdi_in    => (others => '0'),
+            drpen_in(0) => '0',
+            drpwe_in(0) => '0',
+            drpdo_out   => open,
+            drprdy_out  => open,
 
-         -- PI control / monitoring signals
-         txpippmen_in(0)     => '0',
-         txpippmovrden_in(0) => '0',
-         txpippmpd_in(0)     => '0',
-         txpippmsel_in(0)    => '0',
-         txpippmstepsize_in  => (others => '0'),
+            -- PI control / monitoring signals
+            txpippmen_in(0)     => '0',
+            txpippmovrden_in(0) => '0',
+            txpippmpd_in(0)     => '0',
+            txpippmsel_in(0)    => '0',
+            txpippmstepsize_in  => (others => '0'),
 
-         -- Tx buffer status
-         txbufstatus_out => open);
+            -- Tx buffer status
+            txbufstatus_out => open);
+   end generate;
+
+   -------------
+   -- GTY Module
+   -------------
+   GEN_GTY : if (SELECT_GT_TYPE_G = true) generate
+      xlx_ku_mgt_std_i : xlx_ku_gty_ip_10g24_emu
+         port map (
+
+            gtwiz_reset_qpll0reset_out(0) => QPLL_RST_o,
+            gtwiz_reset_qpll0lock_in(0)   => QPLL_LOCK_i(0),
+            qpll0clk_in(0)                => QPLL_CLK_i(0),
+            qpll0refclk_in(0)             => QPLL_REFCLK_i(0),
+            qpll1clk_in(0)                => QPLL_CLK_i(1),
+            qpll1refclk_in(0)             => QPLL_REFCLK_i(1),
+
+            rxusrclk_in(0)  => rx_wordclk_int_sig,
+            rxusrclk2_in(0) => rx_wordclk_sig,
+            rxoutclk_out(0) => rxoutclk_sig,
+            txusrclk_in(0)  => tx_wordclk_int_sig,
+            txusrclk2_in(0) => tx_wordclk_sig,
+            txoutclk_out(0) => txoutclk_sig,
+
+            gtwiz_userclk_tx_active_in(0) => gtwiz_userclk_tx_active_int,
+            gtwiz_userclk_rx_active_in(0) => gtwiz_userclk_rx_active_int,
+            gtwiz_userclk_tx_reset_in(0)  => tx_reset_sig,
+            gtwiz_userclk_rx_reset_in(0)  => MGT_RXRESET_i,
+
+            gtwiz_buffbypass_rx_reset_in(0)      => gtwiz_buffbypass_rx_reset_in_s,
+            gtwiz_buffbypass_rx_start_user_in(0) => '0',
+            gtwiz_buffbypass_rx_done_out(0)      => rxfsm_reset_done,
+            gtwiz_buffbypass_rx_error_out        => open,
+
+            gtwiz_reset_clk_freerun_in(0) => MGT_FREEDRPCLK_i,  -- 156.25 MHz/4 = 39.0625 MHz
+
+            gtwiz_reset_all_in(0)                 => MGT_RXRESET_i,
+            gtwiz_reset_tx_pll_and_datapath_in(0) => tx_reset_sig,
+            gtwiz_reset_tx_datapath_in(0)         => '0',
+            gtwiz_reset_tx_done_out(0)            => tx_reset_done,
+
+            gtwiz_reset_rx_pll_and_datapath_in(0) => MGT_RXRESET_i,
+            gtwiz_reset_rx_datapath_in(0)         => rx_reset_sig,
+            gtwiz_reset_rx_cdr_stable_out         => open,
+            gtwiz_reset_rx_done_out(0)            => rx_reset_done,
+
+            gtwiz_userdata_tx_in  => MGT_USRWORD_TX_s,
+            gtwiz_userdata_rx_out => MGT_USRWORD_RX_s,
+
+            drpclk_in(0) => MGT_FREEDRPCLK_i,  -- 156.25 MHz/4 = 39.0625 MHz
+
+            gtyrxn_in(0)  => RXn_i,
+            gtyrxp_in(0)  => RXp_i,
+            gtytxn_out(0) => TXn_o,
+            gtytxp_out(0) => TXp_o,
+
+            gtrefclk0_in(0) => MGT_REFCLK_i,
+
+            rxslide_in(0) => '0',       -- Using ASYNC GEARBOX instead
+
+            rxpmaresetdone_out(0) => rxpmaresetdone,
+            txpmaresetdone_out(0) => txpmaresetdone,
+
+            -- DRP bus (used by the tx phase aligner)
+            drpaddr_in  => (others => '0'),
+            drpdi_in    => (others => '0'),
+            drpen_in(0) => '0',
+            drpwe_in(0) => '0',
+            drpdo_out   => open,
+            drprdy_out  => open,
+
+            -- PI control / monitoring signals
+            txpippmen_in(0)     => '0',
+            txpippmovrden_in(0) => '0',
+            txpippmpd_in(0)     => '0',
+            txpippmsel_in(0)    => '0',
+            txpippmstepsize_in  => (others => '0'),
+
+            -- Tx buffer status
+            txbufstatus_out => open);
+   end generate;
 
 end structural;
