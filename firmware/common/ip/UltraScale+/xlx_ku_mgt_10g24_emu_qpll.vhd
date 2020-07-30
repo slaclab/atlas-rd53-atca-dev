@@ -24,7 +24,7 @@ use unisim.vcomponents.all;
 entity xlx_ku_mgt_10g24_emu_qpll is
    generic (
       TPD_G             : time            := 1 ns;
-      GT_CLK_SEL_G      : boolean         := false;  -- false = gtClkP/N, true = gtClkIn     
+      GT_CLK_SEL_G      : boolean         := false;  -- false = gtClkP/N, true = gtClkIn
       SELECT_GT_TYPE_G  : boolean         := false;  -- false = GTH, true = GTY
       QPLL_REFCLK_SEL_G : slv(2 downto 0) := "001");
    port (
@@ -81,7 +81,7 @@ begin
             QPLL_CFG2_G        => (others => "0000111111000001"),
             QPLL_CFG2_G3_G     => (others => "0000111111000001"),
             QPLL_CFG3_G        => (others => "0000000100100000"),
-            QPLL_CFG4_G        => (others => "0000000000000011"),
+            QPLL_CFG4_G        => (others => "0000000000000011"),  -- Different from GTY (confirmed on GTH IP core example)
             QPLL_CP_G          => (others => "0011111111"),
             QPLL_CP_G3_G       => (others => "0000001111"),
             QPLL_FBDIV_G       => (others => 32),
@@ -130,7 +130,7 @@ begin
             QPLL_CFG2_G        => (others => "0000111111000001"),
             QPLL_CFG2_G3_G     => (others => "0000111111000001"),
             QPLL_CFG3_G        => (others => "0000000100100000"),
-            QPLL_CFG4_G        => (others => "0000000000000011"),
+            QPLL_CFG4_G        => (others => "0000000000000001"),  -- Different from GTH (confirmed on GTY IP core example)
             QPLL_CP_G          => (others => "0011111111"),
             QPLL_CP_G3_G       => (others => "0000001111"),
             QPLL_FBDIV_G       => (others => 32),

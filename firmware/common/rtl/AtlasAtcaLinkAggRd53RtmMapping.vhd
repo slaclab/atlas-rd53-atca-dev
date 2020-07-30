@@ -96,10 +96,10 @@ begin
       --------------------------------------------
       dpmToRtmP(dpm)(15) <= dPortCmdP(2*dpm+0+24);
       dpmToRtmN(dpm)(15) <= dPortCmdN(2*dpm+0+24);
-      
+
       --------------------------------------------
       -- ERM8 Upgrade Path for Additional commands
-      --------------------------------------------      
+      --------------------------------------------
       rtmToDpmP(dpm)(15) <= dPortCmdP(2*dpm+1+24);
       rtmToDpmN(dpm)(15) <= dPortCmdN(2*dpm+1+24);
 

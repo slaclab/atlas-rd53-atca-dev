@@ -43,6 +43,12 @@ entity xlx_ku_mgt_10g24_emu is
       MGT_RXUSRCLK_o : out std_logic;
       MGT_TXUSRCLK_o : out std_logic;
 
+      txWordClk160_o : out std_logic;
+      rxWordClk80_o  : out std_logic;
+
+      txWordClk40_i : in std_logic;
+      rxWordClk40_i : in std_logic;
+
       --=============--
       -- Resets      --
       --=============--
@@ -257,14 +263,18 @@ begin
          gtwiz_userclk_tx_usrclk2_out => tx_wordclk_sig,
          gtwiz_userclk_tx_active_out  => gtwiz_userclk_tx_active_int);
 
-   U_tx_wordclk : BUFGCE_DIV
-      generic map (
-         BUFGCE_DIVIDE => 4)
-      port map (
-         I   => tx_wordclk_sig,
-         CE  => '1',
-         CLR => '0',
-         O   => tx_wordclk40_sig);
+--   U_tx_wordclk : BUFGCE_DIV
+--      generic map (
+--         BUFGCE_DIVIDE => 4)
+--      port map (
+--         I   => tx_wordclk_sig,
+--         CE  => '1',
+--         CLR => '0',
+--         O   => tx_wordclk40_sig);
+
+   -- Use common 40 MHz clock to save on clock resources for clock region partitioning
+   txWordClk160_o   <= tx_wordclk_sig;
+   tx_wordclk40_sig <= txWordClk40_i;
 
    gtwiz_userclk_rx_inst : xlx_ku_mgt_ip_10g24_emu_example_gtwiz_userclk_rx
       port map(
@@ -274,14 +284,18 @@ begin
          gtwiz_userclk_rx_usrclk2_out => rx_wordclk_sig,
          gtwiz_userclk_rx_active_out  => gtwiz_userclk_rx_active_int);
 
-   U_rx_wordclk : BUFGCE_DIV
-      generic map (
-         BUFGCE_DIVIDE => 2)
-      port map (
-         I   => rx_wordclk_sig,
-         CE  => '1',
-         CLR => '0',
-         O   => rx_wordclk40_sig);
+--   U_rx_wordclk : BUFGCE_DIV
+--      generic map (
+--         BUFGCE_DIVIDE => 2)
+--      port map (
+--         I   => rx_wordclk_sig,
+--         CE  => '1',
+--         CLR => '0',
+--         O   => rx_wordclk40_sig);
+
+   -- Use common 40 MHz clock to save on clock resources for clock region partitioning
+   rxWordClk80_o    <= rx_wordclk_sig;
+   rx_wordclk40_sig <= rxWordClk40_i;
 
    ------------------
    -- Gearbox Modules

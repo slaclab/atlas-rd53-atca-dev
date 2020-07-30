@@ -55,6 +55,10 @@ entity AtlasRd53EmuLpGbtLane is
       refClk160       : in  sl;  -- Using jitter clean FMC 320 MHz reference
       drpClk          : in  sl;
       rxRecClk        : out sl;
+      txWordClk160    : out sl;
+      rxWordClk80     : out sl;
+      txWordClk40     : in sl;
+      rxWordClk40     : in sl;
       qplllock        : in  slv(1 downto 0);
       qplloutclk      : in  slv(1 downto 0);
       qplloutrefclk   : in  slv(1 downto 0);
@@ -188,11 +192,15 @@ begin
          downlinkIcData_o    => downlinkIcData,
          downlinkReady_o     => downlinkReady,
          -- MGT
-         rxRecClk            => rxRecClk,
+         txWordClk160_o      => txWordClk160,
+         rxWordClk80_o       => rxWordClk80,
+         txWordClk40_i       => txWordClk40,
+         rxWordClk40_i       => rxWordClk40,
          qplllock            => qplllock,
          qplloutclk          => qplloutclk,
          qplloutrefclk       => qplloutrefclk,
          qpllRst             => qpllRst,
+         rxRecClk            => rxRecClk,
          clk_refclk_i        => refClk160,      -- CPLL using 160 MHz reference
          clk_mgtfreedrpclk_i => drpClk,
          mgt_rxn_i           => sfpRxN,

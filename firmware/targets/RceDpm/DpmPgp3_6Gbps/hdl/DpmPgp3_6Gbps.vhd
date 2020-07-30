@@ -169,7 +169,7 @@ begin
    -- PGPv3 GTX
    ------------
    GEN_LANE : for i in 1 downto 0 generate
-   
+
       ----------------------------------------------
       -- Note: SFP RTM uses lane[0] and lane[6] Only
       ----------------------------------------------
@@ -207,7 +207,7 @@ begin
             axilWriteMaster => axilWriteMasters(i),
             axilWriteSlave  => axilWriteSlaves(i));
 
-      
+
       U_TERM : entity surf.Gtxe2ChannelDummy
          generic map (
             TPD_G   => TPD_G,
@@ -224,7 +224,7 @@ begin
    -- Loopback DMA CH[2]
    dmaIbMasters(2) <= dmaObMasters(2);
    dmaObSlaves(2)  <= dmaIbSlaves(2);
-   
+
    U_PgpTuning : entity work.PgpTuning
       generic map (
          TPD_G => TPD_G)

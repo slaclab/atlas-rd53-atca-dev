@@ -65,6 +65,11 @@ architecture testbed of LpGbt2EmuLpGbt_LinkingWithGthTb is
    signal qpllRst       : sl              := '1';
    signal rxRecClk      : sl              := '0';
 
+   signal txWordClk160 : sl := '0';
+   signal rxWordClk80  : sl := '0';
+   signal txWordClk40  : sl := '0';
+   signal rxWordClk40  : sl := '0';
+
 begin
 
    process(downlinkClk)
@@ -188,6 +193,10 @@ begin
          downlinkIcData_o    => downlinkRaw(35 downto 34),
          downlinkReady_o     => downlinkReady(1),
          -- MGT
+         txWordClk160_o      => txWordClk160,
+         rxWordClk80_o       => rxWordClk80,
+         txWordClk40_i       => txWordClk40,
+         rxWordClk40_i       => rxWordClk40,
          rxRecClk            => rxRecClk,
          qplllock            => qplllock,
          qplloutclk          => qplloutclk,
@@ -219,5 +228,23 @@ begin
          CE  => '1',
          CLR => '0',
          O   => drpClk);                -- 39.0625 MHz
+
+   U_tx_wordclk : BUFGCE_DIV
+      generic map (
+         BUFGCE_DIVIDE => 4)
+      port map (
+         I   => txWordClk160,
+         CE  => '1',
+         CLR => '0',
+         O   => txWordClk40);
+
+   U_rx_wordclk : BUFGCE_DIV
+      generic map (
+         BUFGCE_DIVIDE => 2)
+      port map (
+         I   => rxWordClk80,
+         CE  => '1',
+         CLR => '0',
+         O   => rxWordClk40);
 
 end testbed;

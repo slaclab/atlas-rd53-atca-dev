@@ -55,6 +55,10 @@ entity EmuLpGbtFpga10g24 is
       fecCorrectionCount_o        : out std_logic_vector(15 downto 0);
       downlinkReady_o             : out std_logic;  --! Downlink ready status
       -- MGT
+      txWordClk160_o              : out std_logic;
+      rxWordClk80_o               : out std_logic;
+      txWordClk40_i               : in  std_logic;
+      rxWordClk40_i               : in  std_logic;
       qplllock                    : in  std_logic_vector(1 downto 0);
       qplloutclk                  : in  std_logic_vector(1 downto 0);
       qplloutrefclk               : in  std_logic_vector(1 downto 0);
@@ -114,6 +118,10 @@ begin
          MGT_FREEDRPCLK_i => clk_mgtfreedrpclk_i,
          MGT_TXUSRCLK_o   => uplinkClk_s,
          MGT_RXUSRCLK_o   => downlinkClk_s,
+         txWordClk160_o   => txWordClk160_o,
+         rxWordClk80_o    => rxWordClk80_o,
+         txWordClk40_i    => txWordClk40_i,
+         rxWordClk40_i    => rxWordClk40_i,
          --=============--
          -- Resets      --
          --=============--

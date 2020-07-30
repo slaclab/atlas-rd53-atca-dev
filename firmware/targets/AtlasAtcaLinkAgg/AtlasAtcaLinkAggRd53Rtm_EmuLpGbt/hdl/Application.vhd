@@ -118,18 +118,29 @@ architecture mapping of Application is
 
    constant NUM_ELINKS_C : positive := 6*12;  -- (6 per lpGBT link) x (4 SFP links + 8 QSFP links)
 
+   constant RX_RECCLK_INDEX_C : natural := 0;  -- Using SFP[0] for the recovered clock reference for jitter cleaner PLL
+
    impure function RxPhyToApp return Slv7Array is
       variable i      : natural;
       variable j      : natural;
       variable retVar : Slv7Array(127 downto 0);
    begin
+      -- SFP's downlinks configuration
       for i in 0 to 3 loop
          for j in 0 to 5 loop
             -- APP.CH[i*6+j]  <--- PHY.CH[24*i+4*j+3]  = mDP.CH[i*6+j].RX[3]
             retVar(i*6+j) := toSlv((24*i+4*j+3), 7);
          end loop;
       end loop;
-      for i in 24 to 127 loop
+      -- Copy the SFP's downlinks to QSFP[0]
+      for i in 24 to 47 loop
+         retVar(i) := retVar(i-24);
+      end loop;
+      -- Copy the SFP's downlinks to QSFP[1]
+      for i in 48 to 71 loop
+         retVar(i) := retVar(i-48);
+      end loop;
+      for i in 72 to 127 loop
          -- APP.CH[i]  <--- Unused
          retVar(i) := toSlv(127, 7);
       end loop;
@@ -212,18 +223,26 @@ architecture mapping of Application is
    signal rst160MHz : sl;
 
    signal smaClk : sl;
+   signal drpClk : sl;
 
    signal iDelayCtrlRdy : sl;
    signal refClk300MHz  : sl;
    signal refRst300MHz  : sl;
 
-   signal refClk160     : sl;
-   signal drpClk        : sl;
-   signal rxRecClk      : slv(3 downto 0);
-   signal qplllock      : slv(1 downto 0);
-   signal qplloutclk    : slv(1 downto 0);
-   signal qplloutrefclk : slv(1 downto 0);
-   signal qpllRst       : slv(3 downto 0);
+   signal sfpRef160Clk  : sl;
+   signal qsfpRef160Clk : sl;
+   signal qsfpPllClk    : sl;
+
+   signal txWordClk160 : slv(11 downto 0);
+   signal rxWordClk80  : slv(11 downto 0);
+   signal txWordClk40  : sl;
+   signal rxWordClk40  : sl;
+
+   signal rxRecClk      : slv(11 downto 0);
+   signal qplllock      : Slv2Array(2 downto 0);
+   signal qplloutclk    : Slv2Array(2 downto 0);
+   signal qplloutrefclk : Slv2Array(2 downto 0);
+   signal qpllRst       : slv(11 downto 0);
 
    attribute IODELAY_GROUP                 : string;
    attribute IODELAY_GROUP of U_IDELAYCTRL : label is "rd53_aurora";
@@ -249,23 +268,6 @@ begin
          O     => open);
 
    NOT_SIM : if (SIMULATION_G = false) generate
-
-      ----------------------------------------------------
-      -- https://www.xilinx.com/support/answers/70060.html
-      ----------------------------------------------------
-      GEN_QSFP :
-      for i in 1 downto 0 generate
-         U_TERM_GTs : entity surf.Gtye4ChannelDummy
-            generic map (
-               TPD_G   => TPD_G,
-               WIDTH_G => 4)
-            port map (
-               refClk => ref156Clk,
-               gtRxP  => qsfpRxP(i),
-               gtRxN  => qsfpRxN(i),
-               gtTxP  => qsfpTxP(i),
-               gtTxN  => qsfpTxN(i));
-      end generate GEN_QSFP;
 
       ----------------------
       -- AXI-Lite: Power I2C
@@ -304,14 +306,14 @@ begin
          TPD_G        => TPD_G,
          XIL_DEVICE_G => XIL_DEVICE_C)
       port map (
-         clkIn   => rxRecClk(0),  -- emulation LP-GBT recovered clock used as jitter cleaner reference
+         clkIn   => rxRecClk(RX_RECCLK_INDEX_C),  -- emulation LP-GBT recovered clock used as jitter cleaner reference
          clkOutP => fpgaToPllClkP,
          clkOutN => fpgaToPllClkN);
 
-   --------------------------------
-   -- 160 MHz External Reference Clock
-   --------------------------------
-   U_IBUFDS_refClk160 : IBUFDS_GTE4
+   ---------------------------------------
+   -- 160 MHz Free-running Reference Clock
+   ---------------------------------------
+   U_SFP_refClk160 : IBUFDS_GTE4
       generic map (
          REFCLK_EN_TX_PATH  => '0',
          REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
@@ -321,21 +323,100 @@ begin
          IB    => sfpRef160ClkN,
          CEB   => '0',
          ODIV2 => open,
-         O     => refClk160);
+         O     => sfpRef160Clk);
+
+   U_QSFP_refClk160 : IBUFDS_GTE4
+      generic map (
+         REFCLK_EN_TX_PATH  => '0',
+         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
+         REFCLK_ICNTL_RX    => "00")
+      port map (
+         I     => qsfpRef160ClkP,
+         IB    => qsfpRef160ClkN,
+         CEB   => '0',
+         ODIV2 => open,
+         O     => qsfpRef160Clk);
+
+   ---------------
+   -- GT DRP Clock
+   ---------------
+   U_drp_clk : BUFGCE_DIV
+      generic map (
+         BUFGCE_DIVIDE => 4)
+      port map (
+         I   => axilClk,                -- 156.25 MHz
+         CE  => '1',
+         CLR => '0',
+         O   => drpClk);                -- 39.0625 MHz
 
    ------------------------
    -- LP-GBT QPLL Reference
    ------------------------
-   U_EmuLpGbtQpll : entity work.xlx_ku_mgt_10g24_emu_qpll
+   U_EmuLpGbtQpll_0 : entity work.xlx_ku_mgt_10g24_emu_qpll
+      generic map (
+         TPD_G             => TPD_G,
+         GT_CLK_SEL_G      => false,    -- false = gtClkP/N
+         SELECT_GT_TYPE_G  => false,    -- false = GTH
+         QPLL_REFCLK_SEL_G => "010")    -- 010: GTREFCLK1 selected
       port map (
          -- MGT Clock Port (320 MHz)
          gtClkP        => sfpPllClkP,
          gtClkN        => sfpPllClkN,
          -- Quad PLL Interface
-         qplllock      => qplllock,
-         qplloutclk    => qplloutclk,
-         qplloutrefclk => qplloutrefclk,
-         qpllRst       => qpllRst(0));
+         qplllock      => qplllock(0),
+         qplloutclk    => qplloutclk(0),
+         qplloutrefclk => qplloutrefclk(0),
+         qpllRst       => qpllRst(RX_RECCLK_INDEX_C));
+
+   U_EmuLpGbtQpll_1 : entity work.xlx_ku_mgt_10g24_emu_qpll
+      generic map (
+         TPD_G             => TPD_G,
+         GT_CLK_SEL_G      => false,    -- false = gtClkP/N
+         SELECT_GT_TYPE_G  => true,     -- true = GTY
+         QPLL_REFCLK_SEL_G => "010")    -- 010: GTREFCLK1 selected
+      port map (
+         -- MGT Clock Port (320 MHz)
+         gtClkP        => qsfpPllClkP,
+         gtClkN        => qsfpPllClkN,
+         gtClkOut      => qsfpPllClk,
+         -- Quad PLL Interface
+         qplllock      => qplllock(1),
+         qplloutclk    => qplloutclk(1),
+         qplloutrefclk => qplloutrefclk(1),
+         qpllRst       => qpllRst(RX_RECCLK_INDEX_C));
+
+   U_EmuLpGbtQpll_2 : entity work.xlx_ku_mgt_10g24_emu_qpll
+      generic map (
+         TPD_G             => TPD_G,
+         GT_CLK_SEL_G      => true,     -- true = gtClkIn
+         SELECT_GT_TYPE_G  => true,     -- true = GTY
+         QPLL_REFCLK_SEL_G => "100")    -- 100: GTNORTHREFCLK1 selected
+      port map (
+         -- MGT Clock Port (320 MHz)
+         gtClkIn       => qsfpPllClk,
+         -- Quad PLL Interface
+         qplllock      => qplllock(2),
+         qplloutclk    => qplloutclk(2),
+         qplloutrefclk => qplloutrefclk(2),
+         qpllRst       => qpllRst(RX_RECCLK_INDEX_C));
+
+   U_tx_wordclk : BUFGCE_DIV
+      generic map (
+         BUFGCE_DIVIDE => 4)
+      port map (
+         I   => txWordClk160(RX_RECCLK_INDEX_C),
+         CE  => '1',
+         CLR => '0',
+         O   => txWordClk40);
+
+   U_rx_wordclk : BUFGCE_DIV
+      generic map (
+         BUFGCE_DIVIDE => 2)
+      port map (
+         I   => rxWordClk80(RX_RECCLK_INDEX_C),
+         CE  => '1',
+         CLR => '0',
+         O   => rxWordClk40);
 
    --------------------------
    -- 160 MHz Reference Clock
@@ -358,15 +439,6 @@ begin
          clk    => ref160Clk,
          rstIn  => axilRst,
          rstOut => ref160Rst);
-
-   U_drp_clk : BUFGCE_DIV
-      generic map (
-         BUFGCE_DIVIDE => 4)
-      port map (
-         I   => axilClk,                -- 156.25 MHz
-         CE  => '1',
-         CLR => '0',
-         O   => drpClk);                -- 39.0625 MHz
 
    --------------------------
    -- Reference 300 MHz clock
@@ -525,9 +597,10 @@ begin
    for i in 3 downto 0 generate
       U_EMU_LP_GBT : entity work.AtlasRd53EmuLpGbtLane
          generic map (
-            TPD_G        => TPD_G,
-            NUM_ELINK_G  => 6,
-            XIL_DEVICE_G => XIL_DEVICE_C)
+            TPD_G            => TPD_G,
+            NUM_ELINK_G      => 6,
+            SELECT_GT_TYPE_G => false,  -- false = GTH
+            XIL_DEVICE_G     => XIL_DEVICE_C)
          port map (
             -- AXI-Lite interface (axilClk domain)
             axilClk         => axilClk,
@@ -540,24 +613,114 @@ begin
             clk160MHz       => clk160MHz,
             rst160MHz       => rst160MHz,
             -- RD53 ASIC Ports (clk160MHz domain)
-            cmdOutP         => dPortCmdP(6*i+5 downto 6*i),
-            cmdOutN         => dPortCmdN(6*i+5 downto 6*i),
+            cmdOutP         => dPortCmdP(6*(i+0)+5 downto 6*(i+0)),
+            cmdOutN         => dPortCmdN(6*(i+0)+5 downto 6*(i+0)),
             -- Deserialization Interface (clk160MHz domain)
-            serDesData      => serDesData(6*i+5 downto 6*i),
-            rxLinkUp        => rxLinkUp(6*i+5 downto 6*i),
+            serDesData      => serDesData(6*(i+0)+5 downto 6*(i+0)),
+            rxLinkUp        => rxLinkUp(6*(i+0)+5 downto 6*(i+0)),
             -- SFP Interface
-            refClk160       => refClk160,
-            rxRecClk        => rxRecClk(i),
+            refClk160       => sfpRef160Clk,
+            rxRecClk        => rxRecClk(i+0),
             drpClk          => drpClk,
-            qplllock        => qplllock,
-            qplloutclk      => qplloutclk,
-            qplloutrefclk   => qplloutrefclk,
-            qpllRst         => qpllRst(i),
+            txWordClk160    => txWordClk160(i+0),
+            rxWordClk80     => rxWordClk80(i+0),
+            txWordClk40     => txWordClk40,
+            rxWordClk40     => rxWordClk40,
+            qplllock        => qplllock(0),
+            qplloutclk      => qplloutclk(0),
+            qplloutrefclk   => qplloutrefclk(0),
+            qpllRst         => qpllRst(i+0),
             sfpTxP          => sfpTxP(i),
             sfpTxN          => sfpTxN(i),
             sfpRxP          => sfpRxP(i),
             sfpRxN          => sfpRxN(i));
    end generate GEN_SFP;
+
+   GEN_QSFP0 :
+   for i in 3 downto 0 generate
+      U_EMU_LP_GBT : entity work.AtlasRd53EmuLpGbtLane
+         generic map (
+            TPD_G            => TPD_G,
+            NUM_ELINK_G      => 6,
+            SELECT_GT_TYPE_G => true,   -- true = GTY
+            XIL_DEVICE_G     => XIL_DEVICE_C)
+         port map (
+            -- AXI-Lite interface (axilClk domain)
+            axilClk         => axilClk,
+            axilRst         => axilRst,
+            axilReadMaster  => lpgbtReadMasters(i+4),
+            axilReadSlave   => lpgbtReadSlaves(i+4),
+            axilWriteMaster => lpgbtWriteMasters(i+4),
+            axilWriteSlave  => lpgbtWriteSlaves(i+4),
+            -- Timing Interface
+            clk160MHz       => clk160MHz,
+            rst160MHz       => rst160MHz,
+            -- RD53 ASIC Ports (clk160MHz domain)
+--          cmdOutP         => dPortCmdP(6*(i+4)+5 downto 6*(i+4)),
+--          cmdOutN         => dPortCmdN(6*(i+4)+5 downto 6*(i+4)),
+            -- Deserialization Interface (clk160MHz domain)
+            serDesData      => serDesData(6*(i+4)+5 downto 6*(i+4)),
+            rxLinkUp        => rxLinkUp(6*(i+4)+5 downto 6*(i+4)),
+            -- SFP Interface
+            refClk160       => qsfpRef160Clk,
+            rxRecClk        => rxRecClk(i+4),
+            drpClk          => drpClk,
+            txWordClk160    => txWordClk160(i+4),
+            rxWordClk80     => rxWordClk80(i+4),
+            txWordClk40     => txWordClk40,
+            rxWordClk40     => rxWordClk40,
+            qplllock        => qplllock(1),
+            qplloutclk      => qplloutclk(1),
+            qplloutrefclk   => qplloutrefclk(1),
+            qpllRst         => qpllRst(i+4),
+            sfpTxP          => qsfpTxP(0)(i),
+            sfpTxN          => qsfpTxN(0)(i),
+            sfpRxP          => qsfpRxP(0)(i),
+            sfpRxN          => qsfpRxN(0)(i));
+   end generate GEN_QSFP0;
+
+   GEN_QSFP1 :
+   for i in 3 downto 0 generate
+      U_EMU_LP_GBT : entity work.AtlasRd53EmuLpGbtLane
+         generic map (
+            TPD_G            => TPD_G,
+            NUM_ELINK_G      => 6,
+            SELECT_GT_TYPE_G => true,   -- true = GTY
+            XIL_DEVICE_G     => XIL_DEVICE_C)
+         port map (
+            -- AXI-Lite interface (axilClk domain)
+            axilClk         => axilClk,
+            axilRst         => axilRst,
+            axilReadMaster  => lpgbtReadMasters(i+8),
+            axilReadSlave   => lpgbtReadSlaves(i+8),
+            axilWriteMaster => lpgbtWriteMasters(i+8),
+            axilWriteSlave  => lpgbtWriteSlaves(i+8),
+            -- Timing Interface
+            clk160MHz       => clk160MHz,
+            rst160MHz       => rst160MHz,
+            -- RD53 ASIC Ports (clk160MHz domain)
+--          cmdOutP         => dPortCmdP(6*(i+8)+5 downto 6*(i+8)),
+--          cmdOutN         => dPortCmdN(6*(i+8)+5 downto 6*(i+8)),
+            -- Deserialization Interface (clk160MHz domain)
+            serDesData      => serDesData(6*(i+8)+5 downto 6*(i+8)),
+            rxLinkUp        => rxLinkUp(6*(i+8)+5 downto 6*(i+8)),
+            -- SFP Interface
+            refClk160       => qsfpRef160Clk,
+            rxRecClk        => rxRecClk(i+8),
+            drpClk          => drpClk,
+            txWordClk160    => txWordClk160(i+8),
+            rxWordClk80     => rxWordClk80(i+8),
+            txWordClk40     => txWordClk40,
+            rxWordClk40     => rxWordClk40,
+            qplllock        => qplllock(2),
+            qplloutclk      => qplloutclk(2),
+            qplloutrefclk   => qplloutrefclk(2),
+            qpllRst         => qpllRst(i+8),
+            sfpTxP          => qsfpTxP(1)(i),
+            sfpTxN          => qsfpTxN(1)(i),
+            sfpRxP          => qsfpRxP(1)(i),
+            sfpRxN          => qsfpRxN(1)(i));
+   end generate GEN_QSFP1;
 
    GEN_ERM8 :
    for i in 7 downto 0 generate
