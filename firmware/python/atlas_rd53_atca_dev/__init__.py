@@ -11,3 +11,4 @@
 from atlas_rd53_atca_dev._AtlasRd53EmuLpGbtLaneReg   import *
 from atlas_rd53_atca_dev._AuroraRxLaneWrapper        import *
 from atlas_rd53_atca_dev._AtlasRd53HsSelectioWrapper import *
+from atlas_rd53_atca_dev._AtlasRd53CmdPhyMux         import *

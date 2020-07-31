@@ -102,3 +102,12 @@ class RudpRoot(pr.Root):
             offset      = 0x89000000,
             memBase     = self._srp,
         ))
+
+        #########################
+        # Add TX PHY/APP Crossbar
+        #########################
+        self.add(common.AtlasRd53CmdPhyMux(
+            name        = f'TxPhyXbar',
+            offset      = 0x8A000000,
+            memBase     = self._srp,
+        ))
