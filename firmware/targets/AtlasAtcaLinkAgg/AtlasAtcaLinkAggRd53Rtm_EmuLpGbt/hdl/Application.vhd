@@ -165,6 +165,17 @@ architecture mapping of Application is
    end function;
    constant RX_APP_TO_PHY_INIT_C : Slv7Array(127 downto 0) := RxAppToPhy;
 
+   impure function TxAppToPhy return Slv7Array is
+      variable i      : natural;
+      variable retVar : Slv7Array(31 downto 0);
+   begin
+      for i in 0 to 31 loop
+         retVar(i) := toSlv(i, 7);
+      end loop;
+      return retVar;
+   end function;
+   constant TX_APP_TO_PHY_INIT_C : Slv7Array(31 downto 0) := TxAppToPhy;
+
    constant I2C_CONFIG_C : I2cAxiLiteDevArray(0 to 2) := (
       0              => MakeI2cAxiLiteDevType(
          i2cAddress  => "0100000",      -- PCA9555
@@ -185,12 +196,13 @@ architecture mapping of Application is
          endianness  => '0',            -- Little endian
          repeatStart => '1'));          -- Repeat Start
 
-   constant NUM_AXIL_MASTERS_C : positive := 10;
+   constant NUM_AXIL_MASTERS_C : positive := 11;
 
    constant I2C_INDEX_C          : natural := 0;  -- [0:1]
    constant RX_INDEX_C           : natural := 4;  -- [4:7]
    constant LP_GBT_INDEX_C       : natural := 8;
    constant RX_PHY_REMAP_INDEX_C : natural := 9;
+   constant TX_PHY_REMAP_INDEX_C : natural := 10;
 
    constant AXIL_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXIL_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXIL_MASTERS_C, APP_AXIL_BASE_ADDR_C, 28, 24);
 
@@ -212,6 +224,10 @@ architecture mapping of Application is
    signal serDesData : Slv8Array(127 downto 0) := (others => (others => '0'));
    signal dlyLoad    : slv(127 downto 0)       := (others => '0');
    signal dlyCfg     : Slv9Array(127 downto 0) := (others => (others => '0'));
+
+   signal cmd    : slv(127 downto 0) := (others => '0');
+   signal invCmd : slv(127 downto 0) := (others => '0');
+   signal dlyCmd : slv(127 downto 0) := (others => '0');
 
    signal rxLinkUp : slv(NUM_ELINKS_C-1 downto 0);
 
@@ -541,8 +557,8 @@ begin
       generic map(
          TPD_G                => TPD_G,
          SIMULATION_G         => SIMULATION_G,
-         RX_PHY_TO_APP_INIT_C => RX_PHY_TO_APP_INIT_C,
-         RX_APP_TO_PHY_INIT_C => RX_APP_TO_PHY_INIT_C)
+         RX_PHY_TO_APP_INIT_G => RX_PHY_TO_APP_INIT_C,
+         RX_APP_TO_PHY_INIT_G => RX_APP_TO_PHY_INIT_C)
       port map (
          ref160Clk       => ref160Clk,
          ref160Rst       => ref160Rst,
@@ -564,6 +580,31 @@ begin
          axilReadSlave   => axilReadSlaves(RX_PHY_REMAP_INDEX_C),
          axilWriteMaster => axilWriteMasters(RX_PHY_REMAP_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(RX_PHY_REMAP_INDEX_C));
+
+   --------------------------
+   -- App-to-Phy CMD Crossbar
+   --------------------------
+   U_CmdXbar : entity work.CmdPhyMux
+      generic map(
+         TPD_G                => TPD_G,
+         TX_APP_TO_PHY_INIT_G => TX_APP_TO_PHY_INIT_C)
+      port map (
+         -- mDP CMD Interface
+         cmdOutP         => dPortCmdP,
+         cmdOutN         => dPortCmdN,
+         -- Timing Clock/Reset Interface
+         clk160MHz       => clk160MHz,
+         rst160MHz       => rst160MHz,
+         cmd             => cmd,
+         invCmd          => invCmd,
+         dlyCmd          => dlyCmd,
+         -- AXI-Lite Interface (axilClk domain)
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => axilReadMasters(TX_PHY_REMAP_INDEX_C),
+         axilReadSlave   => axilReadSlaves(TX_PHY_REMAP_INDEX_C),
+         axilWriteMaster => axilWriteMasters(TX_PHY_REMAP_INDEX_C),
+         axilWriteSlave  => axilWriteSlaves(TX_PHY_REMAP_INDEX_C));
 
    ----------------------------------------------------------
    -- Using AuroraRxLane for this is IDELAY alignment feature
@@ -612,9 +653,10 @@ begin
             -- Timing Interface
             clk160MHz       => clk160MHz,
             rst160MHz       => rst160MHz,
-            -- RD53 ASIC Ports (clk160MHz domain)
-            cmdOutP         => dPortCmdP(6*(i+0)+5 downto 6*(i+0)),
-            cmdOutN         => dPortCmdN(6*(i+0)+5 downto 6*(i+0)),
+            -- CMD Outputs (clk160MHz domain)
+            cmdOut          => cmd(6*(i+0)+5 downto 6*(i+0)),
+            invCmdOut       => invCmd(6*(i+0)+5 downto 6*(i+0)),
+            dlyCmdOut       => dlyCmd(6*(i+0)+5 downto 6*(i+0)),
             -- Deserialization Interface (clk160MHz domain)
             serDesData      => serDesData(6*(i+0)+5 downto 6*(i+0)),
             rxLinkUp        => rxLinkUp(6*(i+0)+5 downto 6*(i+0)),
@@ -655,9 +697,10 @@ begin
             -- Timing Interface
             clk160MHz       => clk160MHz,
             rst160MHz       => rst160MHz,
-            -- RD53 ASIC Ports (clk160MHz domain)
---          cmdOutP         => dPortCmdP(6*(i+4)+5 downto 6*(i+4)),
---          cmdOutN         => dPortCmdN(6*(i+4)+5 downto 6*(i+4)),
+            -- CMD Outputs (clk160MHz domain)
+            cmdOut          => cmd(6*(i+4)+5 downto 6*(i+4)),
+            invCmdOut       => invCmd(6*(i+4)+5 downto 6*(i+4)),
+            dlyCmdOut       => dlyCmd(6*(i+4)+5 downto 6*(i+4)),
             -- Deserialization Interface (clk160MHz domain)
             serDesData      => serDesData(6*(i+4)+5 downto 6*(i+4)),
             rxLinkUp        => rxLinkUp(6*(i+4)+5 downto 6*(i+4)),
@@ -698,9 +741,10 @@ begin
             -- Timing Interface
             clk160MHz       => clk160MHz,
             rst160MHz       => rst160MHz,
-            -- RD53 ASIC Ports (clk160MHz domain)
---          cmdOutP         => dPortCmdP(6*(i+8)+5 downto 6*(i+8)),
---          cmdOutN         => dPortCmdN(6*(i+8)+5 downto 6*(i+8)),
+            -- CMD Outputs (clk160MHz domain)
+            cmdOut          => cmd(6*(i+8)+5 downto 6*(i+8)),
+            invCmdOut       => invCmd(6*(i+8)+5 downto 6*(i+8)),
+            dlyCmdOut       => dlyCmd(6*(i+8)+5 downto 6*(i+8)),
             -- Deserialization Interface (clk160MHz domain)
             serDesData      => serDesData(6*(i+8)+5 downto 6*(i+8)),
             rxLinkUp        => rxLinkUp(6*(i+8)+5 downto 6*(i+8)),
@@ -721,14 +765,5 @@ begin
             sfpRxP          => qsfpRxP(1)(i),
             sfpRxN          => qsfpRxN(1)(i));
    end generate GEN_QSFP1;
-
-   GEN_ERM8 :
-   for i in 7 downto 0 generate
-      U_OBUFDS : OBUFDS
-         port map(
-            I  => axilRst,
-            O  => dPortCmdP(24+i),
-            OB => dPortCmdN(24+i));
-   end generate GEN_ERM8;
 
 end mapping;

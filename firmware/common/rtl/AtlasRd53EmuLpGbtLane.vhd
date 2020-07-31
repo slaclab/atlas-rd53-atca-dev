@@ -48,6 +48,10 @@ entity AtlasRd53EmuLpGbtLane is
       -- RD53 ASIC Ports (clk160MHz domain)
       cmdOutP         : out slv(NUM_ELINK_G-1 downto 0);
       cmdOutN         : out slv(NUM_ELINK_G-1 downto 0);
+      -- CMD Outputs (clk160MHz domain)
+      cmdOut          : out slv(NUM_ELINK_G-1 downto 0);
+      invCmdOut       : out slv(NUM_ELINK_G-1 downto 0);
+      dlyCmdOut       : out slv(NUM_ELINK_G-1 downto 0);
       -- Deserialization Interface (clk160MHz domain)
       serDesData      : in  Slv8Array(NUM_ELINK_G-1 downto 0);
       rxLinkUp        : in  slv(NUM_ELINK_G-1 downto 0);
@@ -57,8 +61,8 @@ entity AtlasRd53EmuLpGbtLane is
       rxRecClk        : out sl;
       txWordClk160    : out sl;
       rxWordClk80     : out sl;
-      txWordClk40     : in sl;
-      rxWordClk40     : in sl;
+      txWordClk40     : in  sl;
+      rxWordClk40     : in  sl;
       qplllock        : in  slv(1 downto 0);
       qplloutclk      : in  slv(1 downto 0);
       qplloutrefclk   : in  slv(1 downto 0);
@@ -105,6 +109,10 @@ begin
 
    downlinkUp <= downlinkReady;
    uplinkUp   <= uplinkReady;
+
+   cmdOut    <= cmd;
+   invCmdOut <= invCmd;
+   dlyCmdOut <= dlyCmd;
 
    ---------------------------
    -- Axi-Lite Register Module

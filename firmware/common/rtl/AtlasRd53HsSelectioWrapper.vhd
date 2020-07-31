@@ -31,8 +31,8 @@ entity AtlasRd53HsSelectioWrapper is
    generic (
       TPD_G                : time    := 1 ns;
       SIMULATION_G         : boolean := false;
-      RX_PHY_TO_APP_INIT_C : Slv7Array(127 downto 0);
-      RX_APP_TO_PHY_INIT_C : Slv7Array(127 downto 0));
+      RX_PHY_TO_APP_INIT_G : Slv7Array(127 downto 0);
+      RX_APP_TO_PHY_INIT_G : Slv7Array(127 downto 0));
    port (
       ref160Clk       : in  sl;
       ref160Rst       : in  sl;
@@ -75,8 +75,8 @@ architecture mapping of AtlasRd53HsSelectioWrapper is
       cnt            => x"1",
       addr           => (others => '1'),
       data           => (others => '1'),
-      phyToAppRemap  => RX_PHY_TO_APP_INIT_C,
-      appToPhyRemap  => RX_APP_TO_PHY_INIT_C,
+      phyToAppRemap  => RX_PHY_TO_APP_INIT_G,
+      appToPhyRemap  => RX_APP_TO_PHY_INIT_G,
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
@@ -189,11 +189,11 @@ begin
          -- Load default configuration
          v.we                := '1';
          v.addr              := r.addr + 1;
-         v.data(6 downto 0)  := RX_PHY_TO_APP_INIT_C(conv_integer(v.addr));
-         v.data(13 downto 7) := RX_APP_TO_PHY_INIT_C(conv_integer(v.addr));
+         v.data(6 downto 0)  := RX_PHY_TO_APP_INIT_G(conv_integer(v.addr));
+         v.data(13 downto 7) := RX_APP_TO_PHY_INIT_G(conv_integer(v.addr));
 
          -- Check for last write
-         if (v.addr = "1111111") then
+         if (uAnd(v.addr) = '1') then
             -- Initialization is completed
             v.init := '0';
          end if;
