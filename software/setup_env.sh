@@ -1,2 +1,2 @@
 # Activate Rogue conda Environment
-conda activate rogue_env
+conda activate rogue_tag
