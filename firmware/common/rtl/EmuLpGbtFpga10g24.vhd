@@ -30,6 +30,7 @@ entity EmuLpGbtFpga10g24 is
       SIMULATION_G     : boolean := false;
       SELECT_GT_TYPE_G : boolean := false);
    port (
+      fecMode                     : in  std_logic;  -- 1=FEC12, 0=FEC5
       -- Up link
       uplinkClk_o                 : out std_logic;  --! Clock provided by the Rx serdes: in phase with data
       uplinkClkEn_o               : out std_logic;  --! Clock enable pulsed when new data is ready
@@ -195,7 +196,7 @@ begin
          GT_TXDATA_OUT               => uplink_mgtword_s,
          GT_RXDATA_IN                => downlink_mgtword_s,
          -- General Configuration
-         fecMode                     => '1',   -- ‘1’ - FEC 12
+         fecMode                     => fecMode,
          txDataRate                  => '1');  -- ‘1’ - 10.24 Gb/s
 
    U_uplinkRst : entity surf.RstSync

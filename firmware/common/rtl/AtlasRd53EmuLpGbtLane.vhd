@@ -105,6 +105,8 @@ architecture rtl of AtlasRd53EmuLpGbtLane is
    signal uplinkRst      : sl;
    signal uplinkClkEn    : sl;
 
+   signal fecMode : sl;
+
 begin
 
    downlinkUp <= downlinkReady;
@@ -132,6 +134,7 @@ begin
          dlyCmd          => dlyCmd,
          downlinkRst     => downlinkRst,
          uplinkRst       => uplinkRst,
+         fecMode         => fecMode,
          -- AXI-Lite Interface (axilClk domain)
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -183,6 +186,7 @@ begin
       generic map (
          SELECT_GT_TYPE_G => SELECT_GT_TYPE_G)
       port map (
+         fecMode             => fecMode,
          -- Up link
          uplinkClk_o         => uplinkClk,      -- 40 MHz
          uplinkClkEn_o       => uplinkClkEn,    -- 40 MHz strobe
