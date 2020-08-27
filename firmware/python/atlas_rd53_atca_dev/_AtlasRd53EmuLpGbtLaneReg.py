@@ -97,6 +97,17 @@ class AtlasRd53EmuLpGbtLaneReg(pr.Device):
             mode         = 'RW',
         ))
 
+        self.add(pr.RemoteVariable(
+            name         = 'UpLinkFecMode',
+            offset       = 0x80C,
+            bitSize      = 1,
+            mode         = 'RW',
+            enum        = {
+                0x0: 'FEC5',
+                0x1: 'FEC12',
+            },
+        ))
+
         self.add(pr.RemoteCommand(
             name         = 'DownlinkRst',
             offset       = 0xFF0,
