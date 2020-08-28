@@ -271,7 +271,9 @@ begin
 
       -- Synchronous Reset
       if (reset160 = '1') then
-         v := REG_INIT_C;
+         v      := REG_INIT_C;
+         -- Don't init on 2nd reset
+         v.init := r.init;
       end if;
 
       -- Register the variable for next clock cycle

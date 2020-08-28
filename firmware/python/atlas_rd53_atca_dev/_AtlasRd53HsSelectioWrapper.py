@@ -41,4 +41,5 @@ class AtlasRd53HsSelectioWrapper(pr.Device):
                 mode         = 'RO',
                 enum         = dict(zip(range(128), remapEnum)),
                 pollInterval = 1,
+                hidden       = True,
             ))

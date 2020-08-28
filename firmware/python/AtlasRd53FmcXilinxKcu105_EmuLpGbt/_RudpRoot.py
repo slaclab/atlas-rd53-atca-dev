@@ -110,6 +110,8 @@ class RudpRoot(pr.Root):
     def start(self, **kwargs):
         super().start(**kwargs)
 
+        self.ReadAll()
+
         # Set the default PLL configuration files
         self.Pll[0].CsvFilePath.set('../firmware/targets/XilinxKcu105/AtlasRd53FmcXilinxKcu105_EmuLpGbt/pll-config/AtlasRd53FmcXilinxKcu105_EmuLpGbt.csv')
         self.Pll[1].CsvFilePath.set('../firmware/targets/XilinxKcu105/AtlasRd53FmcXilinxKcu105_EmuLpGbt/pll-config/AtlasRd53FmcXilinxKcu105_lpcRefClk.csv')
