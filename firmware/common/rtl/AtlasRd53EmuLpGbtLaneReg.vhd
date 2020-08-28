@@ -25,7 +25,7 @@ use surf.AxiLitePkg.all;
 entity AtlasRd53EmuLpGbtLaneReg is
    generic (
       TPD_G       : time                  := 1 ns;
-      NUM_ELINK_G : positive range 1 to 6 := 4);
+      NUM_ELINK_G : positive range 1 to 7 := 4);
    port (
       -- Config/status Interface (clk160MHz domain)
       clk160MHz       : in  sl;

@@ -125,18 +125,18 @@ architecture mapping of Application is
       variable j      : natural;
       variable retVar : Slv7Array(127 downto 0);
    begin
-      -- SFP's downlinks configuration
+      -- Uplink: PHY to Application Mapping
       for i in 0 to 3 loop
          for j in 0 to 5 loop
             -- APP.CH[i*6+j]  <--- PHY.CH[24*i+4*j+3]  = mDP.CH[i*6+j].RX[3]
             retVar(i*6+j) := toSlv((24*i+4*j+3), 7);
          end loop;
       end loop;
-      -- Copy the SFP's downlinks to QSFP[0]
+      -- Copy the SFP's uplinks to QSFP[0]
       for i in 24 to 47 loop
          retVar(i) := retVar(i-24);
       end loop;
-      -- Copy the SFP's downlinks to QSFP[1]
+      -- Copy the SFP's uplinks to QSFP[1]
       for i in 48 to 71 loop
          retVar(i) := retVar(i-48);
       end loop;
@@ -147,23 +147,6 @@ architecture mapping of Application is
       return retVar;
    end function;
    constant RX_PHY_TO_APP_INIT_C : Slv7Array(127 downto 0) := RxPhyToApp;
-
-   impure function RxAppToPhy return Slv7Array is
-      variable i      : natural;
-      variable index  : natural;
-      variable retVar : Slv7Array(127 downto 0);
-   begin
-      -- Init the default value
-      retVar := (others => (others => '1'));
-      for i in 0 to 23 loop
-         -- Get the index from previous INIT constant
-         index         := conv_integer(RX_PHY_TO_APP_INIT_C(i));
-         -- Use index to remap the APP-->PHY route path
-         retVar(index) := toSlv(i, 7);
-      end loop;
-      return retVar;
-   end function;
-   constant RX_APP_TO_PHY_INIT_C : Slv7Array(127 downto 0) := RxAppToPhy;
 
    impure function TxAppToPhy return Slv7Array is
       variable i      : natural;
@@ -557,8 +540,7 @@ begin
       generic map(
          TPD_G                => TPD_G,
          SIMULATION_G         => SIMULATION_G,
-         RX_PHY_TO_APP_INIT_G => RX_PHY_TO_APP_INIT_C,
-         RX_APP_TO_PHY_INIT_G => RX_APP_TO_PHY_INIT_C)
+         RX_PHY_TO_APP_INIT_G => RX_PHY_TO_APP_INIT_C)
       port map (
          ref160Clk       => ref160Clk,
          ref160Rst       => ref160Rst,

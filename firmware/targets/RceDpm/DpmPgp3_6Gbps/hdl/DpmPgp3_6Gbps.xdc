@@ -9,7 +9,7 @@
 ##############################################################################
 
 create_clock -name locRefClk -period 4.0 [get_ports locRefClkP]
-    
+
 set_clock_groups -asynchronous \
     -group [get_clocks -include_generated_clocks sysClk200] \
     -group [get_clocks -include_generated_clocks sysClk125] \
@@ -21,5 +21,5 @@ set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_DpmCor
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_DpmCore/U_RceG3Top/U_RceG3Clocks/U_MMCM/MmcmGen.U_Mmcm/CLKOUT3]] -group [get_clocks -of_objects [get_pins {GEN_LANE[*].U_Pgp/U_PgpLane/REAL_PGP.GEN_LANE[2].U_Pgp/U_Pgp3Gtx7IpWrapper/U_RX_PLL/PllGen.U_Pll/CLKOUT1}]]
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_DpmCore/U_RceG3Top/U_RceG3Clocks/U_MMCM/MmcmGen.U_Mmcm/CLKOUT3]] -group [get_clocks -of_objects [get_pins {GEN_LANE[*].U_Pgp/U_PgpLane/REAL_PGP.GEN_LANE[3].U_Pgp/U_Pgp3Gtx7IpWrapper/U_RX_PLL/PllGen.U_Pll/CLKOUT1}]]
 
-set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_DpmCore/U_RceG3Top/U_RceG3Clocks/U_MMCM/MmcmGen.U_Mmcm/CLKOUT0]] -group [get_clocks -of_objects [get_pins {GEN_LANE[*].U_Pgp/U_PgpLane/REAL_PGP.U_TX_PLL/PllGen.U_Pll/CLKOUT1}]] 
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_DpmCore/U_RceG3Top/U_RceG3Clocks/U_MMCM/MmcmGen.U_Mmcm/CLKOUT0]] -group [get_clocks -of_objects [get_pins {GEN_LANE[*].U_Pgp/U_PgpLane/REAL_PGP.U_TX_PLL/PllGen.U_Pll/CLKOUT1}]]
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_DpmCore/U_RceG3Top/U_RceG3Clocks/U_MMCM/MmcmGen.U_Mmcm/CLKOUT3]] -group [get_clocks -of_objects [get_pins {GEN_LANE[*].U_Pgp/U_PgpLane/REAL_PGP.U_TX_PLL/PllGen.U_Pll/CLKOUT1}]]

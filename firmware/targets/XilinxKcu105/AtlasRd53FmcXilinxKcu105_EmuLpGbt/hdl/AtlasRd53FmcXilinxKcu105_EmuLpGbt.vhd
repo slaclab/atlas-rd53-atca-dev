@@ -7,6 +7,8 @@
 --    SFP[1] = emulation LP-GBT
 -------------------------------------------------------------------------------
 -- Note: This design requires two FMC cards installed (HPC and LPC bays)
+--       HPC mDP used with RD53 ASICs via mDP ports
+--       LPC is only used for a LHC free-running clock reference (mDP unused)
 -------------------------------------------------------------------------------
 -- This file is part of 'ATLAS RD53 FMC DEV'.
 -- It is subject to the license terms in the LICENSE.txt file found in the
@@ -66,6 +68,23 @@ end AtlasRd53FmcXilinxKcu105_EmuLpGbt;
 
 architecture top_level of AtlasRd53FmcXilinxKcu105_EmuLpGbt is
 
+   impure function RxPhyToApp return Slv7Array is
+      variable i      : natural;
+      variable retVar : Slv7Array(127 downto 0);
+   begin
+      -- Uplink: PHY to Application Mapping
+      for i in 0 to 3 loop
+         -- APP.CH[i]  <--- PHY.CH[4*i+3]  = mDP.CH[i].RX[3]
+         retVar(i) := toSlv((4*i+3), 7);
+      end loop;
+      for i in 4 to 127 loop
+         -- APP.CH[i]  <--- Unused
+         retVar(i) := toSlv(127, 7);
+      end loop;
+      return retVar;
+   end function;
+   constant RX_PHY_TO_APP_INIT_C : Slv7Array(127 downto 0) := RxPhyToApp;
+
    constant XIL_DEVICE_C : string := "ULTRASCALE";
 
    constant PLL_GPIO_I2C_CONFIG_C : I2cAxiLiteDevArray(0 to 1) := (
@@ -84,13 +103,14 @@ architecture top_level of AtlasRd53FmcXilinxKcu105_EmuLpGbt is
 
    constant AXIL_CLK_FREQ_C : real := 156.25E+6;  -- Units of Hz
 
-   constant NUM_AXIL_MASTERS_C : positive := 6;
+   constant NUM_AXIL_MASTERS_C : positive := 7;
 
-   constant VERSION_INDEX_C : natural := 0;
-   constant PLL_INDEX_C     : natural := 1;  -- [1:2]
-   constant I2C_INDEX_C     : natural := 3;
-   constant LP_GBT_INDEX_C  : natural := 4;
-   constant RX_INDEX_C      : natural := 5;
+   constant VERSION_INDEX_C      : natural := 0;
+   constant PLL_INDEX_C          : natural := 1;  -- [1:2]
+   constant I2C_INDEX_C          : natural := 3;
+   constant LP_GBT_INDEX_C       : natural := 4;
+   constant RX_INDEX_C           : natural := 5;
+   constant RX_PHY_REMAP_INDEX_C : natural := 6;
 
    constant AXIL_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXIL_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXIL_MASTERS_C, x"0000_0000", 24, 16);
 
@@ -323,36 +343,44 @@ begin
    -------------------
    -- FMC Port Mapping
    -------------------
-   U_FmcMapping : entity atlas_rd53_fw_lib.AtlasRd53FmcMapping
+   U_FmcMapping : entity work.AtlasRd53FmcMappingWithMux
       generic map (
-         TPD_G        => TPD_G,
-         XIL_DEVICE_G => XIL_DEVICE_C)
+         TPD_G                => TPD_G,
+         XIL_DEVICE_G         => XIL_DEVICE_C,
+         RX_PHY_TO_APP_INIT_G => RX_PHY_TO_APP_INIT_C)
       port map (
          -- Deserialization Interface
-         serDesData    => serDesData,
-         dlyLoad       => dlyLoad,
-         dlyCfg        => dlyCfg,
-         iDelayCtrlRdy => iDelayCtrlRdy,
+         serDesData      => serDesData,
+         dlyLoad         => dlyLoad,
+         dlyCfg          => dlyCfg,
+         iDelayCtrlRdy   => iDelayCtrlRdy,
          -- Timing/Trigger Interface
-         clk160MHz     => clk160MHz,
-         rst160MHz     => rst160MHz,
+         clk160MHz       => clk160MHz,
+         rst160MHz       => rst160MHz,
          -- PLL Clocking Interface
-         fpgaPllClkIn  => rxRecClk,  -- emulation LP-GBT recovered clock used as jitter cleaner reference
+         fpgaPllClkIn    => rxRecClk,  -- emulation LP-GBT recovered clock used as jitter cleaner reference
          -- PLL SPI Interface
-         pllRst        => x"0",
-         pllCsL        => pllCsL,
-         pllSck        => pllSck,
-         pllSdi        => pllSdi,
-         pllSdo        => pllSdo,
+         pllRst          => x"0",
+         pllCsL          => pllCsL,
+         pllSck          => pllSck,
+         pllSdi          => pllSdi,
+         pllSdo          => pllSdo,
          -- mDP CMD Interface
-         dPortCmdP     => dPortCmdP,
-         dPortCmdN     => dPortCmdN,
+         dPortCmdP       => dPortCmdP,
+         dPortCmdN       => dPortCmdN,
          -- I2C Interface
-         i2cScl        => i2cScl,
-         i2cSda        => i2cSda,
+         i2cScl          => i2cScl,
+         i2cSda          => i2cSda,
          -- FMC LPC Ports
-         fmcLaP        => fmcHpcLaP,
-         fmcLaN        => fmcHpcLaN);
+         fmcLaP          => fmcHpcLaP,
+         fmcLaN          => fmcHpcLaN,
+         -- AXI-Lite Interface (axilClk domain)
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => axilReadMasters(RX_PHY_REMAP_INDEX_C),
+         axilReadSlave   => axilReadSlaves(RX_PHY_REMAP_INDEX_C),
+         axilWriteMaster => axilWriteMasters(RX_PHY_REMAP_INDEX_C),
+         axilWriteSlave  => axilWriteSlaves(RX_PHY_REMAP_INDEX_C));
 
    --------------------
    -- AxiVersion Module
@@ -467,49 +495,45 @@ begin
    U_EMU_LP_GBT : entity work.AtlasRd53EmuLpGbtLane
       generic map (
          TPD_G        => TPD_G,
-         NUM_ELINK_G  => 4,
+         NUM_ELINK_G  => 7,
          XIL_DEVICE_G => XIL_DEVICE_C)
       port map (
          -- AXI-Lite interface (axilClk domain)
-         axilClk         => axilClk,
-         axilRst         => axilRst,
-         axilReadMaster  => axilReadMasters(LP_GBT_INDEX_C),
-         axilReadSlave   => axilReadSlaves(LP_GBT_INDEX_C),
-         axilWriteMaster => axilWriteMasters(LP_GBT_INDEX_C),
-         axilWriteSlave  => axilWriteSlaves(LP_GBT_INDEX_C),
+         axilClk             => axilClk,
+         axilRst             => axilRst,
+         axilReadMaster      => axilReadMasters(LP_GBT_INDEX_C),
+         axilReadSlave       => axilReadSlaves(LP_GBT_INDEX_C),
+         axilWriteMaster     => axilWriteMasters(LP_GBT_INDEX_C),
+         axilWriteSlave      => axilWriteSlaves(LP_GBT_INDEX_C),
          -- Timing Interface
-         clk160MHz       => clk160MHz,
-         rst160MHz       => rst160MHz,
+         clk160MHz           => clk160MHz,
+         rst160MHz           => rst160MHz,
          -- RD53 ASIC Ports (clk160MHz domain)
-         cmdOutP         => dPortCmdP,
-         cmdOutN         => dPortCmdN,
+         cmdOutP(3 downto 0) => dPortCmdP,
+         cmdOutP(6 downto 4) => open,
+         cmdOutN(3 downto 0) => dPortCmdN,
+         cmdOutN(6 downto 4) => open,
          -- Deserialization Interface (clk160MHz domain)
-         serDesData(0)   => serDesData(4*0+3),
-         serDesData(1)   => serDesData(4*1+3),
-         serDesData(2)   => serDesData(4*2+3),
-         serDesData(3)   => serDesData(4*3+3),
-         rxLinkUp(0)     => rxLinkUp(4*0+3),
-         rxLinkUp(1)     => rxLinkUp(4*1+3),
-         rxLinkUp(2)     => rxLinkUp(4*2+3),
-         rxLinkUp(3)     => rxLinkUp(4*3+3),
+         serDesData          => serDesData(6 downto 0),
+         rxLinkUp            => rxLinkUp(6 downto 0),
          -- SFP Interface
-         refClk160       => refClk160,
-         drpClk          => drpClk,
-         txWordClk160    => txWordClk160,
-         rxWordClk80     => rxWordClk80,
-         txWordClk40     => txWordClk40,
-         rxWordClk40     => rxWordClk40,
-         rxRecClk        => rxRecClk,
-         qplllock        => qplllock,
-         qplloutclk      => qplloutclk,
-         qplloutrefclk   => qplloutrefclk,
-         qpllRst         => qpllRst,
-         downlinkUp      => downlinkUp,
-         uplinkUp        => uplinkUp,
-         sfpTxP          => sfpTxP(1),
-         sfpTxN          => sfpTxN(1),
-         sfpRxP          => sfpRxP(1),
-         sfpRxN          => sfpRxN(1));
+         refClk160           => refClk160,
+         drpClk              => drpClk,
+         txWordClk160        => txWordClk160,
+         rxWordClk80         => rxWordClk80,
+         txWordClk40         => txWordClk40,
+         rxWordClk40         => rxWordClk40,
+         rxRecClk            => rxRecClk,
+         qplllock            => qplllock,
+         qplloutclk          => qplloutclk,
+         qplloutrefclk       => qplloutrefclk,
+         qpllRst             => qpllRst,
+         downlinkUp          => downlinkUp,
+         uplinkUp            => uplinkUp,
+         sfpTxP              => sfpTxP(1),
+         sfpTxN              => sfpTxN(1),
+         sfpRxP              => sfpRxP(1),
+         sfpRxN              => sfpRxN(1));
 
    U_drp_clk : BUFGCE_DIV
       generic map (

@@ -29,10 +29,11 @@ use unisim.vcomponents.all;
 
 entity AtlasRd53HsSelectioWrapper is
    generic (
-      TPD_G                : time    := 1 ns;
-      SIMULATION_G         : boolean := false;
-      RX_PHY_TO_APP_INIT_G : Slv7Array(127 downto 0);
-      RX_APP_TO_PHY_INIT_G : Slv7Array(127 downto 0));
+      TPD_G                : time     := 1 ns;
+      SIMULATION_G         : boolean  := false;
+      NUM_CHIP_G           : positive := 24;
+      XIL_DEVICE_G         : string   := "ULTRASCALE_PLUS";
+      RX_PHY_TO_APP_INIT_G : Slv7Array(127 downto 0));
    port (
       ref160Clk       : in  sl;
       ref160Rst       : in  sl;
@@ -42,8 +43,8 @@ entity AtlasRd53HsSelectioWrapper is
       dlyCfg          : in  Slv9Array(127 downto 0);
       iDelayCtrlRdy   : in  sl;
       -- mDP DATA Interface
-      dPortDataP      : in  Slv4Array(23 downto 0);
-      dPortDataN      : in  Slv4Array(23 downto 0);
+      dPortDataP      : in  Slv4Array(NUM_CHIP_G-1 downto 0);
+      dPortDataN      : in  Slv4Array(NUM_CHIP_G-1 downto 0);
       -- Timing Clock/Reset Interface
       clk160MHz       : out sl;
       rst160MHz       : out sl;
@@ -58,12 +59,30 @@ end AtlasRd53HsSelectioWrapper;
 
 architecture mapping of AtlasRd53HsSelectioWrapper is
 
+   impure function RxAppToPhy return Slv7Array is
+      variable i      : natural;
+      variable index  : natural;
+      variable retVar : Slv7Array(127 downto 0);
+   begin
+      -- Init the default value
+      retVar := (others => (others => '1'));
+      for i in 0 to NUM_CHIP_G-1 loop
+         -- Get the index from previous INIT constant
+         index         := conv_integer(RX_PHY_TO_APP_INIT_G(i));
+         -- Use index to remap the APP-->PHY route path
+         retVar(index) := toSlv(i, 7);
+      end loop;
+      return retVar;
+   end function;
+   constant RX_APP_TO_PHY_INIT_C : Slv7Array(127 downto 0) := RxAppToPhy;
+
    type RegType is record
       init           : sl;
       we             : sl;
       cnt            : slv(3 downto 0);
-      addr           : slv(6 downto 0);
-      data           : slv(13 downto 0);
+      addr           : slv(7 downto 0);
+      raddr          : slv(7 downto 0);
+      data           : slv(6 downto 0);
       phyToAppRemap  : Slv7Array(127 downto 0);
       appToPhyRemap  : Slv7Array(127 downto 0);
       axilReadSlave  : AxiLiteReadSlaveType;
@@ -72,11 +91,12 @@ architecture mapping of AtlasRd53HsSelectioWrapper is
    constant REG_INIT_C : RegType := (
       init           => '1',
       we             => '0',
-      cnt            => x"1",
+      cnt            => x"0",
       addr           => (others => '1'),
+      raddr          => toSlv(127, 8),
       data           => (others => '1'),
       phyToAppRemap  => RX_PHY_TO_APP_INIT_G,
-      appToPhyRemap  => RX_APP_TO_PHY_INIT_G,
+      appToPhyRemap  => RX_APP_TO_PHY_INIT_C,
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
@@ -90,7 +110,7 @@ architecture mapping of AtlasRd53HsSelectioWrapper is
    signal dlyLoad_s    : slv(127 downto 0)       := (others => '0');
    signal dlyCfg_s     : Slv9Array(127 downto 0) := (others => (others => '0'));
 
-   signal ramData : slv(13 downto 0) := (others => '0');
+   signal ramData : slv(6 downto 0) := (others => '0');
 
 begin
 
@@ -101,15 +121,15 @@ begin
       generic map(
          TPD_G        => TPD_G,
          SIMULATION_G => SIMULATION_G,
-         NUM_CHIP_G   => 24,
-         XIL_DEVICE_G => "ULTRASCALE_PLUS")
+         NUM_CHIP_G   => NUM_CHIP_G,
+         XIL_DEVICE_G => XIL_DEVICE_G)
       port map (
          ref160Clk     => ref160Clk,
          ref160Rst     => ref160Rst,
          -- Deserialization Interface
-         serDesData    => serDesData_s(95 downto 0),
-         dlyLoad       => dlyLoad_s(95 downto 0),
-         dlyCfg        => dlyCfg_s(95 downto 0),
+         serDesData    => serDesData_s(4*NUM_CHIP_G-1 downto 0),
+         dlyLoad       => dlyLoad_s(4*NUM_CHIP_G-1 downto 0),
+         dlyCfg        => dlyCfg_s(4*NUM_CHIP_G-1 downto 0),
          iDelayCtrlRdy => iDelayCtrlRdy,
          -- mDP DATA Interface
          dPortDataP    => dPortDataP,
@@ -155,8 +175,8 @@ begin
          AXI_WR_EN_G    => true,
          SYS_WR_EN_G    => true,
          COMMON_CLK_G   => false,
-         ADDR_WIDTH_G   => 7,
-         DATA_WIDTH_G   => 14)
+         ADDR_WIDTH_G   => 8,
+         DATA_WIDTH_G   => 7)
       port map (
          -- Axi Port
          axiClk         => axilClk,
@@ -174,8 +194,9 @@ begin
          dout           => ramData);
 
    comb : process (r, ramData, reset160) is
-      variable v : RegType;
-
+      variable v     : RegType;
+      variable i     : natural;
+      variable index : natural;
    begin
       -- Latch the current value
       v := r;
@@ -183,14 +204,22 @@ begin
       -- Reset strobes
       v.we := '0';
 
+      -- Update variable
+      i     := conv_integer(r.raddr);
+      index := conv_integer(r.phyToAppRemap(i));
+
       -- Check for init
       if (r.init = '1') then
 
          -- Load default configuration
-         v.we                := '1';
-         v.addr              := r.addr + 1;
-         v.data(6 downto 0)  := RX_PHY_TO_APP_INIT_G(conv_integer(v.addr));
-         v.data(13 downto 7) := RX_APP_TO_PHY_INIT_G(conv_integer(v.addr));
+         v.we   := '1';
+         v.addr := r.addr + 1;
+
+         if (v.addr(7) = '0') then
+            v.data := RX_PHY_TO_APP_INIT_G(conv_integer(v.addr(6 downto 0)));
+         else
+            v.data := RX_APP_TO_PHY_INIT_C(conv_integer(v.addr(6 downto 0)));
+         end if;
 
          -- Check for last write
          if (uAnd(v.addr) = '1') then
@@ -206,12 +235,35 @@ begin
          -- Check the counter
          if (r.cnt = 0) then
 
-            -- Update the remap value
-            v.phyToAppRemap(conv_integer(r.addr)) := ramData(6 downto 0);
-            v.appToPhyRemap(conv_integer(r.addr)) := ramData(13 downto 7);
+            -- Update the read address
+            if (r.raddr = 127) then
+               v.raddr := (others => '0');
+            else
+               v.raddr := r.raddr + 1;
+            end if;
 
-            -- Increment the counter
-            v.addr := r.addr + 1;
+            -- Map the read address to the RAM
+            v.addr := v.raddr;
+
+         elsif (r.cnt = 8) then
+
+            -- Update the remap value
+            v.phyToAppRemap(i) := ramData;
+
+         elsif (r.cnt = 9) then
+
+            -- Use index to remap the APP-->PHY route path
+            v.appToPhyRemap(index) := toSlv(i, 7);
+
+         elsif (r.cnt = 10) then
+
+            -- Load calculated APP-to-PHY configuration
+            v.we   := '1';
+            v.data := r.appToPhyRemap(index);
+
+            -- Map the read address to the RAM
+            v.addr(6 downto 0) := toSlv(index, 7);
+            v.addr(7)          := '1';
 
          end if;
 

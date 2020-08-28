@@ -31,7 +31,7 @@ use unisim.vcomponents.all;
 entity AtlasRd53EmuLpGbtLane is
    generic (
       TPD_G            : time                  := 1 ns;
-      NUM_ELINK_G      : positive range 1 to 6 := 6;
+      NUM_ELINK_G      : positive range 1 to 7 := 6;
       SELECT_GT_TYPE_G : boolean               := false;  -- false = GTH, true = GTY
       XIL_DEVICE_G     : string                := "ULTRASCALE");
    port (

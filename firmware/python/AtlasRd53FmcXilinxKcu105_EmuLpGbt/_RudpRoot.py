@@ -82,7 +82,7 @@ class RudpRoot(pr.Root):
         self.add(common.AtlasRd53EmuLpGbtLaneReg(
             name        = 'Ctrl',
             offset      = (4*0x0001_0000),
-            NUM_ELINK_G = 4,
+            NUM_ELINK_G = 7,
             memBase     = self._srp,
             expand      = True,
         ))
@@ -95,6 +95,17 @@ class RudpRoot(pr.Root):
                 memBase     = self._srp,
                 expand      = False,
             ))
+
+        #########################
+        # Add RX PHY/APP Crossbar
+        #########################
+        self.add(common.AtlasRd53HsSelectioWrapper(
+            name        = f'RxPhyXbar',
+            offset      = (6*0x0001_0000),
+            memBase     = self._srp,
+            numPhyLanes = 16,
+            expand      = True,
+        ))
 
     def start(self, **kwargs):
         super().start(**kwargs)
