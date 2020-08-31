@@ -30,51 +30,44 @@ entity EmuLpGbtFpga10g24 is
       SIMULATION_G     : boolean := false;
       SELECT_GT_TYPE_G : boolean := false);
    port (
-      fecMode                     : in  std_logic;  -- 1=FEC12, 0=FEC5
+      -- Uplink mode
+      fecMode             : in  std_logic;  -- 1=FEC12, 0=FEC5
       -- Up link
-      uplinkClk_o                 : out std_logic;  --! Clock provided by the Rx serdes: in phase with data
-      uplinkClkEn_o               : out std_logic;  --! Clock enable pulsed when new data is ready
-      uplinkRst_i                 : in  std_logic;  --! Reset the uplink path
-      uplinkUserData_i            : in  std_logic_vector(229 downto 0);  --! Uplink data (user)
-      uplinkEcData_i              : in  std_logic_vector(1 downto 0);  --! Uplink EC field
-      uplinkIcData_i              : in  std_logic_vector(1 downto 0);  --! Uplink IC field
-      uplinkBypassInterleaver_i   : in  std_logic                    := '0';  --! Bypass uplink interleaver (test purpose only)
-      uplinkBypassFECEncoder_i    : in  std_logic                    := '0';  --! Bypass uplink FEC (test purpose only)
-      uplinkBypassScrambler_i     : in  std_logic                    := '0';  --! Bypass uplink scrambler (test purpose only)
-      uplinkReady_o               : out std_logic;  --! Uplink ready status
+      uplinkClk_o         : out std_logic;  --! Clock provided by the Rx serdes: in phase with data
+      uplinkClkEn_o       : out std_logic;  --! Clock enable pulsed when new data is ready
+      uplinkRst_i         : in  std_logic;  --! Reset the uplink path
+      uplinkUserData_i    : in  std_logic_vector(229 downto 0);  --! Uplink data (user)
+      uplinkEcData_i      : in  std_logic_vector(1 downto 0);  --! Uplink EC field
+      uplinkIcData_i      : in  std_logic_vector(1 downto 0);  --! Uplink IC field
+      uplinkReady_o       : out std_logic;  --! Uplink ready status
       -- Down link
-      donwlinkClk_o               : out std_logic;  --! Downlink datapath clock (either 320 or 40MHz)
-      downlinkClkEn_o             : out std_logic;  --! Clock enable (1 over 8 when encoding runs @ 320Mhz, '1' @ 40MHz)
-      downlinkRst_i               : in  std_logic;  --! Reset the downlink path
-      downlinkUserData_o          : out std_logic_vector(31 downto 0);  --! Downlink data (user)
-      downlinkEcData_o            : out std_logic_vector(1 downto 0);  --! Downlink EC field
-      downlinkIcData_o            : out std_logic_vector(1 downto 0);  --! Downlink IC field
-      downLinkBypassInterleaver_i : in  std_logic                    := '0';  --! Bypass downlink interleaver (test purpose only)
-      downLinkBypassFECEncoder_i  : in  std_logic                    := '0';  --! Bypass downlink FEC (test purpose only)
-      downLinkBypassScrambler_i   : in  std_logic                    := '0';  --! Bypass downlink scrambler (test purpose only)
-      enableFECErrCounter_i       : in  std_logic                    := '1';
-      fecCorrectionCount_o        : out std_logic_vector(15 downto 0);
-      downlinkReady_o             : out std_logic;  --! Downlink ready status
+      donwlinkClk_o       : out std_logic;  --! Downlink datapath clock (either 320 or 40MHz)
+      downlinkClkEn_o     : out std_logic;  --! Clock enable (1 over 8 when encoding runs @ 320Mhz, '1' @ 40MHz)
+      downlinkRst_i       : in  std_logic;  --! Reset the downlink path
+      downlinkUserData_o  : out std_logic_vector(31 downto 0);  --! Downlink data (user)
+      downlinkEcData_o    : out std_logic_vector(1 downto 0);  --! Downlink EC field
+      downlinkIcData_o    : out std_logic_vector(1 downto 0);  --! Downlink IC field
+      downlinkReady_o     : out std_logic;  --! Downlink ready status
       -- MGT
-      txWordClk160_o              : out std_logic;
-      rxWordClk80_o               : out std_logic;
-      txWordClk40_i               : in  std_logic;
-      rxWordClk40_i               : in  std_logic;
-      qplllock                    : in  std_logic_vector(1 downto 0);
-      qplloutclk                  : in  std_logic_vector(1 downto 0);
-      qplloutrefclk               : in  std_logic_vector(1 downto 0);
-      qpllRst                     : out std_logic;
-      rxRecClk                    : out std_logic;
-      clk_refclk_i                : in  std_logic;  --! CPLL using 160 MHz reference
-      clk_mgtfreedrpclk_i         : in  std_logic;
-      mgt_rxn_i                   : in  std_logic;
-      mgt_rxp_i                   : in  std_logic;
-      mgt_txn_o                   : out std_logic;
-      mgt_txp_o                   : out std_logic;
-      mgt_txcaliben_i             : in  std_logic                    := '0';
-      mgt_txcalib_i               : in  std_logic_vector(6 downto 0) := (others => '0');
-      mgt_txaligned_o             : out std_logic                    := '0';
-      mgt_txphase_o               : out std_logic_vector(6 downto 0) := (others => '0'));
+      txWordClk160_o      : out std_logic;
+      rxWordClk80_o       : out std_logic;
+      txWordClk40_i       : in  std_logic;
+      rxWordClk40_i       : in  std_logic;
+      qplllock            : in  std_logic_vector(1 downto 0);
+      qplloutclk          : in  std_logic_vector(1 downto 0);
+      qplloutrefclk       : in  std_logic_vector(1 downto 0);
+      qpllRst             : out std_logic;
+      rxRecClk            : out std_logic;
+      clk_refclk_i        : in  std_logic;  --! CPLL using 160 MHz reference
+      clk_mgtfreedrpclk_i : in  std_logic;
+      mgt_rxn_i           : in  std_logic;
+      mgt_rxp_i           : in  std_logic;
+      mgt_txn_o           : out std_logic;
+      mgt_txp_o           : out std_logic;
+      mgt_txcaliben_i     : in  std_logic                    := '0';
+      mgt_txcalib_i       : in  std_logic_vector(6 downto 0) := (others => '0');
+      mgt_txaligned_o     : out std_logic                    := '0';
+      mgt_txphase_o       : out std_logic_vector(6 downto 0) := (others => '0'));
 end EmuLpGbtFpga10g24;
 
 architecture mapping of EmuLpGbtFpga10g24 is
@@ -158,46 +151,35 @@ begin
          c_mgtWordWidth         => 256)
       port map(
          -- DownLink
-         downlinkClkEn_o             => downlinkClkEn_s,
-         rst_downlink_i              => downlinkRst_s,
-         downLinkDataGroup0          => downlinkUserData_o(15 downto 0),
-         downLinkDataGroup1          => downlinkUserData_o(31 downto 16),
-         downLinkDataEc              => downlinkEcData_o,
-         downLinkDataIc              => downlinkIcData_o,
-         downLinkBypassDeinterleaver => downLinkBypassInterleaver_i,
-         downLinkBypassFECDecoder    => downLinkBypassFECEncoder_i,
-         downLinkBypassDescsrambler  => downLinkBypassScrambler_i,
-         enableFECErrCounter         => enableFECErrCounter_i,
-         fecCorrectionCount          => fecCorrectionCount_o,
-         downlinkRdy_o               => downlinkReady_o,
+         downlinkClkEn_o    => downlinkClkEn_s,
+         downLinkDataGroup0 => downlinkUserData_o(15 downto 0),
+         downLinkDataGroup1 => downlinkUserData_o(31 downto 16),
+         downLinkDataEc     => downlinkEcData_o,
+         downLinkDataIc     => downlinkIcData_o,
+         downlinkRdy_o      => downlinkReady_o,
          -- uplink data
-         uplinkClkEn_i               => uplinkClkEn_s,
-         rst_uplink_i                => uplinkRst_s,
-         upLinkData0                 => uplinkUserData_i(31 downto 0),
-         upLinkData1                 => uplinkUserData_i(63 downto 32),
-         upLinkData2                 => uplinkUserData_i(95 downto 64),
-         upLinkData3                 => uplinkUserData_i(127 downto 96),
-         upLinkData4                 => uplinkUserData_i(159 downto 128),
-         upLinkData5                 => uplinkUserData_i(191 downto 160),
-         upLinkData6                 => uplinkUserData_i(223 downto 192),
-         upLinkDataIC                => uplinkIcData_i,
-         upLinkDataEC                => uplinkEcData_i,
-         upLinkScramblerBypass       => uplinkBypassScrambler_i,
-         upLinkScramblerReset        => uplinkRst_s,
-         upLinkFecBypass             => uplinkBypassFECEncoder_i,
-         upLinkInterleaverBypass     => uplinkBypassInterleaver_i,
-         uplinkRdy_o                 => uplinkReady_o,
+         uplinkClkEn_i      => uplinkClkEn_s,
+         upLinkData0        => uplinkUserData_i(31 downto 0),
+         upLinkData1        => uplinkUserData_i(63 downto 32),
+         upLinkData2        => uplinkUserData_i(95 downto 64),
+         upLinkData3        => uplinkUserData_i(127 downto 96),
+         upLinkData4        => uplinkUserData_i(159 downto 128),
+         upLinkData5        => uplinkUserData_i(191 downto 160),
+         upLinkData6        => uplinkUserData_i(223 downto 192),
+         upLinkDataIC       => uplinkIcData_i,
+         upLinkDataEC       => uplinkEcData_i,
+         uplinkRdy_o        => uplinkReady_o,
          -- MGT
-         GT_RXUSRCLK_IN              => downlinkClk_s,
-         GT_TXUSRCLK_IN              => uplinkClk_s,
-         GT_RXSLIDE_OUT              => mgt_rxslide_s,
-         GT_TXREADY_IN               => mgt_txrdy_s,
-         GT_RXREADY_IN               => mgt_rxrdy_s,
-         GT_TXDATA_OUT               => uplink_mgtword_s,
-         GT_RXDATA_IN                => downlink_mgtword_s,
-         -- General Configuration
-         fecMode                     => fecMode,
-         txDataRate                  => '1');  -- ‘1’ - 10.24 Gb/s
+         GT_RXUSRCLK_IN     => downlinkClk_s,
+         GT_TXUSRCLK_IN     => uplinkClk_s,
+         GT_RXSLIDE_OUT     => mgt_rxslide_s,
+         GT_TXREADY_IN      => mgt_txrdy_s,
+         GT_RXREADY_IN      => mgt_rxrdy_s,
+         GT_TXDATA_OUT      => uplink_mgtword_s,
+         GT_RXDATA_IN       => downlink_mgtword_s,
+         -- Uplink mode
+         fecMode            => fecMode,
+         txDataRate         => '1');    -- ‘1’ - 10.24 Gb/s
 
    U_uplinkRst : entity surf.RstSync
       port map(

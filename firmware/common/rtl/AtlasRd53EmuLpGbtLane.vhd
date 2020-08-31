@@ -186,6 +186,7 @@ begin
       generic map (
          SELECT_GT_TYPE_G => SELECT_GT_TYPE_G)
       port map (
+         -- Uplink mode
          fecMode             => fecMode,
          -- Up link
          uplinkClk_o         => uplinkClk,      -- 40 MHz

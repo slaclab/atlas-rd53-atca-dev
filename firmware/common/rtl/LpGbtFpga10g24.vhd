@@ -200,26 +200,25 @@ begin
          c_bitslip_waitdly         => 40)
       port map(
          -- Clock and reset
-         clk_freeRunningClk_i => clk_mgtfreedrpclk_i,
-         uplinkClk_i          => uplinkClk_s,
-         uplinkClkOutEn_o     => uplinkClkEn_s,
-         uplinkRst_n_i        => mgt_rxrdy_s,
+         uplinkClk_i         => uplinkClk_s,
+         uplinkClkOutEn_o    => uplinkClkEn_s,
+         uplinkRst_n_i       => mgt_rxrdy_s,
          -- Input
-         mgt_word_o           => uplink_mgtword_s,
+         mgt_word_i          => uplink_mgtword_s,
          -- Data
-         userData_o           => uplinkUserData_o,
-         EcData_o             => uplinkEcData_o,
-         IcData_o             => uplinkIcData_o,
+         userData_o          => uplinkUserData_o,
+         EcData_o            => uplinkEcData_o,
+         IcData_o            => uplinkIcData_o,
          -- Control
-         bypassInterleaver_i  => uplinkBypassInterleaver_i,
-         bypassFECEncoder_i   => uplinkBypassFECEncoder_i,
-         bypassScrambler_i    => uplinkBypassScrambler_i,
+         bypassInterleaver_i => uplinkBypassInterleaver_i,
+         bypassFECEncoder_i  => uplinkBypassFECEncoder_i,
+         bypassScrambler_i   => uplinkBypassScrambler_i,
          -- Transceiver control
-         mgt_bitslipCtrl_o    => mgt_rxslide_s,
+         mgt_bitslipCtrl_o   => mgt_rxslide_s,
          -- Status
-         dataCorrected_o      => open,
-         IcCorrected_o        => open,
-         EcCorrected_o        => open,
-         rdy_o                => uplinkReady_s);
+         dataCorrected_o     => open,
+         IcCorrected_o       => open,
+         EcCorrected_o       => open,
+         rdy_o               => uplinkReady_s);
 
 end mapping;
