@@ -23,15 +23,14 @@ Targets:
     Extensions:
       - bit
       - mcs
-  XilinxKcu1500Pgp3_6Gbps:
-    ImageDir: targets/AtlasAtcaLinkAgg/XilinxKcu1500Pgp3_6Gbps/images
+  DpmIbertTester_1p50Gbps:
+    ImageDir: targets/RceDpm/DpmIbertTester_1p50Gbps/images
     Extensions:
       - bit
-      - mcs
-  DpmIbertTester:
-    ImageDir: targets/RceDpm/DpmIbertTester/images
+  DpmIbertTester_6p25Gbps:
+    ImageDir: targets/RceDpm/DpmIbertTester_6p25Gbps/images
     Extensions:
-      - bit
+      - bit      
   DpmRudpNode:
     ImageDir: targets/RceDpm/DpmRudpNode/images
     Extensions:
@@ -53,9 +52,9 @@ Releases:
     Primary: True
     Targets:
       - AtlasAtcaLinkAggRd53Rtm_EmuLpGbt
-      # - XilinxKcu1500Pgp3_6Gbps
-      - DpmIbertTester
-      - DpmRudpNode
+      - DpmIbertTester_1p50Gbps
+      - DpmIbertTester_6p25Gbps
+      # - DpmRudpNode
       - DpmPgp3_6Gbps
       - AtlasRd53FmcXilinxKcu105_EmuLpGbt
       - XilinxZcu102LpGbt

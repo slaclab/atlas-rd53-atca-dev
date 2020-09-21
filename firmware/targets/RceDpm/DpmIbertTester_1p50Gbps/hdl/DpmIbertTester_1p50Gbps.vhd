@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : DpmIbertTester.vhd
+-- File       : DpmIbertTester_1p50Gbps.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description:
@@ -28,7 +28,7 @@ use rce_gen3_fw_lib.RceG3Pkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity DpmIbertTester is
+entity DpmIbertTester_1p50Gbps is
    generic (
       TPD_G        : time := 1 ns;
       BUILD_INFO_G : BuildInfoType);
@@ -63,9 +63,9 @@ entity DpmIbertTester is
       -- Clock Select
       clkSelA     : out   slv(1 downto 0);
       clkSelB     : out   slv(1 downto 0));
-end DpmIbertTester;
+end DpmIbertTester_1p50Gbps;
 
-architecture TOP_LEVEL of DpmIbertTester is
+architecture TOP_LEVEL of DpmIbertTester_1p50Gbps is
 
    component ibert_7series_gtx_0
       port (
