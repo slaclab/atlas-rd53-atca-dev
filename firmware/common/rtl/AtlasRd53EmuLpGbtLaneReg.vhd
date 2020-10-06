@@ -38,6 +38,7 @@ entity AtlasRd53EmuLpGbtLaneReg is
       downlinkRst     : out sl;
       uplinkRst       : out sl;
       fecMode         : out sl;         -- 1=FEC12, 0=FEC5
+      bitOrderCmd     : out sl;
       -- AXI-Lite Interface (axilClk domain)
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -53,6 +54,7 @@ architecture mapping of AtlasRd53EmuLpGbtLaneReg is
    constant STATUS_WIDTH_C : positive := 16;
 
    type RegType is record
+      bitOrderCmd    : sl;
       fecMode        : sl;
       invCmd         : slv(NUM_ELINK_G-1 downto 0);
       dlyCmd         : slv(NUM_ELINK_G-1 downto 0);
@@ -66,6 +68,7 @@ architecture mapping of AtlasRd53EmuLpGbtLaneReg is
    end record;
 
    constant REG_INIT_C : RegType := (
+      bitOrderCmd    => '0',
       fecMode        => '1',            -- 1=FEC12(default), 0=FEC5
       invCmd         => (others => '0'),
       dlyCmd         => (others => '0'),
@@ -160,6 +163,7 @@ begin
       axiSlaveRegister (axilEp, x"804", 0, v.dlyCmd);
       axiSlaveRegister (axilEp, x"808", 0, v.wdtRstEn);
       axiSlaveRegister (axilEp, x"80C", 0, v.fecMode);
+      axiSlaveRegister (axilEp, x"810", 0, v.bitOrderCmd);
 
       axiSlaveRegister (axilEp, x"FF0", 0, v.downlinkRst);
       axiSlaveRegister (axilEp, x"FF4", 0, v.uplinkRst);
@@ -216,6 +220,14 @@ begin
          clk     => clk160MHz,
          dataIn  => r.fecMode,
          dataOut => fecMode);
+
+   U_bitOrderCmd : entity surf.Synchronizer
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk     => clk160MHz,
+         dataIn  => r.bitOrderCmd,
+         dataOut => bitOrderCmd);
 
    U_SyncStatusVector : entity surf.SyncStatusVector
       generic map (

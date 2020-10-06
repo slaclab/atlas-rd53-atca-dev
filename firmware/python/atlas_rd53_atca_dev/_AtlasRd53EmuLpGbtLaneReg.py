@@ -108,6 +108,14 @@ class AtlasRd53EmuLpGbtLaneReg(pr.Device):
             },
         ))
 
+        self.add(pr.RemoteVariable(
+            name         = 'BitOrderCmd',
+            description  = 'Used to control the bit ordering into the 4:1 gearbox',
+            offset       = 0x810,
+            bitSize      = 1,
+            mode         = 'RW',
+        ))
+
         self.add(pr.RemoteCommand(
             name         = 'DownlinkRst',
             offset       = 0xFF0,

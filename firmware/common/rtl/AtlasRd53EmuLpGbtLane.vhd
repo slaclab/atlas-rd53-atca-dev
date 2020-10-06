@@ -52,6 +52,7 @@ entity AtlasRd53EmuLpGbtLane is
       cmdOut          : out slv(NUM_ELINK_G-1 downto 0);
       invCmdOut       : out slv(NUM_ELINK_G-1 downto 0);
       dlyCmdOut       : out slv(NUM_ELINK_G-1 downto 0);
+      bitOrderCmdOut  : out sl;
       -- Deserialization Interface (clk160MHz domain)
       serDesData      : in  Slv8Array(NUM_ELINK_G-1 downto 0);
       rxLinkUp        : in  slv(NUM_ELINK_G-1 downto 0);
@@ -77,8 +78,9 @@ end AtlasRd53EmuLpGbtLane;
 
 architecture rtl of AtlasRd53EmuLpGbtLane is
 
-   signal invCmd : slv(NUM_ELINK_G-1 downto 0);
-   signal dlyCmd : slv(NUM_ELINK_G-1 downto 0);
+   signal invCmd      : slv(NUM_ELINK_G-1 downto 0);
+   signal dlyCmd      : slv(NUM_ELINK_G-1 downto 0);
+   signal bitOrderCmd : sl;
 
    signal data : Slv8Array(NUM_ELINK_G-1 downto 0);
 
@@ -90,6 +92,7 @@ architecture rtl of AtlasRd53EmuLpGbtLane is
    signal cmdOutReg  : slv(NUM_ELINK_G-1 downto 0);
 
    signal downlinkUserData : slv(31 downto 0) := (others => '0');
+   signal downlinkData     : slv(31 downto 0) := (others => '0');
    signal downlinkEcData   : slv(1 downto 0)  := (others => '0');
    signal downlinkIcData   : slv(1 downto 0)  := (others => '0');
    signal downlinkReady    : sl;
@@ -112,9 +115,10 @@ begin
    downlinkUp <= downlinkReady;
    uplinkUp   <= uplinkReady;
 
-   cmdOut    <= cmd;
-   invCmdOut <= invCmd;
-   dlyCmdOut <= dlyCmd;
+   cmdOut         <= cmd;
+   invCmdOut      <= invCmd;
+   dlyCmdOut      <= dlyCmd;
+   bitOrderCmdOut <= bitOrderCmd;
 
    ---------------------------
    -- Axi-Lite Register Module
@@ -135,6 +139,7 @@ begin
          downlinkRst     => downlinkRst,
          uplinkRst       => uplinkRst,
          fecMode         => fecMode,
+         bitOrderCmd     => bitOrderCmd,
          -- AXI-Lite Interface (axilClk domain)
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -227,6 +232,14 @@ begin
    GEN_CMD :
    for i in NUM_ELINK_G-1 downto 0 generate
 
+      -----------------------
+      -- Set the bit ordering
+      -----------------------
+      downlinkData((i*4)+3 downto i*4) <= downlinkUserData((i*4)+3 downto i*4) when(bitOrderCmd = '0') else bitReverse(downlinkUserData((i*4)+3 downto i*4));
+
+      --------------
+      -- 4:1 Gearbox
+      --------------
       U_Gearbox_Cmd : entity surf.AsyncGearbox
          generic map (
             TPD_G                => TPD_G,
@@ -242,7 +255,7 @@ begin
             -- Slave Interface
             slaveClk      => donwlinkClk,
             slaveRst      => downlinkRst,
-            slaveData     => downlinkUserData((i*4)+3 downto i*4),
+            slaveData     => downlinkData((i*4)+3 downto i*4),
             slaveValid    => downlinkClkEn,
             slaveReady    => open,
             -- Master Interface
