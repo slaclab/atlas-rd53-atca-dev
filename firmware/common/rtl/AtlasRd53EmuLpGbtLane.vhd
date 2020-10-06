@@ -138,7 +138,11 @@ begin
          dlyCmd          => dlyCmd,
          downlinkRst     => downlinkRst,
          uplinkRst       => uplinkRst,
+         -- Config/status Interface (uplinkClk domain)
+         uplinkClk       => uplinkClk,
          fecMode         => fecMode,
+         -- Config/status Interface (donwlinkClk domain)
+         donwlinkClk     => donwlinkClk,
          bitOrderCmd     => bitOrderCmd,
          -- AXI-Lite Interface (axilClk domain)
          axilClk         => axilClk,

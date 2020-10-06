@@ -37,7 +37,11 @@ entity AtlasRd53EmuLpGbtLaneReg is
       dlyCmd          : out slv(NUM_ELINK_G-1 downto 0);
       downlinkRst     : out sl;
       uplinkRst       : out sl;
+      -- Config/status Interface (uplinkClk domain)
+      uplinkClk       : in  sl;
       fecMode         : out sl;         -- 1=FEC12, 0=FEC5
+      -- Config/status Interface (donwlinkClk domain)
+      donwlinkClk     : in  sl;
       bitOrderCmd     : out sl;
       -- AXI-Lite Interface (axilClk domain)
       axilClk         : in  sl;
@@ -217,7 +221,7 @@ begin
       generic map (
          TPD_G => TPD_G)
       port map (
-         clk     => clk160MHz,
+         clk     => uplinkClk,
          dataIn  => r.fecMode,
          dataOut => fecMode);
 
@@ -225,7 +229,7 @@ begin
       generic map (
          TPD_G => TPD_G)
       port map (
-         clk     => clk160MHz,
+         clk     => donwlinkClk,
          dataIn  => r.bitOrderCmd,
          dataOut => bitOrderCmd);
 
