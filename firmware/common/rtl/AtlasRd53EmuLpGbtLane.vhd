@@ -77,11 +77,18 @@ end AtlasRd53EmuLpGbtLane;
 
 architecture rtl of AtlasRd53EmuLpGbtLane is
 
-   signal invCmd      : slv(NUM_ELINK_G-1 downto 0);
-   signal dlyCmd      : slv(NUM_ELINK_G-1 downto 0);
-   signal bitOrderCmd : sl;
+   signal invCmd : slv(NUM_ELINK_G-1 downto 0);
+   signal dlyCmd : slv(NUM_ELINK_G-1 downto 0);
 
-   signal data : Slv8Array(NUM_ELINK_G-1 downto 0);
+   signal invData         : sl;
+   signal bitOrderData8b  : sl;
+   signal bitOrderData32b : sl;
+   signal bitOrderCmd4b   : sl;
+
+   signal dataA   : Slv8Array(NUM_ELINK_G-1 downto 0);
+   signal dataB   : Slv8Array(NUM_ELINK_G-1 downto 0);
+   signal data8b  : Slv8Array(NUM_ELINK_G-1 downto 0);
+   signal data32b : Slv32Array(NUM_ELINK_G-1 downto 0);
 
    signal cmd        : slv(NUM_ELINK_G-1 downto 0);
    signal cmdMask    : slv(NUM_ELINK_G-1 downto 0);
@@ -136,12 +143,15 @@ begin
          dlyCmd          => dlyCmd,
          downlinkRst     => downlinkRst,
          uplinkRst       => uplinkRst,
+         bitOrderData8b  => bitOrderData8b,
+         invData         => invData,
          -- Config/status Interface (uplinkClk domain)
          uplinkClk       => uplinkClk,
          fecMode         => fecMode,
+         bitOrderData32b => bitOrderData32b,
          -- Config/status Interface (donwlinkClk domain)
          donwlinkClk     => donwlinkClk,
-         bitOrderCmd     => bitOrderCmd,
+         bitOrderCmd4b   => bitOrderCmd4b,
          -- AXI-Lite Interface (axilClk domain)
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -156,9 +166,24 @@ begin
    GEN_DATA :
    for i in NUM_ELINK_G-1 downto 0 generate
 
-      -- Only send the data (include invert) if the delay alignment is completed
-      data(i) <= not(serDesData(i)) when(rxLinkUp(i) = '1') else x"00";
+      -------------------------------------------------------------
+      -- Set the data invert (in case of polarity swap on connector
+      -------------------------------------------------------------
+      dataA(i) <= not(serDesData(i)) when(invData = '1') else serDesData(i);
 
+      ---------------------------------------------------------
+      -- Only send the data if the delay alignment is completed
+      ---------------------------------------------------------
+      dataB(i) <= dataA(i) when(rxLinkUp(i) = '1') else x"00";
+
+      -----------------------
+      -- Set the bit ordering
+      -----------------------
+      data8b(i) <= dataB(i) when(bitOrderData8b = '0') else bitReverse(dataB(i));
+
+      ---------------
+      -- 8:32 Gearbox
+      ---------------
       U_Gearbox_Data : entity surf.AsyncGearbox
          generic map (
             TPD_G                => TPD_G,
@@ -174,15 +199,20 @@ begin
             -- Slave Interface
             slaveClk    => clk160MHz,
             slaveRst    => rst160MHz,
-            slaveData   => data(i),
+            slaveData   => data8b(i),
             slaveValid  => '1',
             slaveReady  => open,
             -- Master Interface
             masterClk   => uplinkClk,
             masterRst   => uplinkRst,
-            masterData  => uplinkUserData((i*32)+31 downto i*32),
+            masterData  => data32b(i),
             masterValid => open,
             masterReady => uplinkClkEn);
+
+      -----------------------
+      -- Set the bit ordering
+      -----------------------
+      uplinkUserData((i*32)+31 downto i*32) <= data32b(i) when(bitOrderData32b = '0') else bitReverse(data32b(i));
 
    end generate GEN_DATA;
 
@@ -237,7 +267,7 @@ begin
       -----------------------
       -- Set the bit ordering
       -----------------------
-      downlinkData((i*4)+3 downto i*4) <= downlinkUserData((i*4)+3 downto i*4) when(bitOrderCmd = '0') else bitReverse(downlinkUserData((i*4)+3 downto i*4));
+      downlinkData((i*4)+3 downto i*4) <= downlinkUserData((i*4)+3 downto i*4) when(bitOrderCmd4b = '0') else bitReverse(downlinkUserData((i*4)+3 downto i*4));
 
       --------------
       -- 4:1 Gearbox

@@ -37,12 +37,15 @@ entity AtlasRd53EmuLpGbtLaneReg is
       dlyCmd          : out slv(NUM_ELINK_G-1 downto 0);
       downlinkRst     : out sl;
       uplinkRst       : out sl;
+      bitOrderData8b  : out sl;
+      invData         : out sl;
       -- Config/status Interface (uplinkClk domain)
       uplinkClk       : in  sl;
       fecMode         : out sl;         -- 1=FEC12, 0=FEC5
+      bitOrderData32b : out sl;
       -- Config/status Interface (donwlinkClk domain)
       donwlinkClk     : in  sl;
-      bitOrderCmd     : out sl;
+      bitOrderCmd4b   : out sl;
       -- AXI-Lite Interface (axilClk domain)
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -58,31 +61,37 @@ architecture mapping of AtlasRd53EmuLpGbtLaneReg is
    constant STATUS_WIDTH_C : positive := 16;
 
    type RegType is record
-      bitOrderCmd    : sl;
-      fecMode        : sl;
-      invCmd         : slv(NUM_ELINK_G-1 downto 0);
-      dlyCmd         : slv(NUM_ELINK_G-1 downto 0);
-      wdtRstEn       : slv(1 downto 0);
-      downlinkRst    : sl;
-      uplinkRst      : sl;
-      cntRst         : sl;
-      rollOverEn     : slv(STATUS_SIZE_C-1 downto 0);
-      axilReadSlave  : AxiLiteReadSlaveType;
-      axilWriteSlave : AxiLiteWriteSlaveType;
+      invData         : sl;
+      bitOrderData8b  : sl;
+      bitOrderData32b : sl;
+      bitOrderCmd4b   : sl;
+      fecMode         : sl;
+      invCmd          : slv(NUM_ELINK_G-1 downto 0);
+      dlyCmd          : slv(NUM_ELINK_G-1 downto 0);
+      wdtRstEn        : slv(1 downto 0);
+      downlinkRst     : sl;
+      uplinkRst       : sl;
+      cntRst          : sl;
+      rollOverEn      : slv(STATUS_SIZE_C-1 downto 0);
+      axilReadSlave   : AxiLiteReadSlaveType;
+      axilWriteSlave  : AxiLiteWriteSlaveType;
    end record;
 
    constant REG_INIT_C : RegType := (
-      bitOrderCmd    => '0',
-      fecMode        => '1',            -- 1=FEC12(default), 0=FEC5
-      invCmd         => (others => '0'),
-      dlyCmd         => (others => '0'),
-      wdtRstEn       => "11",
-      downlinkRst    => '0',
-      uplinkRst      => '0',
-      cntRst         => '1',
-      rollOverEn     => (others => '0'),
-      axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
-      axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
+      invData         => '1',
+      bitOrderData8b  => '0',
+      bitOrderData32b => '0',
+      bitOrderCmd4b   => '0',
+      fecMode         => '1',           -- 1=FEC12(default), 0=FEC5
+      invCmd          => (others => '0'),
+      dlyCmd          => (others => '0'),
+      wdtRstEn        => "11",
+      downlinkRst     => '0',
+      uplinkRst       => '0',
+      cntRst          => '1',
+      rollOverEn      => (others => '0'),
+      axilReadSlave   => AXI_LITE_READ_SLAVE_INIT_C,
+      axilWriteSlave  => AXI_LITE_WRITE_SLAVE_INIT_C);
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
@@ -167,7 +176,11 @@ begin
       axiSlaveRegister (axilEp, x"804", 0, v.dlyCmd);
       axiSlaveRegister (axilEp, x"808", 0, v.wdtRstEn);
       axiSlaveRegister (axilEp, x"80C", 0, v.fecMode);
-      axiSlaveRegister (axilEp, x"810", 0, v.bitOrderCmd);
+
+      axiSlaveRegister (axilEp, x"810", 0, v.bitOrderCmd4b);
+      axiSlaveRegister (axilEp, x"814", 0, v.bitOrderData8b);
+      axiSlaveRegister (axilEp, x"818", 0, v.bitOrderData32b);
+      axiSlaveRegister (axilEp, x"81C", 0, v.invData);
 
       axiSlaveRegister (axilEp, x"FF0", 0, v.downlinkRst);
       axiSlaveRegister (axilEp, x"FF4", 0, v.uplinkRst);
@@ -225,13 +238,37 @@ begin
          dataIn  => r.fecMode,
          dataOut => fecMode);
 
-   U_bitOrderCmd : entity surf.Synchronizer
+   U_bitOrderCmd4b : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G)
       port map (
          clk     => donwlinkClk,
-         dataIn  => r.bitOrderCmd,
-         dataOut => bitOrderCmd);
+         dataIn  => r.bitOrderCmd4b,
+         dataOut => bitOrderCmd4b);
+
+   U_bitOrderData8b : entity surf.Synchronizer
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk     => clk160MHz,
+         dataIn  => r.bitOrderData8b,
+         dataOut => bitOrderData8b);
+
+   U_bitOrderData32b : entity surf.Synchronizer
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk     => uplinkClk,
+         dataIn  => r.bitOrderData32b,
+         dataOut => bitOrderData32b);
+
+   U_invData : entity surf.Synchronizer
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk     => clk160MHz,
+         dataIn  => r.invData,
+         dataOut => invData);
 
    U_SyncStatusVector : entity surf.SyncStatusVector
       generic map (
