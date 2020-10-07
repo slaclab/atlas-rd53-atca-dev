@@ -52,7 +52,6 @@ entity AtlasRd53EmuLpGbtLane is
       cmdOut          : out slv(NUM_ELINK_G-1 downto 0);
       invCmdOut       : out slv(NUM_ELINK_G-1 downto 0);
       dlyCmdOut       : out slv(NUM_ELINK_G-1 downto 0);
-      bitOrderCmdOut  : out sl;
       -- Deserialization Interface (clk160MHz domain)
       serDesData      : in  Slv8Array(NUM_ELINK_G-1 downto 0);
       rxLinkUp        : in  slv(NUM_ELINK_G-1 downto 0);
@@ -115,10 +114,9 @@ begin
    downlinkUp <= downlinkReady;
    uplinkUp   <= uplinkReady;
 
-   cmdOut         <= cmd;
-   invCmdOut      <= invCmd;
-   dlyCmdOut      <= dlyCmd;
-   bitOrderCmdOut <= bitOrderCmd;
+   cmdOut    <= cmd;
+   invCmdOut <= invCmd;
+   dlyCmdOut <= dlyCmd;
 
    ---------------------------
    -- Axi-Lite Register Module
