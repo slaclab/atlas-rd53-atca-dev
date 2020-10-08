@@ -78,10 +78,10 @@ architecture mapping of AtlasRd53EmuLpGbtLaneReg is
    end record;
 
    constant REG_INIT_C : RegType := (
-      invData         => '1',
+      invData         => '1', -- Default to invert the polarity swap on mDP
       bitOrderData8b  => '0',
-      bitOrderData32b => '0',
-      bitOrderCmd4b   => '0',
+      bitOrderData32b => '1', -- In section 7.1 eLink Group: “The bit shift in/out order for the eLink data inputs and outputs is MSB first.”
+      bitOrderCmd4b   => '1', -- In section 7.1 eLink Group: “The bit shift in/out order for the eLink data inputs and outputs is MSB first.”
       fecMode         => '1',           -- 1=FEC12(default), 0=FEC5
       invCmd          => (others => '0'),
       dlyCmd          => (others => '0'),
