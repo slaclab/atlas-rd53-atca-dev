@@ -110,23 +110,15 @@ class AtlasRd53EmuLpGbtLaneReg(pr.Device):
 
         self.add(pr.RemoteVariable(
             name         = 'BitOrderCmd4b',
-            description  = 'Used to control the inbound bit ordering into the 4:1 gearbox',
+            description  = 'Used to control the inbound bit ordering into the 4:1 gearbox: 0x0=LSB shifted first, 0x1=MSB shifted first',
             offset       = 0x810,
             bitSize      = 1,
             mode         = 'RW',
         ))
 
         self.add(pr.RemoteVariable(
-            name         = 'BitOrderData8b',
-            description  = 'Used to control the inbound bit ordering into the 8:32 gearbox',
-            offset       = 0x814,
-            bitSize      = 1,
-            mode         = 'RW',
-        ))
-
-        self.add(pr.RemoteVariable(
             name         = 'BitOrderData32b',
-            description  = 'Used to control the outbound bit ordering out of the 8:32 gearbox',
+            description  = 'Used to control the outbound bit ordering out of the 8:32 gearbox: 0x0=LSB shifted first, 0x1=MSB shifted first',
             offset       = 0x818,
             bitSize      = 1,
             mode         = 'RW',
