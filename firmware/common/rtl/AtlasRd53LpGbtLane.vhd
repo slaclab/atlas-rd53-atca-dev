@@ -107,6 +107,7 @@ architecture rtl of AtlasRd53LpGbtLane is
 
    signal cmd : slv(NUM_ELINK_C-1 downto 0);
 
+   signal downlinkData     : slv(31 downto 0) := (others => '0');
    signal downlinkUserData : slv(31 downto 0) := (others => '0');
    signal downlinkEcData   : slv(1 downto 0)  := (others => '0');
    signal downlinkIcData   : slv(1 downto 0)  := (others => '0');
@@ -116,6 +117,7 @@ architecture rtl of AtlasRd53LpGbtLane is
    signal downlinkClkEn    : sl;
 
    signal uplinkUserData : slv(229 downto 0) := (others => '0');
+   signal uplinkData     : slv(229 downto 0) := (others => '0');
    signal uplinkEcData   : slv(1 downto 0)   := (others => '0');
    signal uplinkIcData   : slv(1 downto 0)   := (others => '0');
    signal uplinkReady    : sl;
@@ -306,6 +308,9 @@ begin
             cmdBusy         => cmdBusy(i),
             cmdOut          => cmd(i));
 
+      --------------
+      -- 1:4 Gearbox
+      --------------
       U_Gearbox_Cmd : entity surf.AsyncGearbox
          generic map (
             TPD_G                => TPD_G,
@@ -327,9 +332,14 @@ begin
             -- Master Interface
             masterClk    => donwlinkClk,
             masterRst    => downlinkRst,
-            masterData   => downlinkUserData((i*4)+3 downto i*4),
+            masterData   => downlinkData((i*4)+3 downto i*4),
             masterValid  => open,
             masterReady  => downlinkClkEn);
+
+      ------------------
+      -- MSB shifted 1st
+      ------------------
+      downlinkUserData((i*4)+3 downto i*4) <= bitReverse(downlinkData((i*4)+3 downto i*4));
 
    end generate GEN_CMD;
 
@@ -395,6 +405,14 @@ begin
    GEN_DATA :
    for i in NUM_ELINK_C-1 downto 0 generate
 
+      ------------------
+      -- MSB shifted 1st
+      ------------------
+      uplinkData((i*32)+31 downto i*32) <= bitReverse(uplinkUserData((i*32)+31 downto i*32));
+
+      ----------------
+      -- 32:66 Gearbox
+      ----------------
       U_Gearbox_1280Mbps : entity surf.AsyncGearbox
          generic map (
             TPD_G                => TPD_G,
@@ -411,7 +429,7 @@ begin
             -- Slave Interface
             slaveClk                => uplinkClk,
             slaveRst                => uplinkRst,
-            slaveData(31 downto 0)  => uplinkUserData((i*32)+31 downto i*32),
+            slaveData(31 downto 0)  => uplinkData((i*32)+31 downto i*32),
             slaveValid              => uplinkClkEn,
             slaveReady              => open,
             -- Master Interface
