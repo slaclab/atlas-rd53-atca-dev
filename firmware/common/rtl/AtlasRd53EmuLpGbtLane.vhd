@@ -81,14 +81,12 @@ architecture rtl of AtlasRd53EmuLpGbtLane is
    signal dlyCmd : slv(NUM_ELINK_G-1 downto 0);
 
    signal invData         : sl;
-   signal bitOrderData8b  : sl;
    signal bitOrderData32b : sl;
    signal bitOrderCmd4b   : sl;
 
-   signal dataA   : Slv8Array(NUM_ELINK_G-1 downto 0);
-   signal dataB   : Slv8Array(NUM_ELINK_G-1 downto 0);
-   signal data8b  : Slv8Array(NUM_ELINK_G-1 downto 0);
-   signal data32b : Slv32Array(NUM_ELINK_G-1 downto 0);
+   signal dataMask : Slv8Array(NUM_ELINK_G-1 downto 0);
+   signal data8b   : Slv8Array(NUM_ELINK_G-1 downto 0);
+   signal data32b  : Slv32Array(NUM_ELINK_G-1 downto 0);
 
    signal cmd        : slv(NUM_ELINK_G-1 downto 0);
    signal cmdMask    : slv(NUM_ELINK_G-1 downto 0);
@@ -143,7 +141,6 @@ begin
          dlyCmd          => dlyCmd,
          downlinkRst     => downlinkRst,
          uplinkRst       => uplinkRst,
-         bitOrderData8b  => bitOrderData8b,
          invData         => invData,
          -- Config/status Interface (uplinkClk domain)
          uplinkClk       => uplinkClk,
@@ -169,17 +166,12 @@ begin
       -------------------------------------------------------------
       -- Set the data invert (in case of polarity swap on connector
       -------------------------------------------------------------
-      dataA(i) <= not(serDesData(i)) when(invData = '1') else serDesData(i);
+      dataMask(i) <= not(serDesData(i)) when(invData = '1') else serDesData(i);
 
       ---------------------------------------------------------
       -- Only send the data if the delay alignment is completed
       ---------------------------------------------------------
-      dataB(i) <= dataA(i) when(rxLinkUp(i) = '1') else x"00";
-
-      -----------------------
-      -- Set the bit ordering
-      -----------------------
-      data8b(i) <= dataB(i) when(bitOrderData8b = '0') else bitReverse(dataB(i));
+      data8b(i) <= dataMask(i) when(rxLinkUp(i) = '1') else x"00";
 
       ---------------
       -- 8:32 Gearbox

@@ -37,7 +37,6 @@ entity AtlasRd53EmuLpGbtLaneReg is
       dlyCmd          : out slv(NUM_ELINK_G-1 downto 0);
       downlinkRst     : out sl;
       uplinkRst       : out sl;
-      bitOrderData8b  : out sl;
       invData         : out sl;
       -- Config/status Interface (uplinkClk domain)
       uplinkClk       : in  sl;
@@ -62,7 +61,6 @@ architecture mapping of AtlasRd53EmuLpGbtLaneReg is
 
    type RegType is record
       invData         : sl;
-      bitOrderData8b  : sl;
       bitOrderData32b : sl;
       bitOrderCmd4b   : sl;
       fecMode         : sl;
@@ -78,10 +76,9 @@ architecture mapping of AtlasRd53EmuLpGbtLaneReg is
    end record;
 
    constant REG_INIT_C : RegType := (
-      invData         => '1', -- Default to invert the polarity swap on mDP
-      bitOrderData8b  => '0',
-      bitOrderData32b => '1', -- In section 7.1 eLink Group: “The bit shift in/out order for the eLink data inputs and outputs is MSB first.”
-      bitOrderCmd4b   => '1', -- In section 7.1 eLink Group: “The bit shift in/out order for the eLink data inputs and outputs is MSB first.”
+      invData         => '1',  -- Default to invert the polarity swap on mDP
+      bitOrderData32b => '1',  -- In section 7.1 eLink Group: “The bit shift in/out order for the eLink data inputs and outputs is MSB first.”
+      bitOrderCmd4b   => '1',  -- In section 7.1 eLink Group: “The bit shift in/out order for the eLink data inputs and outputs is MSB first.”
       fecMode         => '1',           -- 1=FEC12(default), 0=FEC5
       invCmd          => (others => '0'),
       dlyCmd          => (others => '0'),
@@ -178,7 +175,6 @@ begin
       axiSlaveRegister (axilEp, x"80C", 0, v.fecMode);
 
       axiSlaveRegister (axilEp, x"810", 0, v.bitOrderCmd4b);
-      axiSlaveRegister (axilEp, x"814", 0, v.bitOrderData8b);
       axiSlaveRegister (axilEp, x"818", 0, v.bitOrderData32b);
       axiSlaveRegister (axilEp, x"81C", 0, v.invData);
 
@@ -245,14 +241,6 @@ begin
          clk     => donwlinkClk,
          dataIn  => r.bitOrderCmd4b,
          dataOut => bitOrderCmd4b);
-
-   U_bitOrderData8b : entity surf.Synchronizer
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         clk     => clk160MHz,
-         dataIn  => r.bitOrderData8b,
-         dataOut => bitOrderData8b);
 
    U_bitOrderData32b : entity surf.Synchronizer
       generic map (
