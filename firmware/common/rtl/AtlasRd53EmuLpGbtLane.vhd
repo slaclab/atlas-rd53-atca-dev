@@ -84,10 +84,10 @@ architecture rtl of AtlasRd53EmuLpGbtLane is
    signal bitOrderData32b : sl;
    signal bitOrderCmd4b   : sl;
 
-   signal dataMaskA : Slv8Array(NUM_ELINK_G-1 downto 0);
-   signal dataMaskB : Slv8Array(NUM_ELINK_G-1 downto 0);
-   signal data8b    : Slv8Array(NUM_ELINK_G-1 downto 0);
-   signal data32b   : Slv32Array(NUM_ELINK_G-1 downto 0);
+   signal data8bMask  : Slv8Array(NUM_ELINK_G-1 downto 0);
+   signal data8b      : Slv8Array(NUM_ELINK_G-1 downto 0);
+   signal data32bMask : Slv32Array(NUM_ELINK_G-1 downto 0);
+   signal data32b     : Slv32Array(NUM_ELINK_G-1 downto 0);
 
    signal cmd        : slv(NUM_ELINK_G-1 downto 0);
    signal cmdMask    : slv(NUM_ELINK_G-1 downto 0);
@@ -121,7 +121,8 @@ architecture rtl of AtlasRd53EmuLpGbtLane is
    signal txDummyFec5       : slv(5 downto 0) := "001100";
    signal linkDownPattern   : slv(7 downto 0);
    signal debugMode         : sl;
-   signal debugPattern      : slv(7 downto 0);
+   signal debugPattern      : Slv32Array(1 downto 0);
+   signal data32bToggle     : sl              := '0';
 
 
 begin
@@ -184,17 +185,12 @@ begin
       -------------------------------------------------------------
       -- Set the data invert (in case of polarity swap on connector
       -------------------------------------------------------------
-      dataMaskA(i) <= not(serDesData(i)) when(invData = '1') else serDesData(i);
+      data8bMask(i) <= not(serDesData(i)) when(invData = '1') else serDesData(i);
 
       ---------------------------------------------------------
       -- Only send the data if the delay alignment is completed
       ---------------------------------------------------------
-      dataMaskB(i) <= dataMaskA(i) when(rxLinkUp(i) = '1') else linkDownPattern;
-
-      ----------------------------------------------------------
-      -- Check if we are in debug mode and sending debug pattern
-      ----------------------------------------------------------
-      data8b(i) <= dataMaskB(i) when(debugMode = '0') else debugPattern;
+      data8b(i) <= data8bMask(i) when(rxLinkUp(i) = '1') else linkDownPattern;
 
       ---------------
       -- 8:32 Gearbox
@@ -227,9 +223,36 @@ begin
       -----------------------
       -- Set the bit ordering
       -----------------------
-      uplinkUserData((i*32)+31 downto i*32) <= data32b(i) when(bitOrderData32b = '0') else bitReverse(data32b(i));
+      data32bMask(i) <= data32b(i) when(bitOrderData32b = '0') else bitReverse(data32b(i));
+
+      ----------------------------------------------------------
+      -- Check if we are in debug mode and sending debug pattern
+      ----------------------------------------------------------
+      process(data32bMask, data32bToggle, debugMode, debugPattern)
+      begin
+         if (debugMode = '0') then
+            uplinkUserData((i*32)+31 downto i*32) <= data32bMask(i);
+         else
+            if (data32bToggle = '0') then
+               uplinkUserData((i*32)+31 downto i*32) <= debugPattern(0);
+            else
+               uplinkUserData((i*32)+31 downto i*32) <= debugPattern(1);
+            end if;
+         end if;
+      end process;
 
    end generate GEN_DATA;
+
+   process(uplinkClk)
+   begin
+      if rising_edge(uplinkClk) then
+         if data32bToggle = '1' then
+            data32bToggle <= '0' after TPD_G;
+         else
+            data32bToggle <= '1' after TPD_G;
+         end if;
+      end if;
+   end process;
 
    -----------------------
    -- Emulation LpGBT FPGA

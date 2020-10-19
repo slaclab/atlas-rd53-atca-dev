@@ -183,13 +183,15 @@ class AtlasRd53EmuLpGbtLaneReg(pr.Device):
             mode         = 'RW',
         ))
 
-        self.add(pr.RemoteVariable(
+        self.addRemoteVariables(
             name         = 'UpLinkDebugPattern',
-            description  = 'When UpLinkDebugMode=0x1 then  8:32 gearbox input is UpLinkDebugPattern',
+            description  = 'When UpLinkDebugMode=0x1 then 8:32 gearbox output toggles between UpLinkDebugPattern[0] & UpLinkDebugPattern[1]',
             offset       = 0x83C,
-            bitSize      = 8,
+            bitSize      = 32,
             mode         = 'RW',
-        ))
+            number       = 2,
+            stride       = 4,
+        )
 
         self.add(pr.RemoteCommand(
             name         = 'DownlinkRst',
