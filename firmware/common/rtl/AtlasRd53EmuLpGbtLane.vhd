@@ -84,9 +84,10 @@ architecture rtl of AtlasRd53EmuLpGbtLane is
    signal bitOrderData32b : sl;
    signal bitOrderCmd4b   : sl;
 
-   signal dataMask : Slv8Array(NUM_ELINK_G-1 downto 0);
-   signal data8b   : Slv8Array(NUM_ELINK_G-1 downto 0);
-   signal data32b  : Slv32Array(NUM_ELINK_G-1 downto 0);
+   signal dataMaskA : Slv8Array(NUM_ELINK_G-1 downto 0);
+   signal dataMaskB : Slv8Array(NUM_ELINK_G-1 downto 0);
+   signal data8b    : Slv8Array(NUM_ELINK_G-1 downto 0);
+   signal data32b   : Slv32Array(NUM_ELINK_G-1 downto 0);
 
    signal cmd        : slv(NUM_ELINK_G-1 downto 0);
    signal cmdMask    : slv(NUM_ELINK_G-1 downto 0);
@@ -119,6 +120,9 @@ architecture rtl of AtlasRd53EmuLpGbtLane is
    signal txDummyFec12      : slv(9 downto 0) := "1001110011";
    signal txDummyFec5       : slv(5 downto 0) := "001100";
    signal linkDownPattern   : slv(7 downto 0);
+   signal debugMode         : sl;
+   signal debugPattern      : slv(7 downto 0);
+
 
 begin
 
@@ -149,6 +153,8 @@ begin
          uplinkRst         => uplinkRst,
          invData           => invData,
          linkDownPattern   => linkDownPattern,
+         debugMode         => debugMode,
+         debugPattern      => debugPattern,
          -- Config/status Interface (uplinkClk domain)
          uplinkClk         => uplinkClk,
          fecMode           => fecMode,
@@ -178,12 +184,17 @@ begin
       -------------------------------------------------------------
       -- Set the data invert (in case of polarity swap on connector
       -------------------------------------------------------------
-      dataMask(i) <= not(serDesData(i)) when(invData = '1') else serDesData(i);
+      dataMaskA(i) <= not(serDesData(i)) when(invData = '1') else serDesData(i);
 
       ---------------------------------------------------------
       -- Only send the data if the delay alignment is completed
       ---------------------------------------------------------
-      data8b(i) <= dataMask(i) when(rxLinkUp(i) = '1') else linkDownPattern;
+      dataMaskB(i) <= dataMaskA(i) when(rxLinkUp(i) = '1') else linkDownPattern;
+
+      ---------------------------------------------------------
+      -- Only send the data if the delay alignment is completed
+      ---------------------------------------------------------
+      data8b(i) <= dataMaskB(i) when(debugMode = '0') else debugPattern;
 
       ---------------
       -- 8:32 Gearbox

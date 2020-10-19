@@ -39,6 +39,8 @@ entity AtlasRd53EmuLpGbtLaneReg is
       uplinkRst         : out sl;
       invData           : out sl;
       linkDownPattern   : out slv(7 downto 0);
+      debugMode         : out sl;
+      debugPattern      : out slv(7 downto 0);
       -- Config/status Interface (uplinkClk domain)
       uplinkClk         : in  sl;
       fecMode           : out sl;       -- 1=FEC12, 0=FEC5
@@ -66,6 +68,8 @@ architecture mapping of AtlasRd53EmuLpGbtLaneReg is
    constant STATUS_WIDTH_C : positive := 16;
 
    type RegType is record
+      debugMode         : sl;
+      debugPattern      : slv(7 downto 0);
       linkDownPattern   : slv(7 downto 0);
       invData           : sl;
       bitOrderData32b   : sl;
@@ -88,6 +92,8 @@ architecture mapping of AtlasRd53EmuLpGbtLaneReg is
    end record;
 
    constant REG_INIT_C : RegType := (
+      debugMode         => '0',
+      debugPattern      => x"AA",
       linkDownPattern   => x"00",
       invData           => '1',  -- Default to invert the polarity swap on mDP
       bitOrderData32b   => '1',  -- In section 7.1 eLink Group: “The bit shift in/out order for the eLink data inputs and outputs is MSB first.”
@@ -203,6 +209,8 @@ begin
 
       axiSlaveRegister (axilEp, x"830", 0, v.txDummyFec12);
       axiSlaveRegister (axilEp, x"834", 0, v.txDummyFec5);
+      axiSlaveRegister (axilEp, x"838", 0, v.debugMode);
+      axiSlaveRegister (axilEp, x"83C", 0, v.debugPattern);
 
       axiSlaveRegister (axilEp, x"FF0", 0, v.downlinkRst);
       axiSlaveRegister (axilEp, x"FF4", 0, v.uplinkRst);
@@ -233,6 +241,23 @@ begin
          r <= rin after TPD_G;
       end if;
    end process seq;
+
+   U_debugMode : entity surf.Synchronizer
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk     => clk160MHz,
+         dataIn  => r.debugMode,
+         dataOut => debugMode);
+
+   U_debugPattern : entity surf.SynchronizerVector
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => 8)
+      port map (
+         clk     => clk160MHz,
+         dataIn  => r.debugPattern,
+         dataOut => debugPattern);
 
    U_linkDownPattern : entity surf.SynchronizerVector
       generic map (
