@@ -28,30 +28,35 @@ entity AtlasRd53EmuLpGbtLaneReg is
       NUM_ELINK_G : positive range 1 to 7 := 4);
    port (
       -- Config/status Interface (clk160MHz domain)
-      clk160MHz       : in  sl;
-      rst160MHz       : in  sl;
-      downlinkUp      : in  sl;
-      uplinkUp        : in  sl;
-      rxLinkUp        : in  slv(NUM_ELINK_G-1 downto 0);
-      invCmd          : out slv(NUM_ELINK_G-1 downto 0);
-      dlyCmd          : out slv(NUM_ELINK_G-1 downto 0);
-      downlinkRst     : out sl;
-      uplinkRst       : out sl;
-      invData         : out sl;
+      clk160MHz         : in  sl;
+      rst160MHz         : in  sl;
+      downlinkUp        : in  sl;
+      uplinkUp          : in  sl;
+      rxLinkUp          : in  slv(NUM_ELINK_G-1 downto 0);
+      invCmd            : out slv(NUM_ELINK_G-1 downto 0);
+      dlyCmd            : out slv(NUM_ELINK_G-1 downto 0);
+      downlinkRst       : out sl;
+      uplinkRst         : out sl;
+      invData           : out sl;
       -- Config/status Interface (uplinkClk domain)
-      uplinkClk       : in  sl;
-      fecMode         : out sl;         -- 1=FEC12, 0=FEC5
-      bitOrderData32b : out sl;
+      uplinkClk         : in  sl;
+      fecMode           : out sl;       -- 1=FEC12, 0=FEC5
+      fecDisable        : out sl;
+      interleaverBypass : out sl;
+      scramblerBypass   : out sl;
+      txDummyFec12      : out slv(9 downto 0);
+      txDummyFec5       : out slv(5 downto 0);
+      bitOrderData32b   : out sl;
       -- Config/status Interface (donwlinkClk domain)
-      donwlinkClk     : in  sl;
-      bitOrderCmd4b   : out sl;
+      donwlinkClk       : in  sl;
+      bitOrderCmd4b     : out sl;
       -- AXI-Lite Interface (axilClk domain)
-      axilClk         : in  sl;
-      axilRst         : in  sl;
-      axilReadMaster  : in  AxiLiteReadMasterType;
-      axilReadSlave   : out AxiLiteReadSlaveType;
-      axilWriteMaster : in  AxiLiteWriteMasterType;
-      axilWriteSlave  : out AxiLiteWriteSlaveType);
+      axilClk           : in  sl;
+      axilRst           : in  sl;
+      axilReadMaster    : in  AxiLiteReadMasterType;
+      axilReadSlave     : out AxiLiteReadSlaveType;
+      axilWriteMaster   : in  AxiLiteWriteMasterType;
+      axilWriteSlave    : out AxiLiteWriteSlaveType);
 end AtlasRd53EmuLpGbtLaneReg;
 
 architecture mapping of AtlasRd53EmuLpGbtLaneReg is
@@ -60,35 +65,45 @@ architecture mapping of AtlasRd53EmuLpGbtLaneReg is
    constant STATUS_WIDTH_C : positive := 16;
 
    type RegType is record
-      invData         : sl;
-      bitOrderData32b : sl;
-      bitOrderCmd4b   : sl;
-      fecMode         : sl;
-      invCmd          : slv(NUM_ELINK_G-1 downto 0);
-      dlyCmd          : slv(NUM_ELINK_G-1 downto 0);
-      wdtRstEn        : slv(1 downto 0);
-      downlinkRst     : sl;
-      uplinkRst       : sl;
-      cntRst          : sl;
-      rollOverEn      : slv(STATUS_SIZE_C-1 downto 0);
-      axilReadSlave   : AxiLiteReadSlaveType;
-      axilWriteSlave  : AxiLiteWriteSlaveType;
+      invData           : sl;
+      bitOrderData32b   : sl;
+      bitOrderCmd4b     : sl;
+      fecMode           : sl;
+      fecDisable        : sl;
+      interleaverBypass : sl;
+      scramblerBypass   : sl;
+      txDummyFec12      : slv(9 downto 0);
+      txDummyFec5       : slv(5 downto 0);
+      invCmd            : slv(NUM_ELINK_G-1 downto 0);
+      dlyCmd            : slv(NUM_ELINK_G-1 downto 0);
+      wdtRstEn          : slv(1 downto 0);
+      downlinkRst       : sl;
+      uplinkRst         : sl;
+      cntRst            : sl;
+      rollOverEn        : slv(STATUS_SIZE_C-1 downto 0);
+      axilReadSlave     : AxiLiteReadSlaveType;
+      axilWriteSlave    : AxiLiteWriteSlaveType;
    end record;
 
    constant REG_INIT_C : RegType := (
-      invData         => '1',  -- Default to invert the polarity swap on mDP
-      bitOrderData32b => '1',  -- In section 7.1 eLink Group: “The bit shift in/out order for the eLink data inputs and outputs is MSB first.”
-      bitOrderCmd4b   => '1',  -- In section 7.1 eLink Group: “The bit shift in/out order for the eLink data inputs and outputs is MSB first.”
-      fecMode         => '1',           -- 1=FEC12(default), 0=FEC5
-      invCmd          => (others => '0'),
-      dlyCmd          => (others => '0'),
-      wdtRstEn        => "11",
-      downlinkRst     => '0',
-      uplinkRst       => '0',
-      cntRst          => '1',
-      rollOverEn      => (others => '0'),
-      axilReadSlave   => AXI_LITE_READ_SLAVE_INIT_C,
-      axilWriteSlave  => AXI_LITE_WRITE_SLAVE_INIT_C);
+      invData           => '1',  -- Default to invert the polarity swap on mDP
+      bitOrderData32b   => '1',  -- In section 7.1 eLink Group: “The bit shift in/out order for the eLink data inputs and outputs is MSB first.”
+      bitOrderCmd4b     => '1',  -- In section 7.1 eLink Group: “The bit shift in/out order for the eLink data inputs and outputs is MSB first.”
+      fecMode           => '1',         -- 1=FEC12(default), 0=FEC5
+      fecDisable        => '0',
+      interleaverBypass => '0',
+      scramblerBypass   => '0',
+      txDummyFec12      => "1001110011",
+      txDummyFec5       => "001100",
+      invCmd            => (others => '0'),
+      dlyCmd            => (others => '0'),
+      wdtRstEn          => "11",
+      downlinkRst       => '0',
+      uplinkRst         => '0',
+      cntRst            => '1',
+      rollOverEn        => (others => '0'),
+      axilReadSlave     => AXI_LITE_READ_SLAVE_INIT_C,
+      axilWriteSlave    => AXI_LITE_WRITE_SLAVE_INIT_C);
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
@@ -178,6 +193,13 @@ begin
       axiSlaveRegister (axilEp, x"818", 0, v.bitOrderData32b);
       axiSlaveRegister (axilEp, x"81C", 0, v.invData);
 
+      axiSlaveRegister (axilEp, x"820", 0, v.fecDisable);
+      axiSlaveRegister (axilEp, x"824", 0, v.interleaverBypass);
+      axiSlaveRegister (axilEp, x"828", 0, v.scramblerBypass);
+
+      axiSlaveRegister (axilEp, x"830", 0, v.txDummyFec12);
+      axiSlaveRegister (axilEp, x"834", 0, v.txDummyFec5);
+
       axiSlaveRegister (axilEp, x"FF0", 0, v.downlinkRst);
       axiSlaveRegister (axilEp, x"FF4", 0, v.uplinkRst);
 
@@ -226,13 +248,40 @@ begin
          dataIn  => r.dlyCmd,
          dataOut => dlyCmd);
 
-   U_fecMode : entity surf.Synchronizer
+   U_uplinkClkSync : entity surf.SynchronizerVector
       generic map (
-         TPD_G => TPD_G)
+         TPD_G   => TPD_G,
+         WIDTH_G => 4)
+      port map (
+         clk        => uplinkClk,
+         -- Input
+         dataIn(0)  => r.fecMode,
+         dataIn(1)  => r.fecDisable,
+         dataIn(2)  => r.interleaverBypass,
+         dataIn(3)  => r.scramblerBypass,
+         -- Output
+         dataOut(0) => fecMode,
+         dataOut(1) => fecDisable,
+         dataOut(2) => interleaverBypass,
+         dataOut(3) => scramblerBypass);
+
+   U_txDummyFec12 : entity surf.SynchronizerVector
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => 10)
       port map (
          clk     => uplinkClk,
-         dataIn  => r.fecMode,
-         dataOut => fecMode);
+         dataIn  => r.txDummyFec12,
+         dataOut => txDummyFec12);
+
+   U_txDummyFec5 : entity surf.SynchronizerVector
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => 6)
+      port map (
+         clk     => uplinkClk,
+         dataIn  => r.txDummyFec5,
+         dataOut => txDummyFec5);
 
    U_bitOrderCmd4b : entity surf.Synchronizer
       generic map (

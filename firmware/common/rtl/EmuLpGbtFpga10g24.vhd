@@ -32,6 +32,11 @@ entity EmuLpGbtFpga10g24 is
    port (
       -- Uplink mode
       fecMode             : in  std_logic;  -- 1=FEC12, 0=FEC5
+      fecDisable          : in  std_logic                    := '0';
+      interleaverBypass   : in  std_logic                    := '0';
+      scramblerBypass     : in  std_logic                    := '0';
+      txDummyFec12        : in  std_logic_vector(9 downto 0) := "1001110011";
+      txDummyFec5         : in  std_logic_vector(5 downto 0) := "001100";
       -- Up link
       uplinkClk_o         : out std_logic;  --! Clock provided by the Rx serdes: in phase with data
       uplinkClkEn_o       : out std_logic;  --! Clock enable pulsed when new data is ready
@@ -179,6 +184,11 @@ begin
          GT_RXDATA_IN       => downlink_mgtword_s,
          -- Uplink mode
          fecMode            => fecMode,
+         fecDisable         => fecDisable,
+         interleaverBypass  => interleaverBypass,
+         scramblerBypass    => scramblerBypass,
+         txDummyFec12       => txDummyFec12,
+         txDummyFec5        => txDummyFec5,
          txDataRate         => '1');    -- ‘1’ - 10.24 Gb/s
 
    U_uplinkRst : entity surf.RstSync

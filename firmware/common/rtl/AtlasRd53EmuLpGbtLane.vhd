@@ -112,7 +112,12 @@ architecture rtl of AtlasRd53EmuLpGbtLane is
    signal uplinkRst      : sl;
    signal uplinkClkEn    : sl;
 
-   signal fecMode : sl;
+   signal fecMode           : sl;
+   signal fecDisable        : sl              := '0';
+   signal interleaverBypass : sl              := '0';
+   signal scramblerBypass   : sl              := '0';
+   signal txDummyFec12      : slv(9 downto 0) := "1001110011";
+   signal txDummyFec5       : slv(5 downto 0) := "001100";
 
 begin
 
@@ -132,30 +137,35 @@ begin
          NUM_ELINK_G => NUM_ELINK_G)
       port map (
          -- Config/status Interface (clk160MHz domain)
-         clk160MHz       => clk160MHz,
-         rst160MHz       => rst160MHz,
-         downlinkUp      => downlinkReady,
-         uplinkUp        => uplinkReady,
-         rxLinkUp        => rxLinkUp,
-         invCmd          => invCmd,
-         dlyCmd          => dlyCmd,
-         downlinkRst     => downlinkRst,
-         uplinkRst       => uplinkRst,
-         invData         => invData,
+         clk160MHz         => clk160MHz,
+         rst160MHz         => rst160MHz,
+         downlinkUp        => downlinkReady,
+         uplinkUp          => uplinkReady,
+         rxLinkUp          => rxLinkUp,
+         invCmd            => invCmd,
+         dlyCmd            => dlyCmd,
+         downlinkRst       => downlinkRst,
+         uplinkRst         => uplinkRst,
+         invData           => invData,
          -- Config/status Interface (uplinkClk domain)
-         uplinkClk       => uplinkClk,
-         fecMode         => fecMode,
-         bitOrderData32b => bitOrderData32b,
+         uplinkClk         => uplinkClk,
+         fecMode           => fecMode,
+         fecDisable        => fecDisable,
+         interleaverBypass => interleaverBypass,
+         scramblerBypass   => scramblerBypass,
+         txDummyFec12      => txDummyFec12,
+         txDummyFec5       => txDummyFec5,
+         bitOrderData32b   => bitOrderData32b,
          -- Config/status Interface (donwlinkClk domain)
-         donwlinkClk     => donwlinkClk,
-         bitOrderCmd4b   => bitOrderCmd4b,
+         donwlinkClk       => donwlinkClk,
+         bitOrderCmd4b     => bitOrderCmd4b,
          -- AXI-Lite Interface (axilClk domain)
-         axilClk         => axilClk,
-         axilRst         => axilRst,
-         axilReadMaster  => axilReadMaster,
-         axilReadSlave   => axilReadSlave,
-         axilWriteMaster => axilWriteMaster,
-         axilWriteSlave  => axilWriteSlave);
+         axilClk           => axilClk,
+         axilRst           => axilRst,
+         axilReadMaster    => axilReadMaster,
+         axilReadSlave     => axilReadSlave,
+         axilWriteMaster   => axilWriteMaster,
+         axilWriteSlave    => axilWriteSlave);
 
    -------------------------
    -- DATA Generation Module
@@ -217,6 +227,11 @@ begin
       port map (
          -- Uplink mode
          fecMode             => fecMode,
+         fecDisable          => fecDisable,
+         interleaverBypass   => interleaverBypass,
+         scramblerBypass     => scramblerBypass,
+         txDummyFec12        => txDummyFec12,
+         txDummyFec5         => txDummyFec5,
          -- Up link
          uplinkClk_o         => uplinkClk,      -- 40 MHz
          uplinkClkEn_o       => uplinkClkEn,    -- 40 MHz strobe

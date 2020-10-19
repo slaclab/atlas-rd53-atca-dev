@@ -132,6 +132,41 @@ class AtlasRd53EmuLpGbtLaneReg(pr.Device):
             mode         = 'RW',
         ))
 
+        self.add(pr.RemoteVariable(
+            name         = 'UpLinkFecDisable',
+            offset       = 0x820,
+            bitSize      = 1,
+            mode         = 'RW',
+        ))
+
+        self.add(pr.RemoteVariable(
+            name         = 'UpLinkInterleaverBypass',
+            offset       = 0x824,
+            bitSize      = 1,
+            mode         = 'RW',
+        ))
+
+        self.add(pr.RemoteVariable(
+            name         = 'UpLinkScramblerBypass',
+            offset       = 0x828,
+            bitSize      = 1,
+            mode         = 'RW',
+        ))
+
+        self.add(pr.RemoteVariable(
+            name         = 'UpLinkTxDummyFec12',
+            offset       = 0x830,
+            bitSize      = 10,
+            mode         = 'RW',
+        ))
+
+        self.add(pr.RemoteVariable(
+            name         = 'UpLinkTxDummyFec5',
+            offset       = 0x834,
+            bitSize      = 6,
+            mode         = 'RW',
+        ))
+
         self.add(pr.RemoteCommand(
             name         = 'DownlinkRst',
             offset       = 0xFF0,
