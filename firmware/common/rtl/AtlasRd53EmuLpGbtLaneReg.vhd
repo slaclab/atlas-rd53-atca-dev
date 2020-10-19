@@ -38,6 +38,7 @@ entity AtlasRd53EmuLpGbtLaneReg is
       downlinkRst       : out sl;
       uplinkRst         : out sl;
       invData           : out sl;
+      linkDownPattern   : out slv(7 downto 0);
       -- Config/status Interface (uplinkClk domain)
       uplinkClk         : in  sl;
       fecMode           : out sl;       -- 1=FEC12, 0=FEC5
@@ -65,6 +66,7 @@ architecture mapping of AtlasRd53EmuLpGbtLaneReg is
    constant STATUS_WIDTH_C : positive := 16;
 
    type RegType is record
+      linkDownPattern   : slv(7 downto 0);
       invData           : sl;
       bitOrderData32b   : sl;
       bitOrderCmd4b     : sl;
@@ -86,6 +88,7 @@ architecture mapping of AtlasRd53EmuLpGbtLaneReg is
    end record;
 
    constant REG_INIT_C : RegType := (
+      linkDownPattern   => x"00",
       invData           => '1',  -- Default to invert the polarity swap on mDP
       bitOrderData32b   => '1',  -- In section 7.1 eLink Group: “The bit shift in/out order for the eLink data inputs and outputs is MSB first.”
       bitOrderCmd4b     => '1',  -- In section 7.1 eLink Group: “The bit shift in/out order for the eLink data inputs and outputs is MSB first.”
@@ -196,6 +199,7 @@ begin
       axiSlaveRegister (axilEp, x"820", 0, v.fecDisable);
       axiSlaveRegister (axilEp, x"824", 0, v.interleaverBypass);
       axiSlaveRegister (axilEp, x"828", 0, v.scramblerBypass);
+      axiSlaveRegister (axilEp, x"82C", 0, v.linkDownPattern);
 
       axiSlaveRegister (axilEp, x"830", 0, v.txDummyFec12);
       axiSlaveRegister (axilEp, x"834", 0, v.txDummyFec5);
@@ -229,6 +233,15 @@ begin
          r <= rin after TPD_G;
       end if;
    end process seq;
+
+   U_linkDownPattern : entity surf.SynchronizerVector
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => 8)
+      port map (
+         clk     => clk160MHz,
+         dataIn  => r.linkDownPattern,
+         dataOut => linkDownPattern);
 
    U_invCmd : entity surf.SynchronizerVector
       generic map (

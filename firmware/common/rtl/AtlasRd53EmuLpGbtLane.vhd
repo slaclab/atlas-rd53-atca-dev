@@ -118,6 +118,7 @@ architecture rtl of AtlasRd53EmuLpGbtLane is
    signal scramblerBypass   : sl              := '0';
    signal txDummyFec12      : slv(9 downto 0) := "1001110011";
    signal txDummyFec5       : slv(5 downto 0) := "001100";
+   signal linkDownPattern   : slv(7 downto 0);
 
 begin
 
@@ -147,6 +148,7 @@ begin
          downlinkRst       => downlinkRst,
          uplinkRst         => uplinkRst,
          invData           => invData,
+         linkDownPattern   => linkDownPattern,
          -- Config/status Interface (uplinkClk domain)
          uplinkClk         => uplinkClk,
          fecMode           => fecMode,
@@ -181,7 +183,7 @@ begin
       ---------------------------------------------------------
       -- Only send the data if the delay alignment is completed
       ---------------------------------------------------------
-      data8b(i) <= dataMask(i) when(rxLinkUp(i) = '1') else x"00";
+      data8b(i) <= dataMask(i) when(rxLinkUp(i) = '1') else linkDownPattern;
 
       ---------------
       -- 8:32 Gearbox

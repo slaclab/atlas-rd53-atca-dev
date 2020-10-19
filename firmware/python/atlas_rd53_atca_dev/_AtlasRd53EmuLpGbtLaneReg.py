@@ -154,6 +154,14 @@ class AtlasRd53EmuLpGbtLaneReg(pr.Device):
         ))
 
         self.add(pr.RemoteVariable(
+            name         = 'UpLinkLinkDownPattern',
+            description  = 'Sets the linkdown pattern on the 8bit bus before the 8:32 gearbox',
+            offset       = 0x82C,
+            bitSize      = 8,
+            mode         = 'RW',
+        ))
+
+        self.add(pr.RemoteVariable(
             name         = 'UpLinkTxDummyFec12',
             offset       = 0x830,
             bitSize      = 10,
