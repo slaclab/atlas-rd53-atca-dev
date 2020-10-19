@@ -191,9 +191,9 @@ begin
       ---------------------------------------------------------
       dataMaskB(i) <= dataMaskA(i) when(rxLinkUp(i) = '1') else linkDownPattern;
 
-      ---------------------------------------------------------
-      -- Only send the data if the delay alignment is completed
-      ---------------------------------------------------------
+      ----------------------------------------------------------
+      -- Check if we are in debug mode and sending debug pattern
+      ----------------------------------------------------------
       data8b(i) <= dataMaskB(i) when(debugMode = '0') else debugPattern;
 
       ---------------
