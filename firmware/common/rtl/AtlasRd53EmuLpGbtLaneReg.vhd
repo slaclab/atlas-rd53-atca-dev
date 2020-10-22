@@ -48,8 +48,9 @@ entity AtlasRd53EmuLpGbtLaneReg is
       txDummyFec12      : out slv(9 downto 0);
       txDummyFec5       : out slv(5 downto 0);
       bitOrderData32b   : out sl;
-      debugMode         : out sl;
-      debugPattern      : out Slv32Array(1 downto 0);
+      debugMode         : out slv(6 downto 0);
+      debugPatternA     : out Slv32Array(6 downto 0);
+      debugPatternB     : out Slv32Array(6 downto 0);
       -- Config/status Interface (donwlinkClk domain)
       donwlinkClk       : in  sl;
       bitOrderCmd4b     : out sl;
@@ -68,8 +69,9 @@ architecture mapping of AtlasRd53EmuLpGbtLaneReg is
    constant STATUS_WIDTH_C : positive := 16;
 
    type RegType is record
-      debugMode         : sl;
-      debugPattern      : Slv32Array(1 downto 0);
+      debugMode         : slv(6 downto 0);
+      debugPatternA     : Slv32Array(6 downto 0);
+      debugPatternB     : Slv32Array(6 downto 0);
       linkDownPattern   : slv(7 downto 0);
       invData           : sl;
       bitOrderData32b   : sl;
@@ -92,8 +94,9 @@ architecture mapping of AtlasRd53EmuLpGbtLaneReg is
    end record;
 
    constant REG_INIT_C : RegType := (
-      debugMode         => '0',
-      debugPattern      => (0 => x"AA_AA_AA_AA", 1 => x"55_55_55_55"),
+      debugMode         => (others => '0'),
+      debugPatternA     => (others => x"AA_AA_AA_AA"),
+      debugPatternB     => (others => x"55_55_55_55"),
       linkDownPattern   => x"00",
       invData           => '1',  -- Default to invert the polarity swap on mDP
       bitOrderData32b   => '1',  -- In section 7.1 eLink Group: “The bit shift in/out order for the eLink data inputs and outputs is MSB first.”
@@ -210,9 +213,11 @@ begin
       axiSlaveRegister (axilEp, x"830", 0, v.txDummyFec12);
       axiSlaveRegister (axilEp, x"834", 0, v.txDummyFec5);
       axiSlaveRegister (axilEp, x"838", 0, v.debugMode);
-      axiSlaveRegister (axilEp, x"83C", 0, v.debugPattern(0));
 
-      axiSlaveRegister (axilEp, x"840", 0, v.debugPattern(1));
+      for i in 6 downto 0 loop
+         axiSlaveRegister (axilEp, toSlv(2304+4*i, 12), 0, v.debugPatternA(i));  -- Address Space = [0x900:0x91B]
+         axiSlaveRegister (axilEp, toSlv(2336+4*i, 12), 0, v.debugPatternB(i));  -- Address Space = [0x920:0x92B]
+      end loop;
 
       axiSlaveRegister (axilEp, x"FF0", 0, v.downlinkRst);
       axiSlaveRegister (axilEp, x"FF4", 0, v.uplinkRst);
@@ -307,25 +312,35 @@ begin
          dataOut => txDummyFec5);
 
 
-   U_debugMode : entity surf.Synchronizer
+   U_debugMode : entity surf.SynchronizerVector
       generic map (
-         TPD_G => TPD_G)
+         TPD_G   => TPD_G,
+         WIDTH_G => 7)
       port map (
          clk     => uplinkClk,
          dataIn  => r.debugMode,
          dataOut => debugMode);
 
    GEN_VEC :
-   for i in 1 downto 0 generate
+   for i in 6 downto 0 generate
 
-      U_debugPattern : entity surf.SynchronizerVector
+      U_debugPatternA : entity surf.SynchronizerVector
          generic map (
             TPD_G   => TPD_G,
             WIDTH_G => 32)
          port map (
             clk     => uplinkClk,
-            dataIn  => r.debugPattern(i),
-            dataOut => debugPattern(i));
+            dataIn  => r.debugPatternA(i),
+            dataOut => debugPatternA(i));
+
+      U_debugPatternB : entity surf.SynchronizerVector
+         generic map (
+            TPD_G   => TPD_G,
+            WIDTH_G => 32)
+         port map (
+            clk     => uplinkClk,
+            dataIn  => r.debugPatternB(i),
+            dataOut => debugPatternB(i));
 
    end generate GEN_VEC;
 

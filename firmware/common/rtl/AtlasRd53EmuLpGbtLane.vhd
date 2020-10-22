@@ -120,9 +120,11 @@ architecture rtl of AtlasRd53EmuLpGbtLane is
    signal txDummyFec12      : slv(9 downto 0) := "1001110011";
    signal txDummyFec5       : slv(5 downto 0) := "001100";
    signal linkDownPattern   : slv(7 downto 0);
-   signal debugMode         : sl;
-   signal debugPattern      : Slv32Array(1 downto 0);
-   signal data32bToggle     : sl              := '0';
+
+   signal debugMode     : slv(6 downto 0);
+   signal debugPatternA : Slv32Array(6 downto 0);
+   signal debugPatternB : Slv32Array(6 downto 0);
+   signal data32bToggle : sl := '0';
 
 
 begin
@@ -155,7 +157,8 @@ begin
          invData           => invData,
          linkDownPattern   => linkDownPattern,
          debugMode         => debugMode,
-         debugPattern      => debugPattern,
+         debugPatternA     => debugPatternA,
+         debugPatternB     => debugPatternB,
          -- Config/status Interface (uplinkClk domain)
          uplinkClk         => uplinkClk,
          fecMode           => fecMode,
@@ -225,23 +228,26 @@ begin
       -----------------------
       data32bMask(i) <= data32b(i) when(bitOrderData32b = '0') else bitReverse(data32b(i));
 
-      ----------------------------------------------------------
-      -- Check if we are in debug mode and sending debug pattern
-      ----------------------------------------------------------
-      process(data32bMask, data32bToggle, debugMode, debugPattern)
-      begin
-         if (debugMode = '0') then
+   end generate GEN_DATA;
+
+   ----------------------------------------------------------
+   -- Check if we are in debug mode and sending debug pattern
+   ----------------------------------------------------------
+   process(data32bMask, data32bToggle, debugMode, debugPatternA, debugPatternB)
+      variable i : natural;
+   begin
+      for i in NUM_ELINK_G-1 downto 0 loop
+         if (debugMode(i) = '0') then
             uplinkUserData((i*32)+31 downto i*32) <= data32bMask(i);
          else
             if (data32bToggle = '0') then
-               uplinkUserData((i*32)+31 downto i*32) <= debugPattern(0);
+               uplinkUserData((i*32)+31 downto i*32) <= debugPatternA(i);
             else
-               uplinkUserData((i*32)+31 downto i*32) <= debugPattern(1);
+               uplinkUserData((i*32)+31 downto i*32) <= debugPatternB(i);
             end if;
          end if;
-      end process;
-
-   end generate GEN_DATA;
+      end loop;
+   end process;
 
    process(uplinkClk)
    begin

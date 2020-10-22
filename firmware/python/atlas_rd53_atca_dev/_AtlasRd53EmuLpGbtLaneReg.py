@@ -178,18 +178,28 @@ class AtlasRd53EmuLpGbtLaneReg(pr.Device):
         self.add(pr.RemoteVariable(
             name         = 'UpLinkDebugMode',
             offset       = 0x838,
-            description  = 'Enables the ability to override the 8:32 gearbox input with UpLinkDebugPattern',
-            bitSize      = 1,
+            description  = 'Enable bitmask to override the 8:32 gearbox input with UpLinkDebugPattern',
+            bitSize      = 7,
             mode         = 'RW',
         ))
 
         self.addRemoteVariables(
-            name         = 'UpLinkDebugPattern',
-            description  = 'When UpLinkDebugMode=0x1 then 8:32 gearbox output toggles between UpLinkDebugPattern[0] & UpLinkDebugPattern[1]',
-            offset       = 0x83C,
+            name         = 'UpLinkDebugPatternA',
+            description  = 'When UpLinkDebugMode[elink]=0x1 then 8:32 gearbox output toggles between UpLinkDebugPatternA[elink] & UpLinkDebugPatternB[elink]',
+            offset       = 0x900,
             bitSize      = 32,
             mode         = 'RW',
-            number       = 2,
+            number       = 7,
+            stride       = 4,
+        )
+
+        self.addRemoteVariables(
+            name         = 'UpLinkDebugPatternB',
+            description  = 'When UpLinkDebugMode[elink]=0x1 then 8:32 gearbox output toggles between UpLinkDebugPatternA[elink] & UpLinkDebugPatternB[elink]',
+            offset       = 0x920,
+            bitSize      = 32,
+            mode         = 'RW',
+            number       = 7,
             stride       = 4,
         )
 
