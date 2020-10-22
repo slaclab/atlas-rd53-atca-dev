@@ -236,7 +236,7 @@ begin
    process(data32bMask, data32bToggle, debugMode, debugPatternA, debugPatternB)
       variable i : natural;
    begin
-      for i in NUM_ELINK_G-1 downto 0 loop
+      for i in 6 downto 0 loop
          if (debugMode(i) = '0') then
             uplinkUserData((i*32)+31 downto i*32) <= data32bMask(i);
          else
