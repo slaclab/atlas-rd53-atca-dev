@@ -106,19 +106,21 @@ architecture rtl of AtlasRd53EmuLpGbtLane is
    signal downlinkClkEn    : sl;
 
    signal uplinkUserData : slv(229 downto 0) := (others => '0');
-   signal uplinkEcData   : slv(1 downto 0)   := (others => '0');
-   signal uplinkIcData   : slv(1 downto 0)   := (others => '0');
+   signal uplinkEcData   : slv(1 downto 0);
+   signal uplinkIcData   : slv(1 downto 0);
    signal uplinkReady    : sl;
    signal uplinkClk      : sl;
    signal uplinkRst      : sl;
    signal uplinkClkEn    : sl;
 
    signal fecMode           : sl;
-   signal fecDisable        : sl              := '0';
-   signal interleaverBypass : sl              := '0';
-   signal scramblerBypass   : sl              := '0';
-   signal txDummyFec12      : slv(9 downto 0) := "1001110011";
-   signal txDummyFec5       : slv(5 downto 0) := "001100";
+   signal fecDisable        : sl := '0';
+   signal interleaverBypass : sl := '0';
+   signal scramblerBypass   : sl := '0';
+   signal txDummyFec12Vec   : Slv10Array(1 downto 0);
+   signal txDummyFec5Vec    : Slv6Array(1 downto 0);
+   signal txDummyFec12      : slv(9 downto 0);
+   signal txDummyFec5       : slv(5 downto 0);
    signal linkDownPattern   : slv(7 downto 0);
 
    signal debugMode     : slv(6 downto 0);
@@ -156,18 +158,20 @@ begin
          uplinkRst         => uplinkRst,
          invData           => invData,
          linkDownPattern   => linkDownPattern,
-         debugMode         => debugMode,
-         debugPatternA     => debugPatternA,
-         debugPatternB     => debugPatternB,
          -- Config/status Interface (uplinkClk domain)
          uplinkClk         => uplinkClk,
          fecMode           => fecMode,
          fecDisable        => fecDisable,
          interleaverBypass => interleaverBypass,
          scramblerBypass   => scramblerBypass,
-         txDummyFec12      => txDummyFec12,
-         txDummyFec5       => txDummyFec5,
+         txDummyFec12      => txDummyFec12Vec,
+         txDummyFec5       => txDummyFec5Vec,
          bitOrderData32b   => bitOrderData32b,
+         debugMode         => debugMode,
+         debugPatternA     => debugPatternA,
+         debugPatternB     => debugPatternB,
+         uplinkEcData      => uplinkEcData,
+         uplinkIcData      => uplinkIcData,
          -- Config/status Interface (donwlinkClk domain)
          donwlinkClk       => donwlinkClk,
          bitOrderCmd4b     => bitOrderCmd4b,
@@ -233,7 +237,8 @@ begin
    ----------------------------------------------------------
    -- Check if we are in debug mode and sending debug pattern
    ----------------------------------------------------------
-   process(data32bMask, data32bToggle, debugMode, debugPatternA, debugPatternB)
+   process(data32bMask, data32bToggle, debugMode, debugPatternA, debugPatternB,
+           txDummyFec12Vec, txDummyFec5Vec)
       variable i : natural;
    begin
       for i in 6 downto 0 loop
@@ -247,6 +252,13 @@ begin
             end if;
          end if;
       end loop;
+      if (data32bToggle = '0') then
+         txDummyFec12 <= txDummyFec12Vec(0);
+         txDummyFec5  <= txDummyFec5Vec(0);
+      else
+         txDummyFec12 <= txDummyFec12Vec(1);
+         txDummyFec5  <= txDummyFec5Vec(1);
+      end if;
    end process;
 
    process(uplinkClk)

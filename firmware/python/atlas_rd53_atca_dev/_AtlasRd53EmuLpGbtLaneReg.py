@@ -161,25 +161,43 @@ class AtlasRd53EmuLpGbtLaneReg(pr.Device):
             mode         = 'RW',
         ))
 
-        self.add(pr.RemoteVariable(
+        self.addRemoteVariables(
             name         = 'UpLinkTxDummyFec12',
             offset       = 0x830,
             bitSize      = 10,
             mode         = 'RW',
-        ))
+            number       = 2,
+            stride       = 4,
+        )
+
+        self.addRemoteVariables(
+            name         = 'UpLinkTxDummyFec5',
+            offset       = 0x838,
+            bitSize      = 6,
+            mode         = 'RW',
+            number       = 2,
+            stride       = 4,
+        )
 
         self.add(pr.RemoteVariable(
-            name         = 'UpLinkTxDummyFec5',
-            offset       = 0x834,
-            bitSize      = 6,
+            name         = 'UpLinkDebugMode',
+            offset       = 0x840,
+            description  = 'Enable bitmask to override the 8:32 gearbox input with UpLinkDebugPattern',
+            bitSize      = 7,
             mode         = 'RW',
         ))
 
         self.add(pr.RemoteVariable(
-            name         = 'UpLinkDebugMode',
-            offset       = 0x838,
-            description  = 'Enable bitmask to override the 8:32 gearbox input with UpLinkDebugPattern',
-            bitSize      = 7,
+            name         = 'UplinkEcData',
+            offset       = 0x850,
+            bitSize      = 2,
+            mode         = 'RW',
+        ))
+
+        self.add(pr.RemoteVariable(
+            name         = 'UplinkEcData',
+            offset       = 0x854,
+            bitSize      = 2,
             mode         = 'RW',
         ))
 

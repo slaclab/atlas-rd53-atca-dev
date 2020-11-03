@@ -45,12 +45,14 @@ entity AtlasRd53EmuLpGbtLaneReg is
       fecDisable        : out sl;
       interleaverBypass : out sl;
       scramblerBypass   : out sl;
-      txDummyFec12      : out slv(9 downto 0);
-      txDummyFec5       : out slv(5 downto 0);
+      txDummyFec12      : out Slv10Array(1 downto 0);
+      txDummyFec5       : out Slv6Array(1 downto 0);
       bitOrderData32b   : out sl;
       debugMode         : out slv(6 downto 0);
       debugPatternA     : out Slv32Array(6 downto 0);
       debugPatternB     : out Slv32Array(6 downto 0);
+      uplinkEcData      : out slv(1 downto 0);
+      uplinkIcData      : out slv(1 downto 0);
       -- Config/status Interface (donwlinkClk domain)
       donwlinkClk       : in  sl;
       bitOrderCmd4b     : out sl;
@@ -69,6 +71,8 @@ architecture mapping of AtlasRd53EmuLpGbtLaneReg is
    constant STATUS_WIDTH_C : positive := 16;
 
    type RegType is record
+      uplinkEcData      : slv(1 downto 0);
+      uplinkIcData      : slv(1 downto 0);
       debugMode         : slv(6 downto 0);
       debugPatternA     : Slv32Array(6 downto 0);
       debugPatternB     : Slv32Array(6 downto 0);
@@ -80,8 +84,8 @@ architecture mapping of AtlasRd53EmuLpGbtLaneReg is
       fecDisable        : sl;
       interleaverBypass : sl;
       scramblerBypass   : sl;
-      txDummyFec12      : slv(9 downto 0);
-      txDummyFec5       : slv(5 downto 0);
+      txDummyFec12      : Slv10Array(1 downto 0);
+      txDummyFec5       : Slv6Array(1 downto 0);
       invCmd            : slv(NUM_ELINK_G-1 downto 0);
       dlyCmd            : slv(NUM_ELINK_G-1 downto 0);
       wdtRstEn          : slv(1 downto 0);
@@ -94,6 +98,8 @@ architecture mapping of AtlasRd53EmuLpGbtLaneReg is
    end record;
 
    constant REG_INIT_C : RegType := (
+      uplinkEcData      => (others => '0'),
+      uplinkIcData      => (others => '0'),
       debugMode         => (others => '0'),
       debugPatternA     => (others => x"AA_AA_AA_AA"),
       debugPatternB     => (others => x"55_55_55_55"),
@@ -105,8 +111,8 @@ architecture mapping of AtlasRd53EmuLpGbtLaneReg is
       fecDisable        => '0',
       interleaverBypass => '0',
       scramblerBypass   => '0',
-      txDummyFec12      => "1001110011",
-      txDummyFec5       => "001100",
+      txDummyFec12      => (0 => "1001110011", 1 => "0110001100"),
+      txDummyFec5       => (0 => "001100", 1 => "110011"),
       invCmd            => (others => '0'),
       dlyCmd            => (others => '0'),
       wdtRstEn          => "11",
@@ -210,9 +216,15 @@ begin
       axiSlaveRegister (axilEp, x"828", 0, v.scramblerBypass);
       axiSlaveRegister (axilEp, x"82C", 0, v.linkDownPattern);
 
-      axiSlaveRegister (axilEp, x"830", 0, v.txDummyFec12);
-      axiSlaveRegister (axilEp, x"834", 0, v.txDummyFec5);
-      axiSlaveRegister (axilEp, x"838", 0, v.debugMode);
+      axiSlaveRegister (axilEp, x"830", 0, v.txDummyFec12(0));
+      axiSlaveRegister (axilEp, x"834", 0, v.txDummyFec12(1));
+      axiSlaveRegister (axilEp, x"838", 0, v.txDummyFec5(0));
+      axiSlaveRegister (axilEp, x"83C", 0, v.txDummyFec5(1));
+
+      axiSlaveRegister (axilEp, x"840", 0, v.debugMode);
+
+      axiSlaveRegister (axilEp, x"850", 0, v.uplinkEcData);
+      axiSlaveRegister (axilEp, x"854", 0, v.uplinkIcData);
 
       for i in 6 downto 0 loop
          axiSlaveRegister (axilEp, toSlv(2304+4*i, 12), 0, v.debugPatternA(i));  -- Address Space = [0x900:0x91B]
@@ -293,24 +305,28 @@ begin
          dataOut(2) => interleaverBypass,
          dataOut(3) => scramblerBypass);
 
-   U_txDummyFec12 : entity surf.SynchronizerVector
-      generic map (
-         TPD_G   => TPD_G,
-         WIDTH_G => 10)
-      port map (
-         clk     => uplinkClk,
-         dataIn  => r.txDummyFec12,
-         dataOut => txDummyFec12);
+   GEN_TX_DUMMY :
+   for i in 1 downto 0 generate
 
-   U_txDummyFec5 : entity surf.SynchronizerVector
-      generic map (
-         TPD_G   => TPD_G,
-         WIDTH_G => 6)
-      port map (
-         clk     => uplinkClk,
-         dataIn  => r.txDummyFec5,
-         dataOut => txDummyFec5);
+      U_txDummyFec12 : entity surf.SynchronizerVector
+         generic map (
+            TPD_G   => TPD_G,
+            WIDTH_G => 10)
+         port map (
+            clk     => uplinkClk,
+            dataIn  => r.txDummyFec12(i),
+            dataOut => txDummyFec12(i));
 
+      U_txDummyFec5 : entity surf.SynchronizerVector
+         generic map (
+            TPD_G   => TPD_G,
+            WIDTH_G => 6)
+         port map (
+            clk     => uplinkClk,
+            dataIn  => r.txDummyFec5(i),
+            dataOut => txDummyFec5(i));
+
+   end generate GEN_TX_DUMMY;
 
    U_debugMode : entity surf.SynchronizerVector
       generic map (
@@ -343,6 +359,24 @@ begin
             dataOut => debugPatternB(i));
 
    end generate GEN_VEC;
+
+   U_uplinkEcData : entity surf.SynchronizerVector
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => 2)
+      port map (
+         clk     => uplinkClk,
+         dataIn  => r.uplinkEcData,
+         dataOut => uplinkEcData);
+
+   U_uplinkIcData : entity surf.SynchronizerVector
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => 2)
+      port map (
+         clk     => uplinkClk,
+         dataIn  => r.uplinkIcData,
+         dataOut => uplinkIcData);
 
    U_bitOrderCmd4b : entity surf.Synchronizer
       generic map (
