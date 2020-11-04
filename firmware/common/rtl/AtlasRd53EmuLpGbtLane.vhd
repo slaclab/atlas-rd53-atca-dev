@@ -84,10 +84,10 @@ architecture rtl of AtlasRd53EmuLpGbtLane is
    signal bitOrderData32b : sl;
    signal bitOrderCmd4b   : sl;
 
-   signal data8bMask  : Slv8Array(NUM_ELINK_G-1 downto 0);
-   signal data8b      : Slv8Array(NUM_ELINK_G-1 downto 0);
-   signal data32bMask : Slv32Array(NUM_ELINK_G-1 downto 0);
-   signal data32b     : Slv32Array(NUM_ELINK_G-1 downto 0);
+   signal data8bMask  : Slv8Array(6 downto 0)  := (others => (others => '0'));
+   signal data8b      : Slv8Array(6 downto 0)  := (others => (others => '0'));
+   signal data32bMask : Slv32Array(6 downto 0) := (others => (others => '0'));
+   signal data32b     : Slv32Array(6 downto 0) := (others => (others => '0'));
 
    signal cmd        : slv(NUM_ELINK_G-1 downto 0);
    signal cmdMask    : slv(NUM_ELINK_G-1 downto 0);
