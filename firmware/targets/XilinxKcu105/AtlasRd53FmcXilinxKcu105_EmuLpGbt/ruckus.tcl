@@ -23,3 +23,5 @@ set_property top {LpGbt2EmuLpGbt_LinkingWithGthTb} [get_filesets sim_1]
 # Remove out of scope .XDC files
 remove_files [get_files xlx_ku_mgt_ip_10g24_example_top.xdc]
 remove_files [get_files xlx_ku_mgt_ip_10g24.xdc]
+
+set_property strategy Performance_ExplorePostRoutePhysOpt [get_runs impl_1]
