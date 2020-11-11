@@ -64,7 +64,7 @@ architecture mapping of RudpServer is
       TUSER_MODE_C  => TUSER_FIRST_LAST_C);
 
    constant TIMEOUT_C          : real     := 1.0E-3;  -- In units of seconds
-   constant WINDOW_ADDR_SIZE_C : positive := ite(JUMBO_G, 3, 4);
+   constant WINDOW_ADDR_SIZE_C : positive := ite(JUMBO_G, 3, 5);
    constant MAX_SEG_SIZE_C     : positive := ite(JUMBO_G, 8192, 1024);  -- Jumbo frame chucking
 
    constant APP_AXIS_CONFIG_C : AxiStreamConfigArray(0 downto 0) := (others => AXIS_CONFIG_C);

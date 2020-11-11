@@ -30,9 +30,10 @@ use unisim.vcomponents.all;
 
 entity AtlasRd53FmcMappingWithMux is
    generic (
-      TPD_G                : time    := 1 ns;
-      SIMULATION_G         : boolean := false;
-      XIL_DEVICE_G         : string  := "7SERIES";
+      TPD_G                : time     := 1 ns;
+      SIMULATION_G         : boolean  := false;
+      XIL_DEVICE_G         : string   := "7SERIES";
+      FMC_WIDTH_G          : positive := 34;
       RX_PHY_TO_APP_INIT_G : Slv7Array(127 downto 0));
    port (
       -- Deserialization Interface
@@ -63,8 +64,8 @@ entity AtlasRd53FmcMappingWithMux is
       tluBsy          : in    sl := '1';
       tluTrgClk       : in    sl := '0';
       -- FMC LPC Ports
-      fmcLaP          : inout slv(33 downto 0);
-      fmcLaN          : inout slv(33 downto 0);
+      fmcLaP          : inout slv(FMC_WIDTH_G-1 downto 0);
+      fmcLaN          : inout slv(FMC_WIDTH_G-1 downto 0);
       -- AXI-Lite Interface (axilClk domain)
       axilClk         : in    sl;
       axilRst         : in    sl;

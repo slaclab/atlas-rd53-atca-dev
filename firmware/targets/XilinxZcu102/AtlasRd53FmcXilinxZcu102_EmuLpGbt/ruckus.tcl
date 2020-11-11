@@ -9,7 +9,7 @@ loadRuckusTcl $::env(TOP_DIR)/common
 
 # Load local source Code and constraints
 loadSource      -dir  "$::DIR_PATH/hdl"
-loadConstraints -path "$::env(TOP_DIR)/submodules/axi-pcie-core/hardware/XilinxKcu105/xdc/XilinxKcu105App.xdc"
+loadConstraints -path "$::env(TOP_DIR)/submodules/rce-gen3-fw-lib/XilinxZcu102Core/xdc/XilinxZcu102Core.xdc"
 loadConstraints -dir  "$::DIR_PATH/hdl"
 
 # Load the simulation testbed

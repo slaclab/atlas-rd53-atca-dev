@@ -43,6 +43,10 @@ Targets:
     ImageDir: targets/XilinxKcu105/AtlasRd53FmcXilinxKcu105_EmuLpGbt/images
     Extensions:
       - bit
+  AtlasRd53FmcXilinxZcu102_EmuLpGbt:
+    ImageDir: targets/XilinxZcu102/AtlasRd53FmcXilinxZcu102_EmuLpGbt/images
+    Extensions:
+      - bin
   XilinxZcu102LpGbt:
     ImageDir: targets/XilinxZcu102/XilinxZcu102LpGbt/images
     Extensions:
@@ -57,6 +61,7 @@ Releases:
       # - DpmRudpNode
       - DpmPgp3_6Gbps
       - AtlasRd53FmcXilinxKcu105_EmuLpGbt
+      - AtlasRd53FmcXilinxZcu102_EmuLpGbt
       - XilinxZcu102LpGbt
     Types:
       - Rogue

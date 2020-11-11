@@ -46,3 +46,7 @@ if { ${family} eq {kintexuplus} } {
    set_property SCOPED_TO_REF    {xlx_ku_gty_ip_10g24_emu} [get_files {xlx_ku_gty_ip_10g24_emu.xdc}]
    set_property SCOPED_TO_CELLS  {inst}                    [get_files {xlx_ku_gty_ip_10g24_emu.xdc}]
 }
+
+# Adding the common Si5345 configuration
+add_files -norecurse "$::DIR_PATH/pll-config/AtlasRd53Fmc_EmuLpGbt.mem"
+add_files -norecurse "$::DIR_PATH/pll-config/AtlasRd53Fmc_lpcRefClk.mem"

@@ -1,14 +1,16 @@
 -------------------------------------------------------------------------------
--- File       : AtlasRd53FmcXilinxKcu105_EmuLpGbt.vhd
+-- File       : AtlasRd53FmcXilinxZcu102_EmuLpGbt.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description:
 --    SFP[0] = 1GbE RUDP
 --    SFP[1] = emulation LP-GBT
+--    SFP[2] = Unused
+--    SFP[3] = Unused
 -------------------------------------------------------------------------------
--- Note: This design requires two FMC cards installed (HPC and LPC bays)
---       HPC mDP used with RD53 ASICs via mDP ports
---       LPC is only used for a LHC free-running clock reference (mDP unused)
+-- Note: This design requires two FMC cards installed (HPC[0] and HPC[1] bays)
+--       HPC[1] mDP used with RD53 ASICs via mDP ports
+--       HPC[0] is only used for a LHC free-running clock reference (mDP unused)
 -------------------------------------------------------------------------------
 -- This file is part of 'ATLAS RD53 FMC DEV'.
 -- It is subject to the license terms in the LICENSE.txt file found in the
@@ -34,17 +36,13 @@ library atlas_rd53_fw_lib;
 library unisim;
 use unisim.vcomponents.all;
 
-entity AtlasRd53FmcXilinxKcu105_EmuLpGbt is
+entity AtlasRd53FmcXilinxZcu102_EmuLpGbt is
    generic (
       TPD_G        : time := 1 ns;
       BUILD_INFO_G : BuildInfoType);
    port (
       extRst       : in    sl;
       led          : out   slv(7 downto 0);
-      smaUserGpioP : out   sl;  -- Copy of the TX's QPLL reference clock for debugging
-      smaUserGpioN : out   sl;
-      smaUserClkP  : out   sl;  -- Copy of the recovered RX clock for debugging
-      smaUserClkN  : out   sl;
       -- 300Mhz System Clock
       sysClk300P   : in    sl;
       sysClk300N   : in    sl;
@@ -53,20 +51,21 @@ entity AtlasRd53FmcXilinxKcu105_EmuLpGbt is
       gtRefClk160N : in    sl;
       gtRefClk320P : in    sl;
       gtRefClk320N : in    sl;
-      fmcHpcLaP    : inout slv(33 downto 0);
-      fmcHpcLaN    : inout slv(33 downto 0);
-      fmcLpcLaP    : inout slv(33 downto 0);
-      fmcLpcLaN    : inout slv(33 downto 0);
+      fmcHpc0LaP   : inout slv(33 downto 0);
+      fmcHpc0LaN   : inout slv(33 downto 0);
+      fmcHpc1LaP   : inout slv(29 downto 0);
+      fmcHpc1LaN   : inout slv(29 downto 0);
       -- SFP Interface
       sfpClk156P   : in    sl;
       sfpClk156N   : in    sl;
-      sfpTxP       : out   slv(1 downto 0);
-      sfpTxN       : out   slv(1 downto 0);
-      sfpRxP       : in    slv(1 downto 0);
-      sfpRxN       : in    slv(1 downto 0));
-end AtlasRd53FmcXilinxKcu105_EmuLpGbt;
+      sfpEnTx      : out   slv(3 downto 0) := x"F";
+      sfpTxP       : out   slv(3 downto 0);
+      sfpTxN       : out   slv(3 downto 0);
+      sfpRxP       : in    slv(3 downto 0);
+      sfpRxN       : in    slv(3 downto 0));
+end AtlasRd53FmcXilinxZcu102_EmuLpGbt;
 
-architecture top_level of AtlasRd53FmcXilinxKcu105_EmuLpGbt is
+architecture TOP_LEVEL of AtlasRd53FmcXilinxZcu102_EmuLpGbt is
 
    impure function RxPhyToApp return Slv7Array is
       variable i      : natural;
@@ -85,7 +84,7 @@ architecture top_level of AtlasRd53FmcXilinxKcu105_EmuLpGbt is
    end function;
    constant RX_PHY_TO_APP_INIT_C : Slv7Array(127 downto 0) := RxPhyToApp;
 
-   constant XIL_DEVICE_C : string := "ULTRASCALE";
+   constant XIL_DEVICE_C : string := "ULTRASCALE_PLUS";
 
    constant PLL_GPIO_I2C_CONFIG_C : I2cAxiLiteDevArray(0 to 1) := (
       0              => MakeI2cAxiLiteDevType(
@@ -195,28 +194,21 @@ begin
    led(1) <= rxLinkUp(4*1+3);
    led(0) <= rxLinkUp(4*0+3);
 
-   U_smaUserGpio : entity surf.ClkOutBufDiff
+   U_TERM_GTs : entity surf.Gthe4ChannelDummy
       generic map (
-         TPD_G        => TPD_G,
-         XIL_DEVICE_G => XIL_DEVICE_C)
+         TPD_G   => TPD_G,
+         WIDTH_G => 2)
       port map (
-         clkIn   => clk160MHz,
-         clkOutP => smaUserGpioP,
-         clkOutN => smaUserGpioN);
-
-   U_smaUserClk : entity surf.ClkOutBufDiff
-      generic map (
-         TPD_G        => TPD_G,
-         XIL_DEVICE_G => XIL_DEVICE_C)
-      port map (
-         clkIn   => rxRecClk,  -- emulation LP-GBT recovered clock used as jitter cleaner reference
-         clkOutP => smaUserClkP,
-         clkOutN => smaUserClkN);
+         refClk => axilClk,
+         gtRxP  => sfpRxP(3 downto 2),
+         gtRxN  => sfpRxN(3 downto 2),
+         gtTxP  => sfpTxP(3 downto 2),
+         gtTxN  => sfpTxN(3 downto 2));
 
    --------------------------------
    -- 160 MHz External Reference Clock
    --------------------------------
-   U_IBUFDS_refClk160 : IBUFDS_GTE3
+   U_IBUFDS_refClk160 : IBUFDS_GTE4
       generic map (
          REFCLK_EN_TX_PATH  => '0',
          REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
@@ -347,6 +339,7 @@ begin
       generic map (
          TPD_G                => TPD_G,
          XIL_DEVICE_G         => XIL_DEVICE_C,
+         FMC_WIDTH_G          => 30,
          RX_PHY_TO_APP_INIT_G => RX_PHY_TO_APP_INIT_C)
       port map (
          -- Deserialization Interface
@@ -372,8 +365,8 @@ begin
          i2cScl          => i2cScl,
          i2cSda          => i2cSda,
          -- FMC LPC Ports
-         fmcLaP          => fmcHpcLaP,
-         fmcLaN          => fmcHpcLaN,
+         fmcLaP          => fmcHpc1LaP,
+         fmcLaN          => fmcHpc1LaN,
          -- AXI-Lite Interface (axilClk domain)
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -437,10 +430,10 @@ begin
          axiWriteMaster => axilWriteMasters(PLL_INDEX_C+1),
          axiWriteSlave  => axilWriteSlaves(PLL_INDEX_C+1),
          -- SPI Ports
-         coreSclk       => fmcLpcLaP(3),
-         coreSDin       => fmcLpcLaN(4),
-         coreSDout      => fmcLpcLaN(3),
-         coreCsb        => fmcLpcLaP(4));
+         coreSclk       => fmcHpc0LaP(3),
+         coreSDin       => fmcHpc0LaN(4),
+         coreSDout      => fmcHpc0LaN(3),
+         coreCsb        => fmcHpc0LaP(4));
 
    ---------------------------
    -- AXI-Lite: I2C Reg Access

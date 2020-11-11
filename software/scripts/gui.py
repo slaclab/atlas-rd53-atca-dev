@@ -18,7 +18,7 @@ import pyrogue.pydm
 import rogue
 
 import AtlasAtcaLinkAggRd53Rtm_EmuLpGbt
-import AtlasRd53FmcXilinxKcu105_EmuLpGbt
+import AtlasRd53FmcXilinxDevBoard_EmuLpGbt
 
 #################################################################
 
@@ -41,7 +41,7 @@ parser.add_argument(
     type     = str,
     required = False,
     default  = 'LinkAgg',
-    help     = "LinkAgg or Kcu105",
+    help     = "LinkAgg or Kcu105 or Zcu102",
 )
 
 parser.add_argument(
@@ -60,8 +60,13 @@ args = parser.parse_args()
 # Select the hardware type
 if args.remoteDevice == 'LinkAgg':
     myRoot = AtlasAtcaLinkAggRd53Rtm_EmuLpGbt.RudpRoot
+
 elif args.remoteDevice == 'Kcu105':
-    myRoot = AtlasRd53FmcXilinxKcu105_EmuLpGbt.RudpRoot
+    myRoot = AtlasRd53FmcXilinxDevBoard_EmuLpGbt.RudpRoot
+
+elif args.remoteDevice == 'Zcu102':
+    myRoot = AtlasRd53FmcXilinxDevBoard_EmuLpGbt.RudpRoot
+
 else:
     raise ValueError("Invalid Remote Device (%s)" % (args.remoteDevice) )
 
