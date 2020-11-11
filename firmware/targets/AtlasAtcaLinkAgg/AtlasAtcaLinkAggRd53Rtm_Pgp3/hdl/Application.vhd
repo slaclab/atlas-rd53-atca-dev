@@ -317,8 +317,7 @@ begin
       generic map(
          TPD_G                => TPD_G,
          SIMULATION_G         => SIMULATION_G,
-         RX_PHY_TO_APP_INIT_G => RX_PHY_TO_APP_INIT_C,
-         RX_APP_TO_PHY_INIT_G => RX_APP_TO_PHY_INIT_C)
+         RX_PHY_TO_APP_INIT_G => RX_PHY_TO_APP_INIT_C)
       port map (
          ref160Clk       => ref160Clk,
          ref160Rst       => ref160Rst,

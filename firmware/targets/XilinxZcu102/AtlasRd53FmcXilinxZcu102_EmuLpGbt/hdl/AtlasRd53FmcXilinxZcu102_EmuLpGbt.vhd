@@ -150,6 +150,8 @@ architecture TOP_LEVEL of AtlasRd53FmcXilinxZcu102_EmuLpGbt is
    signal rxWordClk40  : sl;
 
    signal refClk160     : sl;
+   signal refClk320     : sl;
+   signal refClk320Bufg : sl;
    signal rxRecClk      : sl;
    signal drpClk        : sl;
    signal qplllock      : slv(1 downto 0);
@@ -220,14 +222,42 @@ begin
          ODIV2 => open,
          O     => refClk160);
 
+   --------------------------------
+   -- 320 MHz External Reference Clock
+   --------------------------------
+   U_IBUFDS_refClk320 : IBUFDS_GTE4
+      generic map (
+         REFCLK_EN_TX_PATH  => '0',
+         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
+         REFCLK_ICNTL_RX    => "00")
+      port map (
+         I     => gtRefClk320P,
+         IB    => gtRefClk320N,
+         CEB   => '0',
+         ODIV2 => refClk320,
+         O     => open);
+
+   U_BUFG_GT : BUFG_GT
+      port map (
+         I       => refClk320,
+         CE      => '1',
+         CLR     => '0',
+         CEMASK  => '1',
+         CLRMASK => '1',
+         DIV     => "000",              -- Divide by 1
+         O       => refClk320Bufg);
+
    ------------------------
    -- LP-GBT QPLL Reference
    ------------------------
    U_EmuLpGbtQpll : entity work.xlx_ku_mgt_10g24_emu_qpll
+      generic map (
+         TPD_G             => TPD_G,
+         GT_CLK_SEL_G      => true,
+         QPLL_REFCLK_SEL_G => "111")    -- 111: GTGREFCLK selected
       port map (
          -- MGT Clock Port (320 MHz)
-         gtClkP        => gtRefClk320P,
-         gtClkN        => gtRefClk320N,
+         gtClkIn       => refClk320Bufg,
          -- Quad PLL Interface
          qplllock      => qplllock,
          qplloutclk    => qplloutclk,
