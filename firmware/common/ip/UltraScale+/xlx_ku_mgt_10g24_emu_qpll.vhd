@@ -49,7 +49,7 @@ begin
    gtClkOut <= refClk;
 
    EXT_REF : if (GT_CLK_SEL_G = false) generate
-      IBUFDS_GTE3_Inst : IBUFDS_GTE4
+      IBUFDS_GTE4_Inst : IBUFDS_GTE4
          generic map (
             REFCLK_EN_TX_PATH  => '0',
             REFCLK_HROW_CK_SEL => "00",  -- 2'b00: ODIV2 = O
