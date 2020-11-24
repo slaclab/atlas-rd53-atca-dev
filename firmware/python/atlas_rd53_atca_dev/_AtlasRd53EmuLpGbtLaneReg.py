@@ -195,7 +195,7 @@ class AtlasRd53EmuLpGbtLaneReg(pr.Device):
         ))
 
         self.add(pr.RemoteVariable(
-            name         = 'UplinkEcData',
+            name         = 'UplinkIcData',
             offset       = 0x854,
             bitSize      = 2,
             mode         = 'RW',
