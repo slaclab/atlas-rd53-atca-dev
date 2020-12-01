@@ -116,7 +116,7 @@ begin
          gtwiz_reset_rx_cdr_stable_out      => open,
          gtwiz_reset_tx_done_out            => open,
          gtwiz_reset_rx_done_out            => open,
-         gtwiz_userdata_tx_in               => "11111111110000000000",  -- 160 MHz clock pattern @ 3.2Gb/s
+         gtwiz_userdata_tx_in               => "10101010101010101010",  -- 1.28 GHz clock pattern @ 2.56Gb/s
          gtwiz_userdata_rx_out              => open,
          cpllrefclksel_in                   => "111",
          drpclk_in(0)                       => drpClk,
