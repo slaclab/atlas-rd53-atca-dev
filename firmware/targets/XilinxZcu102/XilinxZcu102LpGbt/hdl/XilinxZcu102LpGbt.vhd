@@ -279,21 +279,21 @@ begin
          TPD_G => TPD_G)
       port map (
          -- AXI-Lite Interface (axilClk domain)
-         axilClk          => axilClk,
-         axilRst          => axilRst,
-         axilReadMasters  => axilReadMasters(7),
-         axilReadSlaves   => axilReadSlaves(7),
-         axilWriteMasters => axilWriteMasters(7),
-         axilWriteSlaves  => axilWriteSlaves(7),
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => axilReadMasters(7),
+         axilReadSlave   => axilReadSlaves(7),
+         axilWriteMaster => axilWriteMasters(7),
+         axilWriteSlave  => axilWriteSlaves(7),
          -- Clocks and Resets
-         gtRefClk         => pllClkOut,
-         drpClk           => clk160MHz,
-         drpRst           => rst160MHz,
+         gtRefClk        => pllClkOut,
+         drpClk          => clk160MHz,
+         drpRst          => rst160MHz,
          -- Broadcast External Timing Clock
-         smaTxP           => smaTxP,
-         smaTxN           => smaTxN,
-         smaRxP           => smaRxP,
-         smaRxN           => smaRxN);
+         smaTxP          => smaTxP,
+         smaTxN          => smaTxN,
+         smaRxP          => smaRxP,
+         smaRxN          => smaRxN);
 
    --------------------------------
    -- 320 MHz LpGBT Reference Clock

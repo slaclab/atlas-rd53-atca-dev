@@ -99,3 +99,5 @@ set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_PLL/Pl
 
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins {GEN_SFP[*].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/U_tx_wordclk/O}]] -group [get_clocks -of_objects [get_pins {GEN_SFP[*].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/gtwiz_userclk_tx_inst/gen_gtwiz_userclk_tx_main.bufg_gt_usrclk2_inst/O}]]
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins {GEN_SFP[*].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/U_rx_wordclk/O}]] -group [get_clocks -of_objects [get_pins {GEN_SFP[*].U_LpGbtLane/lpgbtFpga_top_inst/mgt_inst/gtwiz_userclk_rx_inst/gen_gtwiz_userclk_rx_main.bufg_gt_usrclk2_inst/O}]]
+
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_PLL/PllGen.U_Pll/CLKOUT0]] -group [get_clocks -of_objects [get_pins {U_SmaTxClkout/U_GTH/inst/gen_gtwizard_gthe4_top.sma_tx_clkout_gtwizard_gthe4_inst/gen_gtwizard_gthe4.gen_channel_container[1].gen_enabled_channel.gthe4_channel_wrapper_inst/channel_inst/gthe4_channel_gen.gen_gthe4_channel_inst[0].GTHE4_CHANNEL_PRIM_INST/TXOUTCLK}]]
