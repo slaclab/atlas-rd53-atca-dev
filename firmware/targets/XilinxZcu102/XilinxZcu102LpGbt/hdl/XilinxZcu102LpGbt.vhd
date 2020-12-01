@@ -76,7 +76,7 @@ architecture TOP_LEVEL of XilinxZcu102LpGbt is
          endianness  => '0',            -- Little endian
          repeatStart => '1'));          -- Repeat Start
 
-   constant NUM_AXIL_MASTERS_C : natural := 7;
+   constant NUM_AXIL_MASTERS_C : natural := 8;
 
    constant AXIL_XBAR_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXIL_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXIL_MASTERS_C, x"B400_0000", 26, 20);
 
@@ -278,15 +278,22 @@ begin
       generic map (
          TPD_G => TPD_G)
       port map (
+         -- AXI-Lite Interface (axilClk domain)
+         axilClk          => axilClk,
+         axilRst          => axilRst,
+         axilReadMasters  => axilReadMasters(7),
+         axilReadSlaves   => axilReadSlaves(7),
+         axilWriteMasters => axilWriteMasters(7),
+         axilWriteSlaves  => axilWriteSlaves(7),
          -- Clocks and Resets
-         gtRefClk => pllClkOut,
-         drpClk   => clk160MHz,
-         drpRst   => rst160MHz,
+         gtRefClk         => pllClkOut,
+         drpClk           => clk160MHz,
+         drpRst           => rst160MHz,
          -- Broadcast External Timing Clock
-         smaTxP   => smaTxP,
-         smaTxN   => smaTxN,
-         smaRxP   => smaRxP,
-         smaRxN   => smaRxN);
+         smaTxP           => smaTxP,
+         smaTxN           => smaTxN,
+         smaRxP           => smaRxP,
+         smaRxN           => smaRxN);
 
    --------------------------------
    -- 320 MHz LpGBT Reference Clock

@@ -18,6 +18,18 @@ import rogue.hardware.axi
 
 rogue.Version.minVersion('4.7.0')
 
+class SmaTxClkout(pr.Device):
+    def __init__(self,
+            **kwargs):
+        super().__init__(**kwargs)
+
+        self.add(pr.RemoteVariable(
+            name         = 'TxPattern',
+            offset       = 0x0,
+            bitSize      = 20,
+            mode         = 'RW',
+        ))
+
 class RceRoot(pr.Root):
 
     def __init__(self,
@@ -62,6 +74,13 @@ class RceRoot(pr.Root):
             name        = 'EmuTimingFsm',
             description = 'firmware/submodules/atlas-rd53-fw-lib/python/AtlasRd53/_EmuTiming.py',
             offset      = (0xB400_0000 + 6*0x0010_0000),
+            memBase     = self._RceMemMap,
+        ))
+
+        # Add SMA TX clock device
+        self.add(SmaTxClkout(
+            name        = 'SmaTxClkout',
+            offset      = (0xB400_0000 + 7*0x0010_0000),
             memBase     = self._RceMemMap,
         ))
 
