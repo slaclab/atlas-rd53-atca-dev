@@ -25,7 +25,8 @@ use unisim.vcomponents.all;
 
 entity xlx_ku_mgt_10g24_emu is
    generic (
-      SELECT_GT_TYPE_G : boolean := false);  -- Unused
+      SELECT_GT_TYPE_G  : boolean         := false;  -- Unused
+      CPLL_REFCLK_SEL_G : slv(2 downto 0) := "001");
    port (
       --=============--
       -- Clocks      --
@@ -106,11 +107,13 @@ architecture structural of xlx_ku_mgt_10g24_emu is
          gtwiz_reset_qpll0reset_out         : out std_logic_vector(0 downto 0);
          gtwiz_userdata_tx_in               : in  std_logic_vector(63 downto 0);
          gtwiz_userdata_rx_out              : out std_logic_vector(31 downto 0);
+         cpllrefclksel_in                   : in  std_logic_vector(2 downto 0);
          drpaddr_in                         : in  std_logic_vector(8 downto 0);
          drpclk_in                          : in  std_logic_vector(0 downto 0);
          drpdi_in                           : in  std_logic_vector(15 downto 0);
          drpen_in                           : in  std_logic_vector(0 downto 0);
          drpwe_in                           : in  std_logic_vector(0 downto 0);
+         gtgrefclk_in                       : in  std_logic_vector(0 downto 0);
          gthrxn_in                          : in  std_logic_vector(0 downto 0);
          gthrxp_in                          : in  std_logic_vector(0 downto 0);
          gtrefclk0_in                       : in  std_logic_vector(0 downto 0);
@@ -206,6 +209,9 @@ architecture structural of xlx_ku_mgt_10g24_emu is
    signal rx_reset_done_all : std_logic := '0';
    signal txValid           : std_logic := '0';
    signal rxValid           : std_logic := '0';
+
+   signal gtrefclk0 : std_logic := '0';
+   signal gtgrefclk : std_logic := '0';
 
 begin
 
@@ -407,7 +413,9 @@ begin
          gthtxn_out(0) => TXn_o,
          gthtxp_out(0) => TXp_o,
 
-         gtrefclk0_in(0) => MGT_REFCLK_i,
+         gtrefclk0_in(0)  => gtrefclk0,
+         gtgrefclk_in(0)  => gtgrefclk,
+         cpllrefclksel_in => CPLL_REFCLK_SEL_G,
 
          rxslide_in(0) => '0',          -- Using ASYNC GEARBOX instead
 
@@ -431,5 +439,8 @@ begin
 
          -- Tx buffer status
          txbufstatus_out => open);
+
+   gtrefclk0 <= MGT_REFCLK_i when(CPLL_REFCLK_SEL_G /= "111") else '0';
+   gtgrefclk <= MGT_REFCLK_i when(CPLL_REFCLK_SEL_G = "111")  else '0';
 
 end structural;

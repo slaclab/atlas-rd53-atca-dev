@@ -30,10 +30,11 @@ use unisim.vcomponents.all;
 
 entity AtlasRd53EmuLpGbtLane is
    generic (
-      TPD_G            : time                  := 1 ns;
-      NUM_ELINK_G      : positive range 1 to 7 := 6;
-      SELECT_GT_TYPE_G : boolean               := false;  -- false = GTH, true = GTY
-      XIL_DEVICE_G     : string                := "ULTRASCALE");
+      TPD_G             : time                  := 1 ns;
+      NUM_ELINK_G       : positive range 1 to 7 := 6;
+      SELECT_GT_TYPE_G  : boolean               := false;  -- false = GTH, true = GTY
+      CPLL_REFCLK_SEL_G : slv(2 downto 0)       := "001";
+      XIL_DEVICE_G      : string                := "ULTRASCALE");
    port (
       -- AXI-Lite interface (axilClk domain)
       axilClk         : in  sl;
@@ -277,7 +278,8 @@ begin
    -----------------------
    lpgbtFpga_top_inst : entity work.EmuLpGbtFpga10g24
       generic map (
-         SELECT_GT_TYPE_G => SELECT_GT_TYPE_G)
+         SELECT_GT_TYPE_G  => SELECT_GT_TYPE_G,
+         CPLL_REFCLK_SEL_G => CPLL_REFCLK_SEL_G)
       port map (
          -- Uplink mode
          fecMode             => fecMode,

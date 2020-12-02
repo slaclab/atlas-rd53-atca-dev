@@ -27,8 +27,9 @@ use unisim.vcomponents.all;
 
 entity EmuLpGbtFpga10g24 is
    generic (
-      SIMULATION_G     : boolean := false;
-      SELECT_GT_TYPE_G : boolean := false);
+      SIMULATION_G      : boolean         := false;
+      SELECT_GT_TYPE_G  : boolean         := false;
+      CPLL_REFCLK_SEL_G : std_logic_vector(2 downto 0) := "001");
    port (
       -- Uplink mode
       fecMode             : in  std_logic;  -- 1=FEC12, 0=FEC5
@@ -103,7 +104,8 @@ begin
 
    mgt_inst : entity work.xlx_ku_mgt_10g24_emu
       generic map (
-         SELECT_GT_TYPE_G => SELECT_GT_TYPE_G)
+         SELECT_GT_TYPE_G  => SELECT_GT_TYPE_G,
+         CPLL_REFCLK_SEL_G => CPLL_REFCLK_SEL_G)
       port map (
          --=============--
          -- Clocks      --
