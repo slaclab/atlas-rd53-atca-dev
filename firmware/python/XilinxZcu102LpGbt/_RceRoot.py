@@ -12,23 +12,12 @@ import pyrogue             as pr
 import RceG3               as rce     # firmware/submodules/rce-gen3-fw-lib
 import AtlasRd53           as rd53Lib # firmware/submodules/atlas-rd53-fw-lib
 import surf.devices.silabs as silabs  # firmware/submodules/surf
+import atlas_rd53_atca_dev as atcaDev
 
 import rogue
 import rogue.hardware.axi
 
 rogue.Version.minVersion('4.7.0')
-
-class SmaTxClkout(pr.Device):
-    def __init__(self,
-            **kwargs):
-        super().__init__(**kwargs)
-
-        self.add(pr.RemoteVariable(
-            name         = 'TxPattern',
-            offset       = 0x0,
-            bitSize      = 20,
-            mode         = 'RW',
-        ))
 
 class RceRoot(pr.Root):
 
@@ -78,7 +67,7 @@ class RceRoot(pr.Root):
         ))
 
         # Add SMA TX clock device
-        self.add(SmaTxClkout(
+        self.add(atcaDev.SmaTxClkout(
             name        = 'SmaTxClkout',
             offset      = (0xB400_0000 + 7*0x0010_0000),
             memBase     = self._RceMemMap,

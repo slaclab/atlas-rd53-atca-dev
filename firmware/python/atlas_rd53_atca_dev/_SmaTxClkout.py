@@ -8,8 +8,16 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
-from atlas_rd53_atca_dev._AtlasRd53EmuLpGbtLaneReg   import *
-from atlas_rd53_atca_dev._AuroraRxLaneWrapper        import *
-from atlas_rd53_atca_dev._AtlasRd53HsSelectioWrapper import *
-from atlas_rd53_atca_dev._AtlasRd53CmdPhyMux         import *
-from atlas_rd53_atca_dev._SmaTxClkout                import *
+import pyrogue as pr
+
+class SmaTxClkout(pr.Device):
+    def __init__(self,
+            **kwargs):
+        super().__init__(**kwargs)
+
+        self.add(pr.RemoteVariable(
+            name         = 'TxPattern',
+            offset       = 0x0,
+            bitSize      = 20,
+            mode         = 'RW',
+        ))
