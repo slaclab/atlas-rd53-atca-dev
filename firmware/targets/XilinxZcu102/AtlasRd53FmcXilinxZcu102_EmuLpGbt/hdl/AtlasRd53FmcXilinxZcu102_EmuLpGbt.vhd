@@ -47,10 +47,10 @@ entity AtlasRd53FmcXilinxZcu102_EmuLpGbt is
       sysClk300P   : in    sl;
       sysClk300N   : in    sl;
       -- FMC Interface
-      gtRefClk160P : in    sl;
-      gtRefClk160N : in    sl;
       gtRefClk320P : in    sl;
       gtRefClk320N : in    sl;
+      gtRecClk320P : in    sl;
+      gtRecClk320N : in    sl;
       fmcHpc0LaP   : inout slv(33 downto 0);
       fmcHpc0LaN   : inout slv(33 downto 0);
       fmcHpc1LaP   : inout slv(29 downto 0);
@@ -150,8 +150,9 @@ architecture TOP_LEVEL of AtlasRd53FmcXilinxZcu102_EmuLpGbt is
    signal rxWordClk40  : sl;
 
    signal refClk160     : sl;
-   signal refClk320     : sl;
-   signal refClk320Bufg : sl;
+   signal refClk160Bufg : sl;
+   signal recClk320     : sl;
+   signal recClk320Bufg : sl;
    signal rxRecClk      : sl;
    signal drpClk        : sl;
    signal qplllock      : slv(1 downto 0);
@@ -207,45 +208,55 @@ begin
          gtTxP  => sfpTxP(3 downto 2),
          gtTxN  => sfpTxN(3 downto 2));
 
-   --------------------------------
-   -- 160 MHz External Reference Clock
-   --------------------------------
+   -----------------------------------
+   -- 320 MHz External Reference Clock
+   -----------------------------------
    U_IBUFDS_refClk160 : IBUFDS_GTE4
       generic map (
          REFCLK_EN_TX_PATH  => '0',
-         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
+         REFCLK_HROW_CK_SEL => "01",  -- 2'b01: ODIV2 = Divide-by-2 version of O
          REFCLK_ICNTL_RX    => "00")
       port map (
-         I     => gtRefClk160P,
-         IB    => gtRefClk160N,
+         I     => gtRefClk320P,
+         IB    => gtRefClk320N,
          CEB   => '0',
-         ODIV2 => open,
-         O     => refClk160);
+         ODIV2 => refClk160,
+         O     => open);
 
-   --------------------------------
-   -- 320 MHz External Reference Clock
-   --------------------------------
+   U_BUFG_refClk160 : BUFG_GT
+      port map (
+         I       => refClk160,
+         CE      => '1',
+         CLR     => '0',
+         CEMASK  => '1',
+         CLRMASK => '1',
+         DIV     => "000",              -- Divide by 1
+         O       => refClk160Bufg);
+
+   -----------------------------------
+   -- 320 MHz External Recovered Clock
+   -----------------------------------
    U_IBUFDS_refClk320 : IBUFDS_GTE4
       generic map (
          REFCLK_EN_TX_PATH  => '0',
          REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
          REFCLK_ICNTL_RX    => "00")
       port map (
-         I     => gtRefClk320P,
-         IB    => gtRefClk320N,
+         I     => gtRecClk320P,
+         IB    => gtRecClk320N,
          CEB   => '0',
-         ODIV2 => refClk320,
+         ODIV2 => recClk320,
          O     => open);
 
-   U_BUFG_GT : BUFG_GT
+   U_BUFG_recClk320 : BUFG_GT
       port map (
-         I       => refClk320,
+         I       => recClk320,
          CE      => '1',
          CLR     => '0',
          CEMASK  => '1',
          CLRMASK => '1',
          DIV     => "000",              -- Divide by 1
-         O       => refClk320Bufg);
+         O       => recClk320Bufg);
 
    ------------------------
    -- LP-GBT QPLL Reference
@@ -257,7 +268,7 @@ begin
          QPLL_REFCLK_SEL_G => "111")    -- 111: GTGREFCLK selected
       port map (
          -- MGT Clock Port (320 MHz)
-         gtClkIn       => refClk320Bufg,
+         gtClkIn       => recClk320Bufg,
          -- Quad PLL Interface
          qplllock      => qplllock,
          qplloutclk    => qplloutclk,
@@ -517,9 +528,10 @@ begin
    -----------------------------------------
    U_EMU_LP_GBT : entity work.AtlasRd53EmuLpGbtLane
       generic map (
-         TPD_G        => TPD_G,
-         NUM_ELINK_G  => 7,
-         XIL_DEVICE_G => XIL_DEVICE_C)
+         TPD_G             => TPD_G,
+         NUM_ELINK_G       => 7,
+         CPLL_REFCLK_SEL_G => "111",
+         XIL_DEVICE_G      => XIL_DEVICE_C)
       port map (
          -- AXI-Lite interface (axilClk domain)
          axilClk             => axilClk,
@@ -540,7 +552,7 @@ begin
          serDesData          => serDesData(6 downto 0),
          rxLinkUp            => rxLinkUp(6 downto 0),
          -- SFP Interface
-         refClk160           => refClk160,
+         refClk160           => refClk160Bufg,
          drpClk              => drpClk,
          txWordClk160        => txWordClk160,
          rxWordClk80         => rxWordClk80,

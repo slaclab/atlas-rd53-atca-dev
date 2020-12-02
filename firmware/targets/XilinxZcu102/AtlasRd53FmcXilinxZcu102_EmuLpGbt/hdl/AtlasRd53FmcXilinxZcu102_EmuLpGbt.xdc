@@ -44,26 +44,26 @@ set_property -dict { IOSTANDARD LVDS } [get_ports { fmcHpc1LaP[29] fmcHpc1LaN[29
 
 ##############################################################################
 
-set_property PACKAGE_PIN G27 [get_ports { gtRefClk320P }]; # FMC_HPC1_GBTCLK0_M2C_C_P
-set_property PACKAGE_PIN G28 [get_ports { gtRefClk320N }]; # FMC_HPC1_GBTCLK0_M2C_C_N
+set_property PACKAGE_PIN G27 [get_ports { gtRecClk320P }]; # FMC_HPC1_GBTCLK0_M2C_C_P
+set_property PACKAGE_PIN G28 [get_ports { gtRecClk320N }]; # FMC_HPC1_GBTCLK0_M2C_C_N
 
-set_property PACKAGE_PIN G8  [get_ports { gtRefClk160P }]; # FMC_HPC0_GBTCLK0_M2C_C_P
-set_property PACKAGE_PIN G7  [get_ports { gtRefClk160N }]; # FMC_HPC0_GBTCLK0_M2C_C_N
+set_property PACKAGE_PIN G8  [get_ports { gtRefClk320P }]; # FMC_HPC0_GBTCLK0_M2C_C_P
+set_property PACKAGE_PIN G7  [get_ports { gtRefClk320N }]; # FMC_HPC0_GBTCLK0_M2C_C_N
 
 ####################
 # Timing Constraints
 ####################
 
-create_clock -name gtRefClk160P -period 6.237 [get_ports {gtRefClk160P}]
+create_clock -name gtRefClk320P -period 3.118 [get_ports {gtRefClk320P}]
 create_clock -name fmcHpc1LaP0  -period 6.237 [get_ports {fmcHpc1LaP[0]}]
 create_clock -name fmcHpc1LaP1  -period 6.237 [get_ports {fmcHpc1LaP[1]}]
-create_clock -name gtRefClk320P -period 3.118 [get_ports {gtRefClk320P}]
+create_clock -name gtRecClk320P -period 3.118 [get_ports {gtRecClk320P}]
 create_clock -name sysClk300P   -period 3.333 [get_ports {sysClk300P}]
 
 create_generated_clock -name clk640MHz [get_pins {U_FmcMapping/U_Selectio/U_Selectio/GEN_REAL.U_PLL/CLKOUT0}]
 create_generated_clock -name clk160MHz [get_pins {U_FmcMapping/U_Selectio/U_Selectio/U_Bufg160/O}]
 
-set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Selectio/U_Bufg160/O]] -group [get_clocks gtRefClk320P]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Selectio/U_Bufg160/O]] -group [get_clocks gtRecClk320P]
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Selectio/U_Bufg160/O]] -group [get_clocks -of_objects [get_pins U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/gtwiz_userclk_tx_inst/gen_gtwiz_userclk_tx_main.bufg_gt_usrclk2_inst/O]]
 set_clock_groups -asynchronous -group [get_clocks sfpClk156P] -group [get_clocks -of_objects [get_pins U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/gtwiz_userclk_tx_inst/gen_gtwiz_userclk_tx_main.bufg_gt_usrclk2_inst/O]]
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Selectio/U_Bufg160/O]] -group [get_clocks -of_objects [get_pins U_rx_wordclk/O]]
@@ -85,3 +85,11 @@ set_clock_groups -asynchronous -group [get_clocks sysClk300P] -group [get_clocks
 
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_drp_clk/O]] -group [get_clocks -of_objects [get_pins U_rx_wordclk/O]]
 set_clock_groups -asynchronous -group [get_clocks sysClk300P] -group [get_clocks -of_objects [get_pins U_rx_wordclk/O]]
+
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_drp_clk/O]] -group [get_clocks -of_objects [get_pins {U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/GEN_GTH.xlx_ku_mgt_std_i/inst/gen_gtwizard_gthe4_top.xlx_ku_mgt_ip_10g24_emu_gtwizard_gthe4_inst/gen_gtwizard_gthe4.gen_channel_container[1].gen_enabled_channel.gthe4_channel_wrapper_inst/channel_inst/gthe4_channel_gen.gen_gthe4_channel_inst[0].GTHE4_CHANNEL_PRIM_INST/RXOUTCLK}]]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_drp_clk/O]] -group [get_clocks -of_objects [get_pins {U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/GEN_GTH.xlx_ku_mgt_std_i/inst/gen_gtwizard_gthe4_top.xlx_ku_mgt_ip_10g24_emu_gtwizard_gthe4_inst/gen_gtwizard_gthe4.gen_channel_container[1].gen_enabled_channel.gthe4_channel_wrapper_inst/channel_inst/gthe4_channel_gen.gen_gthe4_channel_inst[0].GTHE4_CHANNEL_PRIM_INST/TXOUTCLK}]]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_drp_clk/O]] -group [get_clocks -of_objects [get_pins U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/gtwiz_userclk_tx_inst/gen_gtwiz_userclk_tx_main.bufg_gt_usrclk2_inst/O]]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins {U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/GEN_GTH.xlx_ku_mgt_std_i/inst/gen_gtwizard_gthe4_top.xlx_ku_mgt_ip_10g24_emu_gtwizard_gthe4_inst/gen_gtwizard_gthe4.gen_channel_container[1].gen_enabled_channel.gthe4_channel_wrapper_inst/channel_inst/gthe4_channel_gen.gen_gthe4_channel_inst[0].GTHE4_CHANNEL_PRIM_INST/RXOUTCLKPCS}]] -group [get_clocks -of_objects [get_pins U_drp_clk/O]]
+set_clock_groups -asynchronous -group [get_clocks sfpClk156P] -group [get_clocks -of_objects [get_pins {U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/GEN_GTH.xlx_ku_mgt_std_i/inst/gen_gtwizard_gthe4_top.xlx_ku_mgt_ip_10g24_emu_gtwizard_gthe4_inst/gen_gtwizard_gthe4.gen_channel_container[1].gen_enabled_channel.gthe4_channel_wrapper_inst/channel_inst/gthe4_channel_gen.gen_gthe4_channel_inst[0].GTHE4_CHANNEL_PRIM_INST/RXOUTCLK}]]
+set_clock_groups -asynchronous -group [get_clocks sfpClk156P] -group [get_clocks -of_objects [get_pins U_drp_clk/O]]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins {U_RUDP/U_1GigE/GEN_LANE[0].U_GigEthGthUltraScale/U_GigEthGthUltraScaleCore/U0/transceiver_inst/GigEthGthUltraScaleCore_gt_i/inst/gen_gtwizard_gthe4_top.GigEthGthUltraScaleCore_gt_gtwizard_gthe4_inst/gen_gtwizard_gthe4.gen_channel_container[0].gen_enabled_channel.gthe4_channel_wrapper_inst/channel_inst/gthe4_channel_gen.gen_gthe4_channel_inst[0].GTHE4_CHANNEL_PRIM_INST/RXOUTCLKPCS}]] -group [get_clocks -of_objects [get_pins U_RUDP/U_1GigE/GEN_INT_PLL.U_MMCM/MmcmGen.U_Mmcm/CLKOUT1]]

@@ -47,26 +47,26 @@ set_property -dict { IOSTANDARD LVDS } [get_ports { fmcHpcLaP[29] fmcHpcLaN[29] 
 set_property -dict { IOSTANDARD DIFF_HSTL_I_18 } [get_ports { smaUserGpioP smaUserGpioN }]
 set_property -dict { IOSTANDARD DIFF_HSTL_I_18 } [get_ports { smaUserClkP  smaUserClkN  }]
 
-set_property PACKAGE_PIN K6 [get_ports { gtRefClk320P }]; # FMC_HPC_GBTCLK0_M2C_C_P
-set_property PACKAGE_PIN K5 [get_ports { gtRefClk320N }]; # FMC_HPC_GBTCLK0_M2C_C_N
+set_property PACKAGE_PIN K6 [get_ports { gtRecClk320P }]; # FMC_HPC_GBTCLK0_M2C_C_P
+set_property PACKAGE_PIN K5 [get_ports { gtRecClk320N }]; # FMC_HPC_GBTCLK0_M2C_C_N
 
-set_property PACKAGE_PIN T6 [get_ports { gtRefClk160P }]; # FMC_LPC_GBTCLK0_M2C_C_P
-set_property PACKAGE_PIN T5 [get_ports { gtRefClk160N }]; # FMC_LPC_GBTCLK0_M2C_C_N
+set_property PACKAGE_PIN T6 [get_ports { gtRefClk320P }]; # FMC_LPC_GBTCLK0_M2C_C_P
+set_property PACKAGE_PIN T5 [get_ports { gtRefClk320N }]; # FMC_LPC_GBTCLK0_M2C_C_N
 
 ####################
 # Timing Constraints
 ####################
 
-create_clock -name gtRefClk160P -period 6.237 [get_ports {gtRefClk160P}]
+create_clock -name gtRefClk320P -period 3.118 [get_ports {gtRefClk320P}]
 create_clock -name fmcHpcLaP0   -period 6.237 [get_ports {fmcHpcLaP[0]}]
 create_clock -name fmcHpcLaP1   -period 6.237 [get_ports {fmcHpcLaP[1]}]
-create_clock -name gtRefClk320P -period 3.118 [get_ports {gtRefClk320P}]
+create_clock -name gtRecClk320P -period 3.118 [get_ports {gtRecClk320P}]
 create_clock -name sysClk300P   -period 3.333 [get_ports {sysClk300P}]
 
 create_generated_clock -name clk640MHz [get_pins {U_FmcMapping/U_Selectio/U_Selectio/GEN_REAL.U_PLL/CLKOUT0}]
 create_generated_clock -name clk160MHz [get_pins {U_FmcMapping/U_Selectio/U_Selectio/U_Bufg160/O}]
 
-set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Selectio/U_Bufg160/O]] -group [get_clocks gtRefClk320P]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Selectio/U_Bufg160/O]] -group [get_clocks gtRecClk320P]
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Selectio/U_Bufg160/O]] -group [get_clocks -of_objects [get_pins U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/gtwiz_userclk_tx_inst/gen_gtwiz_userclk_tx_main.bufg_gt_usrclk2_inst/O]]
 set_clock_groups -asynchronous -group [get_clocks sfpClk156P] -group [get_clocks -of_objects [get_pins U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/gtwiz_userclk_tx_inst/gen_gtwiz_userclk_tx_main.bufg_gt_usrclk2_inst/O]]
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_FmcMapping/U_Selectio/U_Selectio/U_Bufg160/O]] -group [get_clocks -of_objects [get_pins U_rx_wordclk/O]]

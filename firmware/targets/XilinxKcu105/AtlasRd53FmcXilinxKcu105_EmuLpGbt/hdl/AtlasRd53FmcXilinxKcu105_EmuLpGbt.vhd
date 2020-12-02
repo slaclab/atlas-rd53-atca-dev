@@ -49,10 +49,10 @@ entity AtlasRd53FmcXilinxKcu105_EmuLpGbt is
       sysClk300P   : in    sl;
       sysClk300N   : in    sl;
       -- FMC Interface
-      gtRefClk160P : in    sl;
-      gtRefClk160N : in    sl;
       gtRefClk320P : in    sl;
       gtRefClk320N : in    sl;
+      gtRecClk320P : in    sl;
+      gtRecClk320N : in    sl;
       fmcHpcLaP    : inout slv(33 downto 0);
       fmcHpcLaN    : inout slv(33 downto 0);
       fmcLpcLaP    : inout slv(33 downto 0);
@@ -151,6 +151,7 @@ architecture top_level of AtlasRd53FmcXilinxKcu105_EmuLpGbt is
    signal rxWordClk40  : sl;
 
    signal refClk160     : sl;
+   signal refClk160Bufg : sl;
    signal rxRecClk      : sl;
    signal drpClk        : sl;
    signal qplllock      : slv(1 downto 0);
@@ -213,20 +214,30 @@ begin
          clkOutP => smaUserClkP,
          clkOutN => smaUserClkN);
 
-   --------------------------------
-   -- 160 MHz External Reference Clock
-   --------------------------------
+   -----------------------------------
+   -- 320 MHz External Reference Clock
+   -----------------------------------
    U_IBUFDS_refClk160 : IBUFDS_GTE3
       generic map (
          REFCLK_EN_TX_PATH  => '0',
-         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
+         REFCLK_HROW_CK_SEL => "01",  -- 2'b01: ODIV2 = Divide-by-2 version of O
          REFCLK_ICNTL_RX    => "00")
       port map (
-         I     => gtRefClk160P,
-         IB    => gtRefClk160N,
+         I     => gtRefClk320P,
+         IB    => gtRefClk320N,
          CEB   => '0',
-         ODIV2 => open,
-         O     => refClk160);
+         ODIV2 => refClk160,
+         O     => open);
+
+   U_BUFG_GT : BUFG_GT
+      port map (
+         I       => refClk160,
+         CE      => '1',
+         CLR     => '0',
+         CEMASK  => '1',
+         CLRMASK => '1',
+         DIV     => "000",              -- Divide by 1
+         O       => refClk160Bufg);
 
    ------------------------
    -- LP-GBT QPLL Reference
@@ -234,8 +245,8 @@ begin
    U_EmuLpGbtQpll : entity work.xlx_ku_mgt_10g24_emu_qpll
       port map (
          -- MGT Clock Port (320 MHz)
-         gtClkP        => gtRefClk320P,
-         gtClkN        => gtRefClk320N,
+         gtClkP        => gtRecClk320P,
+         gtClkN        => gtRecClk320N,
          -- Quad PLL Interface
          qplllock      => qplllock,
          qplloutclk    => qplloutclk,
@@ -494,9 +505,10 @@ begin
    -----------------------------------------
    U_EMU_LP_GBT : entity work.AtlasRd53EmuLpGbtLane
       generic map (
-         TPD_G        => TPD_G,
-         NUM_ELINK_G  => 7,
-         XIL_DEVICE_G => XIL_DEVICE_C)
+         TPD_G             => TPD_G,
+         NUM_ELINK_G       => 7,
+         CPLL_REFCLK_SEL_G => "111",
+         XIL_DEVICE_G      => XIL_DEVICE_C)
       port map (
          -- AXI-Lite interface (axilClk domain)
          axilClk             => axilClk,
@@ -517,7 +529,7 @@ begin
          serDesData          => serDesData(6 downto 0),
          rxLinkUp            => rxLinkUp(6 downto 0),
          -- SFP Interface
-         refClk160           => refClk160,
+         refClk160           => refClk160Bufg,
          drpClk              => drpClk,
          txWordClk160        => txWordClk160,
          rxWordClk80         => rxWordClk80,
