@@ -43,6 +43,7 @@ Targets:
     ImageDir: targets/XilinxKcu105/AtlasRd53FmcXilinxKcu105_EmuLpGbt/images
     Extensions:
       - bit
+      - ltx
   AtlasRd53FmcXilinxZcu102_EmuLpGbt:
     ImageDir: targets/XilinxZcu102/AtlasRd53FmcXilinxZcu102_EmuLpGbt/images
     Extensions:

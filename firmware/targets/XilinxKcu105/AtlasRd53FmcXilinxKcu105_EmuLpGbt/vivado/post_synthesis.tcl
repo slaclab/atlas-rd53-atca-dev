@@ -12,35 +12,39 @@
 source -quiet $::env(RUCKUS_DIR)/vivado_env_var.tcl
 source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 
-# Bypass the debug chipscope generation
-return
-
-
 # Open the synthesis design
 open_run synth_1
 
 #############################################################################################
 
-set ilaName u_ila_mon
+set ilaName u_ila_downlink
 CreateDebugCore ${ilaName}
 set_property C_DATA_DEPTH 1024 [get_debug_cores ${ilaName}]
-SetDebugCoreClk ${ilaName} {axilClk}
+SetDebugCoreClk ${ilaName} {donwlinkClk}
 
-ConfigProbe ${ilaName} {U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/QPLL_LOCK_i[*]}
-ConfigProbe ${ilaName} {U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/gtwiz_buffbypass_rx_done_out}
-ConfigProbe ${ilaName} {U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/gtwiz_buffbypass_rx_reset_in_s}
-ConfigProbe ${ilaName} {U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/gtwiz_reset_rx_done_out}
-ConfigProbe ${ilaName} {U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/gtwiz_reset_tx_done_out}
-ConfigProbe ${ilaName} {U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/gtwiz_userclk_rx_active_out}
-ConfigProbe ${ilaName} {U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/gtwiz_userclk_tx_active_out}
-ConfigProbe ${ilaName} {U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/MGT_RXREADY_o}
-ConfigProbe ${ilaName} {U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/MGT_RXSlide_i}
-ConfigProbe ${ilaName} {U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/MGT_TXREADY_o}
-ConfigProbe ${ilaName} {U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/MGT_TXRESET_i}
-ConfigProbe ${ilaName} {U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/QPLL_RST_o}
-ConfigProbe ${ilaName} {U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/rx_reset_done_all}
-ConfigProbe ${ilaName} {U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/rxValid}
-ConfigProbe ${ilaName} {U_EMU_LP_GBT/lpgbtFpga_top_inst/mgt_inst/txValid}
+ConfigProbe ${ilaName} {downlinkUserData[*]}
+ConfigProbe ${ilaName} {downlinkData[*]}
+ConfigProbe ${ilaName} {downlinkEcData[*]}
+ConfigProbe ${ilaName} {downlinkIcData[*]}
+ConfigProbe ${ilaName} {downlinkReady}
+ConfigProbe ${ilaName} {downlinkRst}
+ConfigProbe ${ilaName} {downlinkClkEn}
+
+WriteDebugProbes ${ilaName}
+
+#############################################################################################
+
+set ilaName u_ila_uplink
+CreateDebugCore ${ilaName}
+set_property C_DATA_DEPTH 1024 [get_debug_cores ${ilaName}]
+SetDebugCoreClk ${ilaName} {uplinkClk}
+
+ConfigProbe ${ilaName} {uplinkUserData[*]}
+ConfigProbe ${ilaName} {uplinkEcData[*]}
+ConfigProbe ${ilaName} {uplinkIcData[*]}
+ConfigProbe ${ilaName} {uplinkReady}
+ConfigProbe ${ilaName} {uplinkRst}
+ConfigProbe ${ilaName} {uplinkClkEn}
 
 WriteDebugProbes ${ilaName}
 

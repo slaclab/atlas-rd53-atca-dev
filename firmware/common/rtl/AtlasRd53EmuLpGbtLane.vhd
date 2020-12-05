@@ -129,6 +129,22 @@ architecture rtl of AtlasRd53EmuLpGbtLane is
    signal debugPatternB : Slv32Array(6 downto 0);
    signal data32bToggle : sl := '0';
 
+   attribute dont_touch                     : string;
+   attribute dont_touch of downlinkUserData : signal is "TRUE";
+   attribute dont_touch of downlinkData     : signal is "TRUE";
+   attribute dont_touch of downlinkEcData   : signal is "TRUE";
+   attribute dont_touch of downlinkIcData   : signal is "TRUE";
+   attribute dont_touch of downlinkReady    : signal is "TRUE";
+   attribute dont_touch of donwlinkClk      : signal is "TRUE";
+   attribute dont_touch of downlinkRst      : signal is "TRUE";
+   attribute dont_touch of downlinkClkEn    : signal is "TRUE";
+   attribute dont_touch of uplinkUserData   : signal is "TRUE";
+   attribute dont_touch of uplinkEcData     : signal is "TRUE";
+   attribute dont_touch of uplinkIcData     : signal is "TRUE";
+   attribute dont_touch of uplinkReady      : signal is "TRUE";
+   attribute dont_touch of uplinkClk        : signal is "TRUE";
+   attribute dont_touch of uplinkRst        : signal is "TRUE";
+   attribute dont_touch of uplinkClkEn      : signal is "TRUE";
 
 begin
 
