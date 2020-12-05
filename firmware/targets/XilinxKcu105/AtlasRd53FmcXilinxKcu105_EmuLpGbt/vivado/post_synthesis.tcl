@@ -20,15 +20,15 @@ open_run synth_1
 set ilaName u_ila_downlink
 CreateDebugCore ${ilaName}
 set_property C_DATA_DEPTH 1024 [get_debug_cores ${ilaName}]
-SetDebugCoreClk ${ilaName} {donwlinkClk}
+SetDebugCoreClk ${ilaName} {U_EMU_LP_GBT/donwlinkClk}
 
-ConfigProbe ${ilaName} {downlinkUserData[*]}
-ConfigProbe ${ilaName} {downlinkData[*]}
-ConfigProbe ${ilaName} {downlinkEcData[*]}
-ConfigProbe ${ilaName} {downlinkIcData[*]}
-ConfigProbe ${ilaName} {downlinkReady}
-ConfigProbe ${ilaName} {downlinkRst}
-ConfigProbe ${ilaName} {downlinkClkEn}
+ConfigProbe ${ilaName} {U_EMU_LP_GBT/downlinkUserData[*]}
+ConfigProbe ${ilaName} {U_EMU_LP_GBT/downlinkData[*]}
+ConfigProbe ${ilaName} {U_EMU_LP_GBT/downlinkEcData[*]}
+ConfigProbe ${ilaName} {U_EMU_LP_GBT/downlinkIcData[*]}
+ConfigProbe ${ilaName} {U_EMU_LP_GBT/downlinkReady}
+ConfigProbe ${ilaName} {U_EMU_LP_GBT/downlinkRst}
+ConfigProbe ${ilaName} {U_EMU_LP_GBT/downlinkClkEn}
 
 WriteDebugProbes ${ilaName}
 
@@ -37,14 +37,14 @@ WriteDebugProbes ${ilaName}
 set ilaName u_ila_uplink
 CreateDebugCore ${ilaName}
 set_property C_DATA_DEPTH 1024 [get_debug_cores ${ilaName}]
-SetDebugCoreClk ${ilaName} {uplinkClk}
+SetDebugCoreClk ${ilaName} {U_EMU_LP_GBT/uplinkClk}
 
-ConfigProbe ${ilaName} {uplinkUserData[*]}
-ConfigProbe ${ilaName} {uplinkEcData[*]}
-ConfigProbe ${ilaName} {uplinkIcData[*]}
-ConfigProbe ${ilaName} {uplinkReady}
-ConfigProbe ${ilaName} {uplinkRst}
-ConfigProbe ${ilaName} {uplinkClkEn}
+ConfigProbe ${ilaName} {U_EMU_LP_GBT/uplinkUserData[*]}
+ConfigProbe ${ilaName} {U_EMU_LP_GBT/uplinkEcData[*]}
+ConfigProbe ${ilaName} {U_EMU_LP_GBT/uplinkIcData[*]}
+ConfigProbe ${ilaName} {U_EMU_LP_GBT/uplinkReady}
+ConfigProbe ${ilaName} {U_EMU_LP_GBT/uplinkRst}
+ConfigProbe ${ilaName} {U_EMU_LP_GBT/uplinkClkEn}
 
 WriteDebugProbes ${ilaName}
 
