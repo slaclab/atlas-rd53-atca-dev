@@ -76,8 +76,8 @@ architecture mapping of SmaTxClkout is
          gtwiz_reset_rx_cdr_stable_out      : out std_logic_vector(0 downto 0);
          gtwiz_reset_tx_done_out            : out std_logic_vector(0 downto 0);
          gtwiz_reset_rx_done_out            : out std_logic_vector(0 downto 0);
-         gtwiz_userdata_tx_in               : in  std_logic_vector(19 downto 0);
-         gtwiz_userdata_rx_out              : out std_logic_vector(19 downto 0);
+         gtwiz_userdata_tx_in               : in  std_logic_vector(15 downto 0);
+         gtwiz_userdata_rx_out              : out std_logic_vector(15 downto 0);
          cpllrefclksel_in                   : in  std_logic_vector(2 downto 0);
          drpclk_in                          : in  std_logic_vector(0 downto 0);
          gtgrefclk_in                       : in  std_logic_vector(0 downto 0);
@@ -94,13 +94,13 @@ architecture mapping of SmaTxClkout is
    end component;
 
    type RegType is record
-      txPattern      : slv(19 downto 0);
+      txPattern      : slv(15 downto 0);
       axilReadSlave  : AxiLiteReadSlaveType;
       axilWriteSlave : AxiLiteWriteSlaveType;
    end record;
 
    constant REG_INIT_C : RegType := (
-      txPattern      => "10101010101010101010",  -- 1.28 GHz clock pattern @ 2.56Gb/s
+      txPattern      => b"1010_1010_1010_1010",  -- 1.28 GHz clock pattern @ 2.56Gb/s
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 

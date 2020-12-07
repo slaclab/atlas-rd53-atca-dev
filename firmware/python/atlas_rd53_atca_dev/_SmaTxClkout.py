@@ -18,6 +18,6 @@ class SmaTxClkout(pr.Device):
         self.add(pr.RemoteVariable(
             name         = 'TxPattern',
             offset       = 0x0,
-            bitSize      = 20,
+            bitSize      = 16,
             mode         = 'RW',
         ))
