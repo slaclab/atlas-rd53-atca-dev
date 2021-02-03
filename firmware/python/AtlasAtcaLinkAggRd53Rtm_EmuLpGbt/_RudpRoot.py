@@ -85,8 +85,7 @@ class RudpRoot(pr.Root):
         ###########################
         # Add RD53/LpGBT Monitoring
         ###########################
-        # for i in range(12): # SFP and QSFP
-        for i in range(4):  # SFP only
+        for i in range(12): # SFP and QSFP
             self.add(common.AtlasRd53EmuLpGbtLaneReg(
                 name        = f'Ctrl[{i}]',
                 offset      = 0x88000000 + (i*0x0010_0000),
