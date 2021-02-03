@@ -52,6 +52,22 @@ parser.add_argument(
     help     = "Sets the GUI type (PyDM or PyQt)",
 )
 
+parser.add_argument(
+    "--pollEn",
+    type     = argBool,
+    required = False,
+    default  = True,
+    help     = "Enable auto-polling",
+)
+
+parser.add_argument(
+    "--initRead",
+    type     = argBool,
+    required = False,
+    default  = True,
+    help     = "Enable read all variables at start",
+)
+
 # Get the arguments
 args = parser.parse_args()
 
@@ -72,14 +88,22 @@ else:
 
 #################################################################
 
-with myRoot(ip=args.ip) as root:
+with myRoot(
+        ip       =args.ip,
+        pollEn   = args.pollEn,
+        initRead = args.initRead,
+    ) as root:
 
     ######################
     # Development PyDM GUI
     ######################
     if (args.guiType == 'PyDM'):
 
-        pyrogue.pydm.runPyDM(root=root)
+        pyrogue.pydm.runPyDM(
+            root  = root,
+            sizeX = 800,
+            sizeY = 800,
+        )
 
     #################
     # Legacy PyQT GUI
