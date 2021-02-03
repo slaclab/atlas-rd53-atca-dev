@@ -36,9 +36,9 @@ entity PgpLaneWrapper is
       AXIL_CLK_FREQ_G   : real             := 125.0E+6);
    port (
       -- Tuning Interface
-      txPreCursor     : in  Slv(4 downto 0);
-      txPostCursor    : in  Slv(4 downto 0);
-      txDiffCtrl      : in  Slv(3 downto 0);
+      txPreCursor     : in  Slv(4 downto 0); -- Unused port: Tuning Interface is now integrated into Pgp3Gtx7Wrapper
+      txPostCursor    : in  Slv(4 downto 0); -- Unused port: Tuning Interface is now integrated into Pgp3Gtx7Wrapper
+      txDiffCtrl      : in  Slv(3 downto 0); -- Unused port: Tuning Interface is now integrated into Pgp3Gtx7Wrapper
       -- RTM High Speed
       pgpRefClkIn     : in  sl;
       pgpGtTxP        : out sl;
@@ -119,10 +119,6 @@ begin
          -- Frame Receive Interface
          pgpRxMasters    => pgpRxMasters,
          pgpRxCtrl       => pgpRxCtrl,
-         -- Debug Interface
-         txPreCursor(0)  => txPreCursor,
-         txPostCursor(0) => txPostCursor,
-         txDiffCtrl(0)   => txDiffCtrl,
          -- AXI-Lite Register Interface (axilClk domain)
          axilClk         => axilClk,
          axilRst         => axilRst,
