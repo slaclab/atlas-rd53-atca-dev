@@ -132,15 +132,7 @@ architecture mapping of Application is
             retVar(i*6+j) := toSlv((24*i+4*j+3), 7);
          end loop;
       end loop;
-      -- Copy the SFP's uplinks to QSFP[0]
-      for i in 24 to 47 loop
-         retVar(i) := retVar(i-24);
-      end loop;
-      -- Copy the SFP's uplinks to QSFP[1]
-      for i in 48 to 71 loop
-         retVar(i) := retVar(i-48);
-      end loop;
-      for i in 72 to 127 loop
+      for i in 24 to 127 loop
          -- APP.CH[i]  <--- Unused
          retVar(i) := toSlv(127, 7);
       end loop;
