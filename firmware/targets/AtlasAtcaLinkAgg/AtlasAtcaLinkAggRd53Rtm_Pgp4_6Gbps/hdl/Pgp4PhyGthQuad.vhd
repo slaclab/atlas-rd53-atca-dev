@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: Wrapper for PGPv3 communication
+-- Description: Wrapper for PGPv4 communication
 -------------------------------------------------------------------------------
 -- This file is part of 'ATLAS ALTIROC DEV'.
 -- It is subject to the license terms in the LICENSE.txt file found in the
@@ -19,12 +19,12 @@ library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
-use surf.Pgp3Pkg.all;
+use surf.Pgp4Pkg.all;
 
 library atlas_atca_link_agg_fw_lib;
 use atlas_atca_link_agg_fw_lib.AtlasAtcaLinkAggPkg.all;
 
-entity Pgp3PhyGthQuad is
+entity Pgp4PhyGthQuad is
    generic (
       TPD_G            : time     := 1 ns;
       SIMULATION_G     : boolean  := false;
@@ -52,15 +52,15 @@ entity Pgp3PhyGthQuad is
       pgpRxN          : in  slv(3 downto 0);
       pgpTxP          : out slv(3 downto 0);
       pgpTxN          : out slv(3 downto 0));
-end Pgp3PhyGthQuad;
+end Pgp4PhyGthQuad;
 
-architecture mapping of Pgp3PhyGthQuad is
+architecture mapping of Pgp4PhyGthQuad is
 
-   signal pgpRxIn  : Pgp3RxInArray(3 downto 0)  := (others => PGP3_RX_IN_INIT_C);
-   signal pgpRxOut : Pgp3RxOutArray(3 downto 0) := (others => PGP3_RX_OUT_INIT_C);
+   signal pgpRxIn  : Pgp4RxInArray(3 downto 0)  := (others => PGP4_RX_IN_INIT_C);
+   signal pgpRxOut : Pgp4RxOutArray(3 downto 0) := (others => PGP4_RX_OUT_INIT_C);
 
-   signal pgpTxIn  : Pgp3TxInArray(3 downto 0)  := (others => PGP3_TX_IN_INIT_C);
-   signal pgpTxOut : Pgp3TxOutArray(3 downto 0) := (others => PGP3_TX_OUT_INIT_C);
+   signal pgpTxIn  : Pgp4TxInArray(3 downto 0)  := (others => PGP4_TX_IN_INIT_C);
+   signal pgpTxOut : Pgp4TxOutArray(3 downto 0) := (others => PGP4_TX_OUT_INIT_C);
 
    signal pgpTxMasters : AxiStreamMasterArray(4*NUM_VC_G-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
    signal pgpTxSlaves  : AxiStreamSlaveArray(4*NUM_VC_G-1 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
@@ -73,7 +73,7 @@ architecture mapping of Pgp3PhyGthQuad is
 
 begin
 
-   U_PGPv3 : entity surf.Pgp3GthUsWrapper
+   U_PGPv4 : entity surf.Pgp4GthUsWrapper
       generic map(
          TPD_G                => TPD_G,
          ROGUE_SIM_EN_G       => SIMULATION_G,
@@ -128,78 +128,80 @@ begin
       GEN_VC :
       for j in (NUM_VC_G/2)-1 downto 0 generate
 
-         U_rxConfig : entity surf.AxiStreamFifoV2
+         U_rxConfig : entity surf.PgpRxVcFifo
             generic map (
                TPD_G               => TPD_G,
-               SLAVE_READY_EN_G    => SIMULATION_G,
+               ROGUE_SIM_EN_G      => SIMULATION_G,
                GEN_SYNC_FIFO_G     => false,
                FIFO_ADDR_WIDTH_G   => 9,
-               FIFO_FIXED_THRESH_G => true,
                FIFO_PAUSE_THRESH_G => 128,
-               SLAVE_AXI_CONFIG_G  => PGP3_AXIS_CONFIG_C,
-               MASTER_AXI_CONFIG_G => PGP3_AXIS_CONFIG_C)
+               PHY_AXI_CONFIG_G    => PGP4_AXIS_CONFIG_C,
+               APP_AXI_CONFIG_G    => PGP4_AXIS_CONFIG_C)
             port map (
                -- Slave Port
-               sAxisClk    => pgpClk(i),
-               sAxisRst    => pgpRst(i),
-               sAxisMaster => pgpRxMasters(NUM_VC_G*i+j),
-               sAxisSlave  => pgpRxSlaves(NUM_VC_G*i+j),
-               sAxisCtrl   => pgpRxCtrl(NUM_VC_G*i+j),
+               pgpClk      => pgpClk(i),
+               pgpRst      => pgpRst(i),
+               rxlinkReady => pgpRxOut(i).linkReady,
+               pgpRxMaster => pgpRxMasters(NUM_VC_G*i+j),
+               pgpRxSlave  => pgpRxSlaves(NUM_VC_G*i+j),
+               pgpRxCtrl   => pgpRxCtrl(NUM_VC_G*i+j),
                -- Master Port
-               mAxisClk    => axilClk,
-               mAxisRst    => axilRst,
-               mAxisMaster => rxConfigMasters((NUM_VC_G/2)*i+j),
-               mAxisSlave  => rxConfigSlaves((NUM_VC_G/2)*i+j));
+               axisClk     => axilClk,
+               axisRst     => axilRst,
+               axisMaster  => rxConfigMasters((NUM_VC_G/2)*i+j),
+               axisSlave   => rxConfigSlaves((NUM_VC_G/2)*i+j));
 
-         U_txConfig : entity surf.AxiStreamFifoV2
+         U_txConfig : entity surf.PgpTxVcFifo
             generic map (
                -- General Configurations
-               TPD_G               => TPD_G,
-               SLAVE_READY_EN_G    => true,
-               VALID_THOLD_G       => 256,
-               VALID_BURST_MODE_G  => true,
+               TPD_G              => TPD_G,
+               VALID_THOLD_G      => 256,
+               VALID_BURST_MODE_G => true,
                -- FIFO configurations
-               GEN_SYNC_FIFO_G     => false,
-               FIFO_ADDR_WIDTH_G   => 9,
+               GEN_SYNC_FIFO_G    => false,
+               FIFO_ADDR_WIDTH_G  => 9,
                -- AXI Stream Port Configurations
-               SLAVE_AXI_CONFIG_G  => PGP3_AXIS_CONFIG_C,
-               MASTER_AXI_CONFIG_G => PGP3_AXIS_CONFIG_C)
+               APP_AXI_CONFIG_G   => PGP4_AXIS_CONFIG_C,
+               PHY_AXI_CONFIG_G   => PGP4_AXIS_CONFIG_C)
             port map (
                -- Slave Port
-               sAxisClk    => axilClk,
-               sAxisRst    => axilRst,
-               sAxisMaster => txConfigMasters((NUM_VC_G/2)*i+j),
-               sAxisSlave  => txConfigSlaves((NUM_VC_G/2)*i+j),
+               axisClk     => axilClk,
+               axisRst     => axilRst,
+               axisMaster  => txConfigMasters((NUM_VC_G/2)*i+j),
+               axisSlave   => txConfigSlaves((NUM_VC_G/2)*i+j),
                -- Master Port
-               mAxisClk    => pgpClk(i),
-               mAxisRst    => pgpRst(i),
-               mAxisMaster => pgpTxMasters(NUM_VC_G*i+j),
-               mAxisSlave  => pgpTxSlaves(NUM_VC_G*i+j));
+               pgpClk      => pgpClk(i),
+               pgpRst      => pgpRst(i),
+               rxlinkReady => pgpRxOut(i).linkReady,
+               txlinkReady => pgpTxOut(i).linkReady,
+               pgpTxMaster => pgpTxMasters(NUM_VC_G*i+j),
+               pgpTxSlave  => pgpTxSlaves(NUM_VC_G*i+j));
 
-         U_txData : entity surf.AxiStreamFifoV2
+         U_txData : entity surf.PgpTxVcFifo
             generic map (
                -- General Configurations
-               TPD_G               => TPD_G,
-               SLAVE_READY_EN_G    => true,
-               VALID_THOLD_G       => 256,
-               VALID_BURST_MODE_G  => true,
+               TPD_G              => TPD_G,
+               VALID_THOLD_G      => 256,
+               VALID_BURST_MODE_G => true,
                -- FIFO configurations
-               GEN_SYNC_FIFO_G     => false,
-               FIFO_ADDR_WIDTH_G   => 9,
+               GEN_SYNC_FIFO_G    => false,
+               FIFO_ADDR_WIDTH_G  => 9,
                -- AXI Stream Port Configurations
-               SLAVE_AXI_CONFIG_G  => PGP3_AXIS_CONFIG_C,
-               MASTER_AXI_CONFIG_G => PGP3_AXIS_CONFIG_C)
+               APP_AXI_CONFIG_G   => PGP4_AXIS_CONFIG_C,
+               PHY_AXI_CONFIG_G   => PGP4_AXIS_CONFIG_C)
             port map (
                -- Slave Port
-               sAxisClk    => axilClk,
-               sAxisRst    => axilRst,
-               sAxisMaster => txDataMasters((NUM_VC_G/2)*i+j),
-               sAxisSlave  => txDataSlaves((NUM_VC_G/2)*i+j),
+               axisClk     => axilClk,
+               axisRst     => axilRst,
+               axisMaster  => txDataMasters((NUM_VC_G/2)*i+j),
+               axisSlave   => txDataSlaves((NUM_VC_G/2)*i+j),
                -- Master Port
-               mAxisClk    => pgpClk(i),
-               mAxisRst    => pgpRst(i),
-               mAxisMaster => pgpTxMasters(NUM_VC_G*i+j+(NUM_VC_G/2)),
-               mAxisSlave  => pgpTxSlaves(NUM_VC_G*i+j+(NUM_VC_G/2)));
+               pgpClk      => pgpClk(i),
+               pgpRst      => pgpRst(i),
+               rxlinkReady => pgpRxOut(i).linkReady,
+               txlinkReady => pgpTxOut(i).linkReady,
+               pgpTxMaster => pgpTxMasters(NUM_VC_G*i+j+(NUM_VC_G/2)),
+               pgpTxSlave  => pgpTxSlaves(NUM_VC_G*i+j+(NUM_VC_G/2)));
 
       end generate GEN_VC;
 

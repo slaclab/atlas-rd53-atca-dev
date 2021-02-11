@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: DPM PGPv3 6.25Gbps DPM: Top Level Firmware
+-- Description: DPM PGPv4 6.25Gbps DPM: Top Level Firmware
 -------------------------------------------------------------------------------
 -- This file is part of 'ATLAS RD53 DEV'.
 -- It is subject to the license terms in the LICENSE.txt file found in the
@@ -26,10 +26,10 @@ use rce_gen3_fw_lib.RceG3Pkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity DpmPgp3_6Gbps is
+entity DpmPgp4_6Gbps is
    generic (
-      TPD_G         : time                  := 1 ns;
-      BUILD_INFO_G  : BuildInfoType);
+      TPD_G        : time := 1 ns;
+      BUILD_INFO_G : BuildInfoType);
    port (
       -- Debug
       led         : out   slv(1 downto 0);
@@ -61,11 +61,11 @@ entity DpmPgp3_6Gbps is
       -- Clock Select
       clkSelA     : out   slv(1 downto 0);
       clkSelB     : out   slv(1 downto 0));
-end DpmPgp3_6Gbps;
+end DpmPgp4_6Gbps;
 
-architecture TOP_LEVEL of DpmPgp3_6Gbps is
+architecture TOP_LEVEL of DpmPgp4_6Gbps is
 
-   constant NUM_AXIL_MASTERS_C : natural := 3;
+   constant NUM_AXIL_MASTERS_C : natural := 2;
 
    constant AXIL_XBAR_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXIL_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXIL_MASTERS_C, x"A000_0000", 28, 24);
 
@@ -89,10 +89,6 @@ architecture TOP_LEVEL of DpmPgp3_6Gbps is
    signal dmaIbSlaves  : AxiStreamSlaveArray(2 downto 0);
    signal dmaObMasters : AxiStreamMasterArray(2 downto 0);
    signal dmaObSlaves  : AxiStreamSlaveArray(2 downto 0);
-
-   signal txPreCursor  : Slv5Array(1 downto 0) := (others => "00111");
-   signal txPostCursor : Slv5Array(1 downto 0) := (others => "00111");
-   signal txDiffCtrl   : Slv4Array(1 downto 0) := (others => "1111");
 
    signal pgpRefClkIn : sl;
 
@@ -166,7 +162,7 @@ begin
          mAxiReadSlaves      => axilReadSlaves);
 
    ------------
-   -- PGPv3 GTX
+   -- PGPv4 GTX
    ------------
    GEN_LANE : for i in 1 downto 0 generate
 
@@ -182,10 +178,6 @@ begin
             AXIL_BASE_ADDR_G  => AXIL_XBAR_CONFIG_C(i).baseAddr,
             AXIL_CLK_FREQ_G   => 125.0E+6)
          port map (
-            -- Tuning Interface
-            txPreCursor     => txPreCursor(i),
-            txPostCursor    => txPostCursor(i),
-            txDiffCtrl      => txDiffCtrl(i),
             -- RTM High Speed
             pgpRefClkIn     => pgpRefClkIn,
             pgpGtTxP        => dpmToRtmHsP(6*i),
@@ -207,7 +199,6 @@ begin
             axilWriteMaster => axilWriteMasters(i),
             axilWriteSlave  => axilWriteSlaves(i));
 
-
       U_TERM : entity surf.Gtxe2ChannelDummy
          generic map (
             TPD_G   => TPD_G,
@@ -224,21 +215,6 @@ begin
    -- Loopback DMA CH[2]
    dmaIbMasters(2) <= dmaObMasters(2);
    dmaObSlaves(2)  <= dmaIbSlaves(2);
-
-   U_PgpTuning : entity work.PgpTuning
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         txPreCursor     => txPreCursor,
-         txPostCursor    => txPostCursor,
-         txDiffCtrl      => txDiffCtrl,
-         -- AXI-Lite Interface (axilClk domain)
-         axilClk         => axilClk,
-         axilRst         => axilRst,
-         axilReadMaster  => axilReadMasters(2),
-         axilReadSlave   => axilReadSlaves(2),
-         axilWriteMaster => axilWriteMasters(2),
-         axilWriteSlave  => axilWriteSlaves(2));
 
    ------------
    -- DTM Clock

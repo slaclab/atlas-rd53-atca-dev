@@ -19,7 +19,7 @@ library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
-use surf.Pgp3Pkg.all;
+use surf.Pgp4Pkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -35,10 +35,6 @@ entity PgpLaneWrapper is
       AXIL_BASE_ADDR_G  : slv(31 downto 0) := (others => '0');
       AXIL_CLK_FREQ_G   : real             := 125.0E+6);
    port (
-      -- Tuning Interface
-      txPreCursor     : in  Slv(4 downto 0); -- Unused port: Tuning Interface is now integrated into Pgp3Gtx7Wrapper
-      txPostCursor    : in  Slv(4 downto 0); -- Unused port: Tuning Interface is now integrated into Pgp3Gtx7Wrapper
-      txDiffCtrl      : in  Slv(3 downto 0); -- Unused port: Tuning Interface is now integrated into Pgp3Gtx7Wrapper
       -- RTM High Speed
       pgpRefClkIn     : in  sl;
       pgpGtTxP        : out sl;
@@ -66,11 +62,11 @@ architecture mapping of PgpLaneWrapper is
    signal pgpClk : sl;
    signal pgpRst : sl;
 
-   signal pgpRxIn  : Pgp3RxInType := PGP3_RX_IN_INIT_C;
-   signal pgpRxOut : Pgp3RxOutType;
+   signal pgpRxIn  : Pgp4RxInType := PGP4_RX_IN_INIT_C;
+   signal pgpRxOut : Pgp4RxOutType;
 
-   signal pgpTxIn  : Pgp3TxInType := PGP3_TX_IN_INIT_C;
-   signal pgpTxOut : Pgp3TxOutType;
+   signal pgpTxIn  : Pgp4TxInType := PGP4_TX_IN_INIT_C;
+   signal pgpTxOut : Pgp4TxOutType;
 
    signal pgpTxMasters : AxiStreamMasterArray(NUM_VC_G-1 downto 0);
    signal pgpTxSlaves  : AxiStreamSlaveArray(NUM_VC_G-1 downto 0);
@@ -80,14 +76,14 @@ architecture mapping of PgpLaneWrapper is
 
 begin
 
-   U_PgpLane : entity surf.Pgp3Gtx7Wrapper
+   U_PgpLane : entity surf.Pgp4Gtx7Wrapper
       generic map (
          TPD_G            => TPD_G,
          NUM_LANES_G      => 1,
          NUM_VC_G         => NUM_VC_G,
          RATE_G           => RATE_G,
-         REFCLK_TYPE_G    => PGP3_REFCLK_250_C,  -- Using 250 MHz ref clock
-         REFCLK_G         => true,               --  true = pgpRefClkIn
+         REFCLK_FREQ_G    => 250.0E+6,  -- Units of Hz
+         REFCLK_G         => true,      --  true = pgpRefClkIn
          EN_PGP_MON_G     => true,
          TX_POLARITY_G    => (others => TX_POLARITY_G),
          RX_POLARITY_G    => (others => RX_POLARITY_G),

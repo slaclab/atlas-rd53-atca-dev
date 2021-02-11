@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AtlasAtcaLinkAggRd53Rtm_Pgp3.vhd
+-- File       : AtlasAtcaLinkAggRd53Rtm_Pgp4_6Gbps.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: Top Level Firmware for reading out RD53 on 24 mDP via RTM
@@ -27,7 +27,7 @@ use atlas_atca_link_agg_fw_lib.AtlasAtcaLinkAggPkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity AtlasAtcaLinkAggRd53Rtm_Pgp3 is
+entity AtlasAtcaLinkAggRd53Rtm_Pgp4_6Gbps is
    generic (
       TPD_G        : time    := 1 ns;
       SIMULATION_G : boolean := false;
@@ -123,9 +123,9 @@ entity AtlasAtcaLinkAggRd53Rtm_Pgp3 is
       -- SYSMON Ports
       vPIn           : in    sl;
       vNIn           : in    sl);
-end AtlasAtcaLinkAggRd53Rtm_Pgp3;
+end AtlasAtcaLinkAggRd53Rtm_Pgp4_6Gbps;
 
-architecture top_level of AtlasAtcaLinkAggRd53Rtm_Pgp3 is
+architecture top_level of AtlasAtcaLinkAggRd53Rtm_Pgp4_6Gbps is
 
    constant ETH_CONFIG_C : EthConfigArray := (
       -----------------------------------------------------------------------------------

@@ -17,37 +17,6 @@ import rogue.hardware.axi
 
 rogue.Version.minVersion('5.1.2')
 
-class PgpTuning(pr.Device):
-    def __init__(self,**kwargs):
-        super().__init__(**kwargs)
-
-        self.addRemoteVariables(
-            name         = 'TxPreCursor',
-            offset       = 0x00,
-            bitSize      = 5,
-            mode         = 'RW',
-            number       = 2,
-            stride       = 4,
-        )
-
-        self.addRemoteVariables(
-            name         = 'TxPostCursor',
-            offset       = 0x40,
-            bitSize      = 5,
-            mode         = 'RW',
-            number       = 2,
-            stride       = 4,
-        )
-
-        self.addRemoteVariables(
-            name         = 'TxDiffCtrl',
-            offset       = 0x80,
-            bitSize      = 4,
-            mode         = 'RW',
-            number       = 2,
-            stride       = 4,
-        )
-
 class RceRoot(pr.Root):
 
     def __init__(self,
@@ -70,14 +39,8 @@ class RceRoot(pr.Root):
 
         # Add the PGP Monitors
         for sfp in range(2):
-            self.add(pgp.Pgp3AxiL(
+            self.add(pgp.Pgp4AxiL(
                 name    = f'PgpMon[{sfp}]',
                 offset  = (0xA000_0000 + sfp*0x0100_0000),
                 memBase = self._RceMemMap,
             ))
-
-        # Add the PGP Tuning
-        self.add(PgpTuning(
-            offset  = 0xA200_0000,
-            memBase = self._RceMemMap,
-        ))

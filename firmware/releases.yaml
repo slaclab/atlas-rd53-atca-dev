@@ -23,6 +23,11 @@ Targets:
     Extensions:
       - bit
       - mcs
+  AtlasAtcaLinkAggRd53Rtm_Pgp4_6Gbps:
+    ImageDir: targets/AtlasAtcaLinkAgg/AtlasAtcaLinkAggRd53Rtm_Pgp4_6Gbps/images
+    Extensions:
+      - bit
+      - mcs
   DpmIbertTester_1p50Gbps:
     ImageDir: targets/RceDpm/DpmIbertTester_1p50Gbps/images
     Extensions:
@@ -35,8 +40,8 @@ Targets:
     ImageDir: targets/RceDpm/DpmRudpNode/images
     Extensions:
       - bit
-  DpmPgp3_6Gbps:
-    ImageDir: targets/RceDpm/DpmPgp3_6Gbps/images
+  DpmPgp4_6Gbps:
+    ImageDir: targets/RceDpm/DpmPgp4_6Gbps/images
     Extensions:
       - bit
   AtlasRd53FmcXilinxKcu105_EmuLpGbt:
@@ -61,10 +66,11 @@ Releases:
     Primary: True
     Targets:
       - AtlasAtcaLinkAggRd53Rtm_EmuLpGbt
+      - AtlasAtcaLinkAggRd53Rtm_Pgp4_6Gbps
       - DpmIbertTester_1p50Gbps
       - DpmIbertTester_6p25Gbps
       # - DpmRudpNode
-      - DpmPgp3_6Gbps
+      - DpmPgp4_6Gbps
       - AtlasRd53FmcXilinxKcu105_EmuLpGbt
       - AtlasRd53FmcXilinxZcu102_EmuLpGbt
       - AtlasRd53FmcXilinxZcu102_HybridLpGbt

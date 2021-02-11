@@ -23,7 +23,7 @@ use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
 use surf.I2cPkg.all;
-use surf.Pgp3Pkg.all;
+use surf.Pgp4Pkg.all;
 
 library atlas_rd53_fw_lib;
 
@@ -461,7 +461,7 @@ begin
             TPD_G         => TPD_G,
             SIMULATION_G  => SIMULATION_G,
             EN_RX_G       => ite((i < 24), true, false),  -- Only implement 24 RX core to fit into the FPGA
-            AXIS_CONFIG_G => PGP3_AXIS_CONFIG_C,
+            AXIS_CONFIG_G => PGP4_AXIS_CONFIG_C,
             VALID_THOLD_G => VALID_THOLD_C,
             XIL_DEVICE_G  => XIL_DEVICE_C)
          port map (
@@ -506,7 +506,7 @@ begin
       end if;
    end process;
 
-   U_Pgp3PhyGthQuad : entity work.Pgp3PhyGthQuad
+   U_Pgp4PhyGthQuad : entity work.Pgp4PhyGthQuad
       generic map (
          TPD_G            => TPD_G,
          SIMULATION_G     => SIMULATION_G,
