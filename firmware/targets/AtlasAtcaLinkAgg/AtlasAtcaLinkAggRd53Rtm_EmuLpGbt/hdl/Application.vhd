@@ -173,7 +173,7 @@ architecture mapping of Application is
 
    constant NUM_AXIL_MASTERS_C : positive := 11;
 
-   constant I2C_INDEX_C          : natural := 0;  -- [0:1]
+   constant I2C_INDEX_C          : natural := 0;  -- [0:3]
    constant RX_INDEX_C           : natural := 4;  -- [4:7]
    constant LP_GBT_INDEX_C       : natural := 8;
    constant RX_PHY_REMAP_INDEX_C : natural := 9;

@@ -18,6 +18,7 @@ import pyrogue.pydm
 import rogue
 
 import AtlasAtcaLinkAggRd53Rtm_EmuLpGbt
+import AtlasAtcaLinkAggRd53Rtm_Pgp4_6Gbps
 import AtlasRd53FmcXilinxDevBoard_EmuLpGbt
 
 #################################################################
@@ -41,7 +42,7 @@ parser.add_argument(
     type     = str,
     required = False,
     default  = 'LinkAgg',
-    help     = "LinkAgg or Kcu105 or Zcu102",
+    help     = "LinkAggLpGBt or LinkAggPgp or Kcu105 or Zcu102",
 )
 
 parser.add_argument(
@@ -74,8 +75,11 @@ args = parser.parse_args()
 #################################################################
 
 # Select the hardware type
-if args.remoteDevice == 'LinkAgg':
+if args.remoteDevice == 'LinkAggLpGBt':
     myRoot = AtlasAtcaLinkAggRd53Rtm_EmuLpGbt.RudpRoot
+
+elif args.remoteDevice == 'LinkAggPgp':
+    myRoot = AtlasAtcaLinkAggRd53Rtm_Pgp4_6Gbps.RudpRoot
 
 elif args.remoteDevice == 'Kcu105':
     myRoot = AtlasRd53FmcXilinxDevBoard_EmuLpGbt.RudpRoot
