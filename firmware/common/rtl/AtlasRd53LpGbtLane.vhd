@@ -135,9 +135,10 @@ architecture rtl of AtlasRd53LpGbtLane is
    signal rawHeader        : Slv2Array(NUM_ELINK_C-1 downto 0);
    signal rawData          : Slv64Array(NUM_ELINK_C-1 downto 0);
 
-   signal valid  : Slv4Array(NUM_ELINK_C-1 downto 0) := (others => x"0");
-   signal header : Slv2Array(NUM_ELINK_C-1 downto 0);
-   signal data   : Slv64Array(NUM_ELINK_C-1 downto 0);
+   signal valid        : Slv4Array(NUM_ELINK_C-1 downto 0) := (others => x"0");
+   signal header       : Slv2Array(NUM_ELINK_C-1 downto 0);
+   signal data         : Slv64Array(NUM_ELINK_C-1 downto 0);
+   signal enServiceData: slv(NUM_ELINK_C-1 downto 0);
 
    signal batchSize    : Slv16Array(NUM_ELINK_C-1 downto 0);
    signal timerConfig  : Slv16Array(NUM_ELINK_C-1 downto 0);
@@ -254,6 +255,7 @@ begin
             dlyCmd          => open,
             rxPhyXbar       => open,
             debugStream     => open,
+            enServiceData   => enServiceData(i),
             enUsrDlyCfg     => open,
             usrDlyCfg       => open,
             eyescanCfg      => open,
@@ -511,6 +513,8 @@ begin
          generic map (
             TPD_G => TPD_G)
          port map (
+            -- Service Data filter
+            enServiceData      => enServiceData(i),
             -- Timing Interface
             clk160MHz          => clk160MHz,
             rst160MHz          => rst160MHz,
