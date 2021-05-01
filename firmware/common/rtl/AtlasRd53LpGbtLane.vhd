@@ -148,6 +148,14 @@ architecture rtl of AtlasRd53LpGbtLane is
    signal singleHitDet : slv(NUM_ELINK_C-1 downto 0);
    signal doubleHitDet : slv(NUM_ELINK_C-1 downto 0);
    signal cmdBusy      : slv(NUM_ELINK_C-1 downto 0);
+   signal invCmd       : slv(NUM_ELINK_C-1 downto 0);
+   signal cmdMode      : slv2Array(NUM_ELINK_C-1 downto 0);
+   signal NOP_C        : slv16Array(NUM_ELINK_C-1 downto 0);
+   signal SYNC_C       : slv16Array(NUM_ELINK_C-1 downto 0);
+   signal SYNC_freq    : slv16Array(NUM_ELINK_C-1 downto 0);
+   signal GPulse_C     : slv16Array(NUM_ELINK_C-1 downto 0);
+   signal GPulse_freq  : slv16Array(NUM_ELINK_C-1 downto 0);
+
    signal linkUp       : Slv4Array(NUM_ELINK_C-1 downto 0);
    signal hdrErrDet    : Slv4Array(NUM_ELINK_C-1 downto 0);
 
@@ -235,7 +243,14 @@ begin
             enable          => open,
             selectRate      => open,
             invData         => open,
-            invCmd          => open,
+            invCmd          => invCmd(i),
+            cmdMode         => cmdMode(i),
+            -- CMD value
+            NOP_C           => NOP_C(i),
+            SYNC_C          => SYNC_C(i),
+            SYNC_freq       => SYNC_freq(i),
+            GPulse_C        => GPulse_C(i),
+            GPulse_freq     => GPulse_freq(i),
             dlyCmd          => open,
             rxPhyXbar       => open,
             debugStream     => open,
@@ -305,6 +320,14 @@ begin
             clk160MHz       => clk160MHz,
             rst160MHz       => rst160MHz,
             -- Command Serial Interface (clk160MHz domain)
+            invCmd          => invCmd(i),
+            cmdMode         => cmdMode(i),
+            -- CMD value
+            NOP_C           => NOP_C(i),
+            SYNC_C          => SYNC_C(i),
+            SYNC_freq       => SYNC_freq(i),
+            GPulse_C        => GPulse_C(i),
+            GPulse_freq     => GPulse_freq(i),
             cmdBusy         => cmdBusy(i),
             cmdOut          => cmd(i));
 
